@@ -1,111 +1,264 @@
+/* Estilos globales - Tienda Sonido Vivo */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --fuente-principal: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --color-primario: #7B4B3A;
+  --color-secundario: #4B2E2B;
+  --color-texto: #351b16;
+  --color-acento: #b96622;
+  --color-claro: #dac6b3;
+  --color-fondo: #ece6df;
+  --color-detalle: #864a25;
+  --color-blanco: #ffffff;
+  --sombra-card: 0 8px 20px rgba(53, 27, 22, 0.08);
+  --sombra-card-hover: 0 12px 28px rgba(53, 27, 22, 0.14);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+* {
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
   margin: 0;
+  padding: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+body {
+  font-family: var(--fuente-principal);
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+/* Encabezado y Navbar con gradiente corporativo */
+.header-sonido-vivo {
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%) !important;
+  border-bottom: 2px solid var(--color-secundario);
+}
+
+/* Hero Section */
+.hero-sonido-vivo {
+  background: linear-gradient(rgba(53, 27, 22, 0.85), rgba(75, 46, 43, 0.9)), url('/assets/img/AM001.jpg') center/cover no-repeat;
+  color: #ffffff;
+  border-bottom: 3px solid var(--color-acento);
+}
+
+/* Tarjetas de Producto */
+.card-producto-sv {
+  background: var(--color-blanco);
+  border: 1px solid rgba(75, 46, 43, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--sombra-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-producto-sv:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sombra-card-hover);
+}
+
+.card-producto-sv figure {
+  width: 100%;
+  height: 190px;
+  background: #fbf9f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  margin: 0;
+  border-bottom: 1px solid rgba(218, 198, 179, 0.6);
+}
+
+.card-producto-sv figure img {
+  max-height: 155px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* Tarjetas Multimedia (Audio y Video) */
+.media-card-sv {
+  background: var(--color-blanco);
+  border: 1px solid rgba(75, 46, 43, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--sombra-card);
+  padding: 1.25rem;
+}
+
+.media-card-sv audio,
+.media-card-sv video {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.media-card-sv figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-secundario);
+}
+
+/* Botones personalizados con la paleta oficial */
+.btn-sv-primary {
+  background-color: var(--color-acento);
+  border-color: var(--color-acento);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-sv-primary:hover,
+.btn-sv-primary:focus {
+  background-color: var(--color-detalle);
+  border-color: var(--color-detalle);
+  color: #ffffff;
+}
+
+.btn-sv-secondary {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-sv-secondary:hover,
+.btn-sv-secondary:focus {
+  background-color: var(--color-secundario);
+  border-color: var(--color-secundario);
+  color: #ffffff;
+}
+
+/* Pie de pagina */
+.footer-sonido-vivo {
+  background-color: var(--color-secundario);
+  color: var(--color-claro);
+  border-top: 3px solid var(--color-acento);
+}
+
+
+/* Botones de navegacion en header con borde */
+.header-sonido-vivo .nav-btn-link {
+  display: inline-block;
+  padding: 0.4rem 0.9rem !important;
+  border-radius: 8px;
+  background-color: rgba(236, 230, 223, 0.15);
+  border: 1px solid rgba(236, 230, 223, 0.45) !important;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+}
+
+.header-sonido-vivo .nav-btn-link:hover,
+.header-sonido-vivo .nav-btn-link:focus-visible,
+.header-sonido-vivo .nav-btn-link.active {
+  background-color: var(--color-claro);
+  color: var(--color-texto) !important;
+  border-color: var(--color-claro) !important;
+}
+
+
+/* Botones de Selector de Rol con el mismo estilo y borde */
+.btn-rol-sv {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem !important;
+  border-radius: 8px !important;
+  background-color: rgba(236, 230, 223, 0.15) !important;
+  border: 1px solid rgba(236, 230, 223, 0.45) !important;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.btn-rol-sv:hover,
+.btn-rol-sv:focus-visible {
+  background-color: rgba(236, 230, 223, 0.3) !important;
+  color: #ffffff !important;
+  border-color: rgba(236, 230, 223, 0.7) !important;
+}
+
+.btn-rol-sv.active {
+  background-color: var(--color-claro) !important;
+  color: var(--color-texto) !important;
+  border-color: var(--color-claro) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(53, 27, 22, 0.2);
+}
+
+
+/* Optimizacion Mobile para Menu y Botones de Navegacion */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background: rgba(53, 27, 22, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(236, 230, 223, 0.25);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-sonido-vivo .nav-btn-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.6rem 1rem !important;
+    margin-bottom: 0.35rem;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .contenedor-roles-mobile {
+    background: rgba(236, 230, 223, 0.08);
+    border: 1px solid rgba(236, 230, 223, 0.15);
+    border-radius: 10px;
+    padding: 0.75rem;
+    width: 100%;
+  }
+
+  .grupo-roles-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+    width: 100%;
+  }
+
+  .btn-rol-sv {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.55rem 0.25rem !important;
+    font-size: 0.82rem !important;
+    min-height: 48px;
+    text-align: center;
+  }
+
+  .btn-rol-sv i {
+    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .btn-carrito-mobile {
+    width: 100%;
+    padding: 0.65rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 600;
+  }
 }

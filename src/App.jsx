@@ -1,121 +1,91 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import Navbar from './components/Navbar'
+import VistaCliente from './components/VistaCliente'
+import Footer from './components/Footer'
+import { productosIniciales } from './data/productos'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
+  const [rolActual, setRolActual] = useState('cliente')
+
+  // Estado para el inventario de productos
+  const [productos, setProductos] = useState(productosIniciales)
+
+  // Estado para el carrito de compras
+  const [carrito, setCarrito] = useState([])
+
+  // Agregar producto al carrito
+  const handleAgregarAlCarrito = (producto) => {
+    setCarrito(prev => [...prev, producto])
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      {/* Barra de navegacion con selector de rol y badge de carrito */}
+      <Navbar
+        rolActual={rolActual}
+        setRolActual={setRolActual}
+        cantidadCarrito={carrito.length}
+      />
 
-      <div className="ticks"></div>
+      {/* Contenido principal con renderizado condicional segun el rol */}
+      <main className="flex-grow-1">
+        {/* VISTA 1: CLIENTE (Gonzalo - Issue #7) */}
+        {rolActual === 'cliente' && (
+          <VistaCliente
+            productos={productos}
+            onAgregarAlCarrito={handleAgregarAlCarrito}
+          />
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* VISTA 2: TRABAJADOR (Preparado para Itsa - Issue #8) */}
+        {rolActual === 'trabajador' && (
+          <div className="container py-5">
+            <div className="p-4 bg-white rounded-3 shadow-sm border">
+              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 className="fw-bold text-dark mb-0">
+                  <i className="bi bi-briefcase text-info me-2"></i>
+                  Panel de Operacion - Trabajadores de Tienda
+                </h2>
+                <span className="badge bg-info text-dark">Rol: Personal de Bodega y Ventas</span>
+              </div>
+              <p className="text-muted">
+                Modulo de recepcion de pedidos y control rapido de stock.
+              </p>
+              <div className="alert alert-info py-3 mb-0">
+                <i className="bi bi-info-circle me-2"></i>
+                Esta seccion corresponde a la <strong>Issue #8 (Asignada a Itsa)</strong> para implementar la tabla de pedidos y cambio de estados con useState.
+              </div>
+            </div>
+          </div>
+        )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
+        {rolActual === 'jefe' && (
+          <div className="container py-5">
+            <div className="p-4 bg-white rounded-3 shadow-sm border">
+              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 className="fw-bold text-dark mb-0">
+                  <i className="bi bi-shield-lock text-danger me-2"></i>
+                  Panel de Administracion - Jefe de Tienda
+                </h2>
+                <span className="badge bg-danger">Rol: Administrador General</span>
+              </div>
+              <p className="text-muted">
+                Modulo de metricas de rendimiento, total de ventas y gestion del catalogo.
+              </p>
+              <div className="alert alert-warning py-3 mb-0">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                Esta seccion corresponde a la <strong>Issue #9 (Asignada a Damian)</strong> para implementar las tarjetas de KPIs y el formulario de gestion de productos.
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Pie de pagina institucional */}
+      <Footer />
+    </div>
   )
 }
 
