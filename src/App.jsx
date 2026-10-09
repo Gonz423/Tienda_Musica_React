@@ -16,7 +16,7 @@ function App() {
 
   // Agregar producto al carrito
   const handleAgregarAlCarrito = (producto) => {
-    setCarrito(prev => [...prev, producto])
+    setCarrito((prev) => [...prev, producto])
   }
 
   return (
@@ -49,13 +49,9 @@ function App() {
                 </h2>
                 <span className="badge bg-info text-dark">Rol: Personal de Bodega y Ventas</span>
               </div>
-              <p className="text-muted">
+              <p className="text-muted mb-0">
                 Modulo de recepcion de pedidos y control rapido de stock.
               </p>
-              <div className="alert alert-info py-3 mb-0">
-                <i className="bi bi-info-circle me-2"></i>
-                Esta seccion corresponde a la <strong>Issue #8 (Asignada a Itsa)</strong> para implementar la tabla de pedidos y cambio de estados con useState.
-              </div>
             </div>
           </div>
         )}
@@ -71,13 +67,9 @@ function App() {
                 </h2>
                 <span className="badge bg-danger">Rol: Administrador General</span>
               </div>
-              <p className="text-muted">
+              <p className="text-muted mb-0">
                 Modulo de metricas de rendimiento, total de ventas y gestion del catalogo.
               </p>
-              <div className="alert alert-warning py-3 mb-0">
-                <i className="bi bi-exclamation-triangle me-2"></i>
-                Esta seccion corresponde a la <strong>Issue #9 (Asignada a Damian)</strong> para implementar las tarjetas de KPIs y el formulario de gestion de productos.
-              </div>
             </div>
           </div>
         )}
