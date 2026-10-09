@@ -144,10 +144,13 @@ body {
 }
 
 
-/* Botones de navegacion en header con borde */
+/* Botones de navegacion en header con altura uniforme y borde */
 .header-sonido-vivo .nav-btn-link {
-  display: inline-block;
-  padding: 0.4rem 0.9rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px;
+  padding: 0 1rem !important;
   border-radius: 8px;
   background-color: rgba(236, 230, 223, 0.15);
   border: 1px solid rgba(236, 230, 223, 0.45) !important;
@@ -156,49 +159,31 @@ body {
   font-weight: 600;
   font-size: 0.92rem;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .header-sonido-vivo .nav-btn-link:hover,
-.header-sonido-vivo .nav-btn-link:focus-visible,
+.header-sonido-vivo .nav-btn-link:focus-visible {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+
 .header-sonido-vivo .nav-btn-link.active {
-  background-color: var(--color-claro);
-  color: var(--color-texto) !important;
-  border-color: var(--color-claro) !important;
-}
-
-
-/* Botones de Selector de Rol con el mismo estilo y borde */
-.btn-rol-sv {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.85rem !important;
-  border-radius: 8px !important;
-  background-color: rgba(236, 230, 223, 0.15) !important;
-  border: 1px solid rgba(236, 230, 223, 0.45) !important;
-  color: #ffffff !important;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.btn-rol-sv:hover,
-.btn-rol-sv:focus-visible {
-  background-color: rgba(236, 230, 223, 0.3) !important;
-  color: #ffffff !important;
-  border-color: rgba(236, 230, 223, 0.7) !important;
+  background-color: #ffffff !important;
+  color: #351b16 !important;
+  border-color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
 .btn-rol-sv.active {
-  background-color: var(--color-claro) !important;
-  color: var(--color-texto) !important;
-  border-color: var(--color-claro) !important;
+  background-color: #ffffff !important;
+  color: #351b16 !important;
+  border-color: #ffffff !important;
   font-weight: 700 !important;
-  box-shadow: 0 2px 6px rgba(53, 27, 22, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
-
 
 /* Optimizacion Mobile para Menu y Botones de Navegacion */
 @media (max-width: 991.98px) {
