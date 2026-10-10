@@ -10,7 +10,7 @@ const pedidosIniciales = [
     estado: "Pendiente",
     tipoEntrega: "Retiro local",
     productos: [
-      { id: 1, nombre: "Batería Acústica 5 Piezas", cantidad: 1, stock: 6 }
+      { codigo: "BT001", nombre: "Batería Acústica 5 Piezas", cantidad: 1, stock: 6 }
     ]
   },
   {
@@ -21,52 +21,52 @@ const pedidosIniciales = [
     estado: "En preparación",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { id: 2, nombre: "Micrófono Cardioide SM58", cantidad: 2, stock: 8 }
+      { codigo: "MI003", nombre: "Micrófono Condensador", cantidad: 2, stock: 8 }
     ]
   },
   {
     id: 103,
     cliente: "Mariana Silva",
     fecha: "2026-05-13",
-    total: 950000,
+    total: 549990,
     estado: "En preparación",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { id: 2, nombre: "Batería Yamaha Stage Custom", cantidad: 1, stock: 5 }
+      { codigo: "GE005", nombre: "Guitarra Eléctrica Semi-hollow", cantidad: 1, stock: 5 }
     ]
   },
   {
     id: 104,
     cliente: "Felipe Soto",
     fecha: "2026-05-13",
-    total: 279980,
+    total: 100980,
     estado: "Pendiente",
     tipoEntrega: "Retiro local",
     productos: [
-      { id: 3, nombre: "Focusrite Scarlett Solo", cantidad: 1, stock: 1 },
-      { id: 4, nombre: "Arturia MiniLab MKII", cantidad: 1, stock: 3 }
+      { codigo: "GA003", nombre: "Guitarra Acústica Clásica 4/4", cantidad: 1, stock: 1 },
+      { codigo: "AC002", nombre: "Cuerdas Guitarra Acústica 12-53", cantidad: 1, stock: 3 }
     ]
   },
   {
     id: 105,
     cliente: "Andrea Rojas",
     fecha: "2026-05-14",
-    total: 99990,
+    total: 149990,
     estado: "Despachado",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { id: 5, nombre: "Amplificador Guitarra 15W", cantidad: 1, stock: 8 }
+      { codigo: "ES001", nombre: "Interfaz de Audio 2x2 USB", cantidad: 1, stock: 8 }
     ]
   },
     {
     id: 106,
     cliente: "Diego Fernández",
     fecha: "2026-05-14",
-    total: 299990,
+    total: 99990,
     estado: "Despachado",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { id: 5, nombre: "Bajo Eléctrico 4 Cuerdas", cantidad: 1, stock: 8 }
+      { codigo: "PE006", nombre: "Pedal Overdrive", cantidad: 1, stock: 8 }
     ]
   }
 ];
@@ -157,7 +157,7 @@ function VistaEmpleado() {
                       <li key={prod.id} className="py-1">
                         <span>
                           {prod.cantidad}x{" "}
-                               <Link to={`/producto/${prod.id}`}> 
+                               <Link to={`/producto/${prod.codigo}`}> 
                                   {prod.nombre}
                                 </Link>
                               </span>{" "}
