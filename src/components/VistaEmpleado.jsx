@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const pedidosIniciales = [
   {
@@ -7,6 +8,7 @@ const pedidosIniciales = [
     fecha: "2023-06-01",
     total: 599990,
     estado: "Pendiente",
+    tipoEntrega: "Retiro local",
     productos: [
       { id: 1, nombre: "Batería Acústica 5 Piezas", cantidad: 1, stock: 6 }
     ]
@@ -17,6 +19,7 @@ const pedidosIniciales = [
     fecha: "2023-06-02",
     total: 299980,
     estado: "En preparación",
+    tipoEntrega: "Envío a domicilio",
     productos: [
       { id: 2, nombre: "Micrófono Cardioide SM58", cantidad: 2, stock: 8 }
     ]
@@ -27,6 +30,7 @@ const pedidosIniciales = [
     fecha: "2026-05-13",
     total: 950000,
     estado: "En preparación",
+    tipoEntrega: "Envío a domicilio",
     productos: [
       { id: 2, nombre: "Batería Yamaha Stage Custom", cantidad: 1, stock: 5 }
     ]
@@ -37,6 +41,7 @@ const pedidosIniciales = [
     fecha: "2026-05-13",
     total: 279980,
     estado: "Pendiente",
+    tipoEntrega: "Retiro local",
     productos: [
       { id: 3, nombre: "Focusrite Scarlett Solo", cantidad: 1, stock: 1 },
       { id: 4, nombre: "Arturia MiniLab MKII", cantidad: 1, stock: 3 }
@@ -48,6 +53,7 @@ const pedidosIniciales = [
     fecha: "2026-05-14",
     total: 99990,
     estado: "Despachado",
+    tipoEntrega: "Envío a domicilio",
     productos: [
       { id: 5, nombre: "Amplificador Guitarra 15W", cantidad: 1, stock: 8 }
     ]
@@ -58,13 +64,14 @@ const pedidosIniciales = [
     fecha: "2026-05-14",
     total: 299990,
     estado: "Despachado",
+    tipoEntrega: "Envío a domicilio",
     productos: [
       { id: 5, nombre: "Bajo Eléctrico 4 Cuerdas", cantidad: 1, stock: 8 }
     ]
   }
 ];
 
-function WorkerView() {
+function VistaEmpleado() {
  
   const [pedidos, setPedidos] = useState(pedidosIniciales);
   const avanzarEstado = (id) => {
@@ -118,8 +125,8 @@ function WorkerView() {
               <th scope="col"># ID pedido</th>
               <th scope="col">Fecha</th>
               <th scope="col">Cliente</th>
-              <th scope="col">Artículos</th>
               <th scope="col">Tipo de entrega</th>
+              <th scope="col">Artículos</th>
               <th scope="col">Total venta</th>
               <th scope="col">Estado de venta</th>
               <th scope="col" className="text-center">Acción Operativa</th>
@@ -127,17 +134,33 @@ function WorkerView() {
           </thead>
           <tbody>
             {pedidos.map((pedido) => (
+              
               <tr key={pedido.id}>
                 <td className="fw-bold">#{pedido.id}</td>
+
                 <td>{pedido.fecha}</td>
                 <td>{pedido.cliente}</td>
+                <td>
+                  <span
+                    className={`badge ${
+                      pedido.tipoEntrega === "Envío a domicilio"
+                        ? "bg-info text-dark"
+                        : "bg-secondary"
+                    }`}
+                  >
+                    {pedido.tipoEntrega}
+                  </span>
+                </td>
                 <td>
                   <ul className="list-unstyled mb-0">
                     {pedido.productos.map((prod) => (
                       <li key={prod.id} className="py-1">
                         <span>
-                          {prod.cantidad}x {prod.nombre}
-                        </span>{" "}
+                          {prod.cantidad}x{" "}
+                               <Link to={`/producto/${prod.id}`}> 
+                                  {prod.nombre}
+                                </Link>
+                              </span>{" "}
                         {prod.stock < 3 && (
                           <span className="badge bg-danger ms-1">
                             Stock bajo: {prod.stock} disp.
@@ -187,4 +210,4 @@ function WorkerView() {
   );
 }
 
-export default WorkerView;
+export default VistaEmpleado;
