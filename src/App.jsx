@@ -3,18 +3,24 @@ import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
-import WorkerView from "./components/WorkerView";
-
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
+  const [rolActual, setRolActual] = useState('cliente')
+
+  // Estado para el inventario de productos
+  const [productos, setProductos] = useState(productosIniciales)
+
+  // Estado para el carrito de compras
+  const [carrito, setCarrito] = useState([])
+
+  // Agregar producto al carrito
+  const handleAgregarAlCarrito = (producto) => {
+    setCarrito((prev) => [...prev, producto])
+  }
 
   return (
     <>
-      <section className="w-100">
-        <WorkerView />
-      </section>
-
       <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
@@ -119,9 +125,9 @@ function App() {
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      {/* Pie de pagina institucional */}
+      <Footer />
+    </div>
   )
 }
 
