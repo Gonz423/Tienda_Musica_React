@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
+import VistaJefe from './components/VistaJefe'
 import Footer from './components/Footer'
 import { productosIniciales } from './data/productos'
+import { pedidosIniciales } from './data/pedidos'
 
 function App() {
   // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
@@ -10,13 +12,41 @@ function App() {
 
   // Estado para el inventario de productos
   const [productos, setProductos] = useState(productosIniciales)
-
-  // Estado para el carrito de compras
+  const [pedidos, setPedidos] = useState(pedidosIniciales)
+  const [seccionJefe, setSeccionJefe] = useState('metricas')
   const [carrito, setCarrito] = useState([])
 
   // Agregar producto al carrito
   const handleAgregarAlCarrito = (producto) => {
     setCarrito((prev) => [...prev, producto])
+  }
+
+  const handleActualizarEstadoPedido = (id, nuevoEstado) => {
+    setPedidos((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p))
+    )
+  }
+
+  const handleAgregarProducto = (nuevoProducto) => {
+    setProductos((prev) => [nuevoProducto, ...prev])
+  }
+
+  const handleEliminarProducto = (codigo) => {
+    setProductos((prev) => prev.filter((p) => p.codigo !== codigo))
+  }
+
+  const handleActualizarStock = (codigo, nuevoStock) => {
+    setProductos((prev) =>
+      prev.map((p) => (p.codigo === codigo ? { ...p, stock: Number(nuevoStock) } : p))
+    )
+  }
+
+  const handleActualizarProducto = (productoActualizado) => {
+    setProductos((prev) =>
+      prev.map((p) =>
+        p.codigo === productoActualizado.codigo ? { ...p, ...productoActualizado } : p
+      )
+    )
   }
 
   return (
@@ -26,6 +56,8 @@ function App() {
         rolActual={rolActual}
         setRolActual={setRolActual}
         cantidadCarrito={carrito.length}
+        seccionJefe={seccionJefe}
+        setSeccionJefe={setSeccionJefe}
       />
 
       {/* Contenido principal con renderizado condicional segun el rol */}
@@ -58,20 +90,17 @@ function App() {
 
         {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
         {rolActual === 'jefe' && (
-          <div className="container py-5">
-            <div className="p-4 bg-white rounded-3 shadow-sm border">
-              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 className="fw-bold text-dark mb-0">
-                  <i className="bi bi-shield-lock text-danger me-2"></i>
-                  Panel de Administracion - Jefe de Tienda
-                </h2>
-                <span className="badge bg-danger">Rol: Administrador General</span>
-              </div>
-              <p className="text-muted mb-0">
-                Modulo de metricas de rendimiento, total de ventas y gestion del catalogo.
-              </p>
-            </div>
-          </div>
+          <VistaJefe
+            productos={productos}
+            pedidos={pedidos}
+            onAgregarProducto={handleAgregarProducto}
+            onActualizarProducto={handleActualizarProducto}
+            onEliminarProducto={handleEliminarProducto}
+            onActualizarStock={handleActualizarStock}
+            onActualizarEstadoPedido={handleActualizarEstadoPedido}
+            seccionActiva={seccionJefe}
+            onCambiarSeccion={setSeccionJefe}
+          />
         )}
       </main>
 

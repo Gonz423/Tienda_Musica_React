@@ -1,10 +1,19 @@
 import { useState } from 'react'
 
-function Navbar({ rolActual = 'cliente', setRolActual, cantidadCarrito = 0 }) {
+function Navbar({
+  rolActual = 'cliente',
+  setRolActual,
+  cantidadCarrito = 0,
+  seccionJefe: seccionJefeProp,
+  setSeccionJefe: setSeccionJefeProp
+}) {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true)
   const [seccionCliente, setSeccionCliente] = useState('inicio')
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
-  const [seccionJefe, setSeccionJefe] = useState('metricas')
+  const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
+
+  const seccionJefe = seccionJefeProp !== undefined ? seccionJefeProp : seccionJefeLocal
+  const setSeccionJefe = setSeccionJefeProp || setSeccionJefeLocal
 
   const handleNavCollapse = () => {
     setIsNavCollapsed(!isNavCollapsed)
