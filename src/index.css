@@ -177,12 +177,99 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
-.btn-rol-sv.active {
-  background-color: #ffffff !important;
-  color: #351b16 !important;
+/* Botones de Selector de Rol - Letras y bordes blancos de alto contraste */
+.btn-rol-sv {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 8px !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-rol-sv span,
+.btn-rol-sv i {
+  color: #ffffff !important;
+}
+
+.btn-rol-sv:hover,
+.btn-rol-sv:focus-visible {
+  background-color: rgba(255, 255, 255, 0.28) !important;
   border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-rol-sv.active {
+  background-color: var(--color-acento, #b96622) !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
   font-weight: 700 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-rol-sv.active span,
+.btn-rol-sv.active i {
+  color: #ffffff !important;
+}
+
+/* Optimizaciones Responsivas del Catalogo de Productos */
+.categorias-scroll-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.categorias-scroll-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categorias-scroll-bar::-webkit-scrollbar-thumb {
+  background: var(--color-claro);
+  border-radius: 4px;
+}
+
+.btn-categoria-chip {
+  white-space: nowrap;
+  border-radius: 20px !important;
+  padding: 0.35rem 0.85rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.card-producto-sv .producto-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5em;
+}
+
+.card-producto-sv .producto-desc {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.7em;
 }
 
 /* Optimizacion Mobile para Menu y Botones de Navegacion */
@@ -233,11 +320,21 @@ body {
     font-size: 0.82rem !important;
     min-height: 48px;
     text-align: center;
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
   }
 
+  .btn-rol-sv span,
   .btn-rol-sv i {
-    font-size: 1.1rem;
-    margin-bottom: 0.15rem;
+    color: #ffffff !important;
+  }
+
+  .btn-rol-sv.active {
+    background-color: var(--color-acento, #b96622) !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
   }
 
   .btn-carrito-mobile {
@@ -247,3 +344,97 @@ body {
     font-weight: 600;
   }
 }
+
+@media (max-width: 576px) {
+  .vista-cliente .hero-sonido-vivo {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .vista-cliente .hero-sonido-vivo h1 {
+    font-size: 1.6rem !important;
+    line-height: 1.25;
+  }
+
+  .vista-cliente .hero-sonido-vivo p {
+    font-size: 0.88rem !important;
+  }
+
+  .card-producto-sv {
+    border-radius: 14px;
+  }
+
+  .card-producto-sv figure {
+    height: 180px;
+    padding: 0.75rem;
+  }
+
+  .card-producto-sv figure img {
+    max-height: 145px;
+  }
+
+  .card-producto-sv .card-body {
+    padding: 0.9rem !important;
+  }
+}
+
+
+/* ========================================================
+   ESTILOS INSTITUCIONALES DEL FOOTER - SONIDO VIVO
+   ======================================================== */
+.footer-sonido-vivo {
+  background: linear-gradient(180deg, #2b1814 0%, #160c0a 100%);
+  border-top: 3px solid var(--color-acento);
+  color: #ece6df;
+}
+
+.footer-link {
+  color: rgba(236, 230, 223, 0.7);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: #ffffff !important;
+  transform: translateX(4px);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.btn-footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(236, 230, 223, 0.12);
+  border: 1px solid rgba(236, 230, 223, 0.25);
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.btn-footer-social:hover,
+.btn-footer-social:focus-visible {
+  background-color: var(--color-acento);
+  border-color: var(--color-acento);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(185, 102, 34, 0.4);
+}
+
+.mapa-contenedor {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(236, 230, 223, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.25s ease;
+}
+
+.mapa-contenedor:hover {
+  border-color: var(--color-acento);
+}
+

@@ -28,3 +28,7 @@ coverage
 guias/
 *.docx
 *.pdf
+
+# Testing y cobertura
+coverage/
+

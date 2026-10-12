@@ -138,33 +138,35 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
               Mostrando <strong>{productosFiltrados.length}</strong> de <strong>{productos.length}</strong> productos
             </div>
 
-            {/* Botones de Categorias */}
+            {/* Botones de Categorias con scroll horizontal en mobile */}
             <div className="col-12 pt-2 border-top">
-              <div className="d-flex gap-2 flex-wrap align-items-center">
-                <span className="small fw-bold me-1" style={{ color: 'var(--color-secundario)' }}>
-                  Categorias:
+              <div className="d-flex align-items-center gap-2">
+                <span className="small fw-bold me-1 text-nowrap d-none d-sm-inline" style={{ color: 'var(--color-secundario)' }}>
+                  Categorías:
                 </span>
-                {categorias.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`btn btn-sm text-capitalize ${
-                      categoriaFiltro.toLowerCase() === cat.toLowerCase()
-                        ? 'btn-sv-primary shadow-sm'
-                        : 'btn-outline-secondary'
-                    }`}
-                    onClick={() => setCategoriaFiltro(cat)}
-                  >
-                    {cat}
-                  </button>
-                ))}
+                <div className="categorias-scroll-bar d-flex gap-2 align-items-center flex-nowrap flex-sm-wrap w-100">
+                  {categorias.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`btn btn-sm btn-categoria-chip text-capitalize ${
+                        categoriaFiltro.toLowerCase() === cat.toLowerCase()
+                          ? 'btn-sv-primary shadow-sm active'
+                          : 'btn-outline-secondary'
+                      }`}
+                      onClick={() => setCategoriaFiltro(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Grilla Responsiva de Productos */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 g-md-4">
           {productosFiltrados.map((producto) => (
             <div key={producto.codigo || producto.id} className="col">
               <article className="card-producto-sv text-center">
@@ -191,17 +193,16 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
                 <div className="card-body d-flex flex-column justify-content-between p-3 text-center">
                   <div>
                     <h5
-                      className="card-title fw-bold mb-1 fs-6 text-center"
+                      className="card-title fw-bold mb-1 fs-6 text-center producto-titulo"
                       style={{ color: 'var(--color-texto)' }}
                     >
                       {producto.nombre}
                     </h5>
-                    <p className="text-muted small mb-2 text-center">
+                    <p className="text-muted small mb-2 text-center text-truncate">
                       <strong>{producto.marca}</strong> | Modelo: {producto.modelo}
                     </p>
                     <p
-                      className="card-text text-muted small mb-3 text-center"
-                      style={{ fontSize: '0.82rem', lineHeight: '1.4' }}
+                      className="card-text text-muted small mb-3 text-center producto-desc"
                     >
                       {producto.descripcion}
                     </p>
