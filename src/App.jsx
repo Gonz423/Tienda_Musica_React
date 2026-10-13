@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import { Routes, Route } from "react-router-dom";
 import VistaEmpleado from "./components/VistaEmpleado";
@@ -12,6 +13,112 @@ function App() {
           <Route path="/" element={<VistaEmpleado />} />
           <Route path="/producto/:id" element={<DetalleProducto />} />
         </Routes>
+=======
+import { useState } from 'react'
+import Navbar from './components/Navbar'
+import VistaCliente from './components/VistaCliente'
+import VistaJefe from './components/VistaJefe'
+import Footer from './components/Footer'
+import { productosIniciales } from './data/productos'
+import { pedidosIniciales } from './data/pedidos'
+
+function App() {
+  // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
+  const [rolActual, setRolActual] = useState('cliente')
+
+  // Estado para el inventario de productos
+  const [productos, setProductos] = useState(productosIniciales)
+  const [pedidos, setPedidos] = useState(pedidosIniciales)
+  const [seccionJefe, setSeccionJefe] = useState('metricas')
+  const [carrito, setCarrito] = useState([])
+
+  // Agregar producto al carrito
+  const handleAgregarAlCarrito = (producto) => {
+    setCarrito((prev) => [...prev, producto])
+  }
+
+  const handleActualizarEstadoPedido = (id, nuevoEstado) => {
+    setPedidos((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p))
+    )
+  }
+
+  const handleAgregarProducto = (nuevoProducto) => {
+    setProductos((prev) => [nuevoProducto, ...prev])
+  }
+
+  const handleEliminarProducto = (codigo) => {
+    setProductos((prev) => prev.filter((p) => p.codigo !== codigo))
+  }
+
+  const handleActualizarStock = (codigo, nuevoStock) => {
+    setProductos((prev) =>
+      prev.map((p) => (p.codigo === codigo ? { ...p, stock: Number(nuevoStock) } : p))
+    )
+  }
+
+  const handleActualizarProducto = (productoActualizado) => {
+    setProductos((prev) =>
+      prev.map((p) =>
+        p.codigo === productoActualizado.codigo ? { ...p, ...productoActualizado } : p
+      )
+    )
+  }
+
+  return (
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      {/* Barra de navegacion con selector de rol y badge de carrito */}
+      <Navbar
+        rolActual={rolActual}
+        setRolActual={setRolActual}
+        cantidadCarrito={carrito.length}
+        seccionJefe={seccionJefe}
+        setSeccionJefe={setSeccionJefe}
+      />
+
+      {/* Contenido principal con renderizado condicional segun el rol */}
+      <main className="flex-grow-1">
+        {/* VISTA 1: CLIENTE (Gonzalo - Issue #7) */}
+        {rolActual === 'cliente' && (
+          <VistaCliente
+            productos={productos}
+            onAgregarAlCarrito={handleAgregarAlCarrito}
+          />
+        )}
+
+        {/* VISTA 2: TRABAJADOR (Preparado para Itsa - Issue #8) */}
+        {rolActual === 'trabajador' && (
+          <div className="container py-5">
+            <div className="p-4 bg-white rounded-3 shadow-sm border">
+              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 className="fw-bold text-dark mb-0">
+                  <i className="bi bi-briefcase text-info me-2"></i>
+                  Panel de Operacion - Trabajadores de Tienda
+                </h2>
+                <span className="badge bg-info text-dark">Rol: Personal de Bodega y Ventas</span>
+              </div>
+              <p className="text-muted mb-0">
+                Modulo de recepcion de pedidos y control rapido de stock.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
+        {rolActual === 'jefe' && (
+          <VistaJefe
+            productos={productos}
+            pedidos={pedidos}
+            onAgregarProducto={handleAgregarProducto}
+            onActualizarProducto={handleActualizarProducto}
+            onEliminarProducto={handleEliminarProducto}
+            onActualizarStock={handleActualizarStock}
+            onActualizarEstadoPedido={handleActualizarEstadoPedido}
+            seccionActiva={seccionJefe}
+            onCambiarSeccion={setSeccionJefe}
+          />
+        )}
+>>>>>>> main
       </main>
 
 
