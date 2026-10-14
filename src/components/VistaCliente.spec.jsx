@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act, within } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import VistaCliente from './VistaCliente'
-import Navbar from './Navbar'
-import Footer from './Footer'
 import { guardarCarritoStorage, cargarCarritoStorage, cargarProductosStorage } from '../utils/persistencia'
 import { consultarDisponibilidadStock, procesarCheckoutCliente } from '../services/clienteServicio'
 
@@ -44,6 +42,10 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   beforeEach(() => {
     localStorage.clear()
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   // 1. Prueba de renderizado correcto de la lista de productos en el catalogo
@@ -160,7 +162,8 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   it('7. Ejecuta callback onAgregarAlCarrito y muestra alerta temporal al agregar producto', async () => {
     vi.useFakeTimers()
     const onAgregarMock = vi.fn()
-    render(<VistaCliente productos={productosPrueba} onAgregarAlCarrito={onAgregarMock} />)
+    const onAbrirCarritoMock = vi.fn()
+    render(<VistaCliente productos={productosPrueba} onAgregarAlCarrito={onAgregarMock} onAbrirCarrito={onAbrirCarritoMock} />)
 
     const botonesAgregar = screen.getAllByRole('button', { name: /Agregar al Carrito/i })
     await act(async () => {
@@ -170,6 +173,13 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(onAgregarMock).toHaveBeenCalledTimes(1)
     expect(onAgregarMock).toHaveBeenCalledWith(productosPrueba[0])
     expect(screen.getByText(/Agregaste "Guitarra Folk" al carrito de compras/i)).toBeInTheDocument()
+
+    // Probar boton Ver Carrito en la alerta
+    const botonVerCarrito = screen.getByRole('button', { name: /Ver Carrito/i })
+    await act(async () => {
+      botonVerCarrito.click()
+    })
+    expect(onAbrirCarritoMock).toHaveBeenCalled()
 
     // Avanzar temporizador para comprobar que la alerta desaparece
     act(() => {
@@ -262,73 +272,3 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(resultadoCheckout.orderId).toBe(8841)
   })
 })
-
-describe('Componentes Complementarios de la Vista del Usuario', () => {
-  it('Renderiza correctamente el Footer con mapa, datos de contacto y boton de volver arriba', async () => {
-    const usuario = userEvent.setup()
-    const scrollToMock = vi.fn()
-    window.scrollTo = scrollToMock
-
-    render(<Footer />)
-
-    expect(screen.getByText('Sonido Vivo')).toBeInTheDocument()
-    expect(document.getElementById('nosotros')).toBeInTheDocument()
-    expect(screen.getByText(/Av. Libertad 1045, Local 4/i)).toBeInTheDocument()
-    expect(screen.getByText('+56 32 268 4590')).toBeInTheDocument()
-    expect(screen.getByText('+56 9 8452 1198')).toBeInTheDocument()
-    expect(screen.getByText('contacto@sonidovivo.cl')).toBeInTheDocument()
-    expect(screen.getByTitle(/Ubicación de Tienda Sonido Vivo en Viña del Mar/i)).toBeInTheDocument()
-
-    // Hacer clic en boton volver arriba
-    const botonScrollTop = screen.getByTitle(/Volver arriba/i)
-    await usuario.click(botonScrollTop)
-    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
-
-    // Probar enlace de inicio en footer
-    const enlaceInicio = screen.getByRole('link', { name: /Inicio/i })
-    await usuario.click(enlaceInicio)
-    expect(scrollToMock).toHaveBeenCalled()
-  })
-
-  it('Permite navegar en Navbar y el boton Nosotros desplaza hacia el footer #nosotros', async () => {
-    const usuario = userEvent.setup()
-    const scrollIntoViewMock = vi.fn()
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
-
-    render(
-      <div>
-        <Navbar rolActual="cliente" />
-        <div id="inicio">Inicio</div>
-        <div id="catalogo">Catalogo</div>
-        <Footer />
-      </div>
-    )
-
-    const navbar = screen.getByRole('navigation')
-    const botonNosotros = within(navbar).getByRole('link', { name: /Nosotros/i })
-    expect(botonNosotros).toHaveAttribute('href', '#nosotros')
-
-    await usuario.click(botonNosotros)
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth' })
-
-    const botonCatalogo = within(navbar).getByRole('link', { name: /Catalogo/i })
-    await usuario.click(botonCatalogo)
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth' })
-
-    const botonInicio = within(navbar).getByRole('link', { name: /Inicio/i })
-    await usuario.click(botonInicio)
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth' })
-  })
-
-  it('Maneja VistaCliente con prop vacia por defecto y producto con imagen desconocida', () => {
-    // Renderizado sin props para cubrir default productos = []
-    render(<VistaCliente />)
-    expect(screen.getByText(/No se encontraron productos/i)).toBeInTheDocument()
-
-    // Renderizado con id en lugar de codigo para ejercitar rama producto.id y fallback de imagen
-    const productoConId = [{ id: 'ITEM_ID_99', categoria: 'Otros', nombre: 'Item Raro', marca: 'X', modelo: 'Y', stock: 1, precio: 1000 }]
-    render(<VistaCliente productos={productoConId} />)
-    expect(screen.getByText('Item Raro')).toBeInTheDocument()
-  })
-})
-

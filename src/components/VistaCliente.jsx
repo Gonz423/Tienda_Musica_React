@@ -4,7 +4,7 @@ import { guardarCarritoStorage, cargarCarritoStorage } from '../utils/persistenc
 // Carga dinamica y robusta de imagenes locales desde src/assets/img mediante Vite
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
 
-function VistaCliente({ productos = [], onAgregarAlCarrito }) {
+function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
   const [categoriaFiltro, setCategoriaFiltro] = useState('todas')
   const [busqueda, setBusqueda] = useState('')
   const [orden, setOrden] = useState('destacados')
@@ -79,11 +79,23 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
         {/* Mensaje de alerta reactiva al agregar producto */}
         {mensajeAlerta && (
           <div
-            className="alert alert-success alert-dismissible fade show shadow-sm text-center mb-4 border-0"
+            className="alert alert-success alert-dismissible fade show shadow-sm text-center mb-4 border-0 d-flex align-items-center justify-content-center flex-wrap gap-2"
             role="alert"
           >
-            <i className="bi bi-check-circle-fill me-2"></i>
-            {mensajeAlerta}
+            <div>
+              <i className="bi bi-check-circle-fill me-2"></i>
+              {mensajeAlerta}
+            </div>
+            {onAbrirCarrito && (
+              <button
+                type="button"
+                className="btn btn-sm btn-dark ms-2 py-0 px-2 fw-semibold shadow-sm"
+                style={{ fontSize: '0.8rem', borderRadius: '6px' }}
+                onClick={onAbrirCarrito}
+              >
+                <i className="bi bi-cart3 me-1"></i> Ver Carrito
+              </button>
+            )}
           </div>
         )}
 

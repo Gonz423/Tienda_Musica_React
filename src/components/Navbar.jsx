@@ -4,6 +4,7 @@ function Navbar({
   rolActual = 'cliente',
   setRolActual,
   cantidadCarrito = 0,
+  onAbrirCarrito,
   seccionJefe: seccionJefeProp,
   setSeccionJefe: setSeccionJefeProp
 }) {
@@ -246,6 +247,7 @@ function Navbar({
                 className="btn btn-sv-primary btn-carrito-mobile position-relative d-flex align-items-center justify-content-center gap-2 shadow-sm"
                 style={{ height: '38px' }}
                 aria-label="Ver carrito de compras"
+                onClick={onAbrirCarrito}
               >
                 <i className="bi bi-cart3 fs-6"></i>
                 <span>Carrito</span>

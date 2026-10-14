@@ -450,3 +450,41 @@ body {
   border-color: var(--color-acento);
 }
 
+/* Estilos y animaciones del Carrito de Compras */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.modal-backdrop-custom {
+  animation: fadeInBackdrop 0.25s ease-out;
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.carrito-sidebar {
+  box-shadow: -8px 0 32px rgba(53, 27, 22, 0.25) !important;
+}
+
+.card-carrito-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-color: #e5ded5 !important;
+}
+
+.card-carrito-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(53, 27, 22, 0.08) !important;
+}
+
+
