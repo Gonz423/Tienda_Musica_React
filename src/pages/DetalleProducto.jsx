@@ -1,11 +1,19 @@
 import { useParams, Link } from "react-router-dom";
-import catalogoInstrumentos from "../data/productos";
+import productosIniciales from "../data/productos";
 
-function DetalleProducto() {
+
+const imagenesDisponibles = import.meta.glob("../assets/img/*", {
+  eager: true,
+  as: "url",
+});
+
+function DetalleProducto({ productos = productosIniciales }) {
   const { id } = useParams();
 
-  const producto = catalogoInstrumentos.find(
-    (item) => item.codigo === id || String(item.id) === String(id)
+const producto = productos.find(
+    (p) =>
+      String(p.codigo).toLowerCase() === String(id).toLowerCase() ||
+      String(p.id) === String(id)
   );
 
   if (!producto) {
@@ -13,93 +21,111 @@ function DetalleProducto() {
       <main className="container my-5 text-center">
         <div className="alert alert-danger shadow-sm py-4">
           <h2 className="h4 alert-heading">Producto no encontrado</h2>
-          <p className="mb-3">
+          <p className="mb-0">
             El producto: <strong>#{id}</strong> no existe en el catálogo.
           </p>
-          <Link to="/" className="btn btn-outline-danger">
-            Volver a pedidos
+          <Link to="/" className="btn btn-primary">
+            Volver a la tienda
           </Link>
         </div>
       </main>
     );
   }
 
+const resolverImagen = () => {
+    if (!producto.imagen && !producto.codigo) return "";
+    if (producto.imagen?.startsWith("http") || producto.imagen?.startsWith("data:")) {
+      return producto.imagen;
+    }
+ const nombreArchivo = (producto.imagen || producto.codigo).split("/").pop();
+    const nombreBase = nombreArchivo.split(".")[0];
+    for (const ruta in imagenesDisponibles) {
+      if (ruta.includes(nombreBase)) {
+        return imagenesDisponibles[ruta];
+      }
+    }
+
+    return producto.imagen;
+  };
   return (
-    <main className="container my-5">
-      <div className="mb-3">
-        <Link to="/" className="btn btn-outline-secondary btn-sm">
-          Volver a pedidos
-        </Link>
-      </div>
+    <div className="container py-5">
+      <nav aria-label="breadcrumb" className="mb-4">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <Link to="/">Inicio</Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            {producto.nombre}
+          </li>
+        </ol>
+      </nav>
 
-      <div className="card shadow-sm border-0">
-        <div className="card-header bg-dark text-white py-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <h1 className="h4 mb-0">Ficha Técnica: {producto.nombre}</h1>
-            <span className="badge bg-secondary fs-6">Código: {producto.codigo}</span>
+      <div className="card shadow-sm border-0 overflow-hidden">
+        <div className="row g-0">
+          <div className="col-md-5 bg-white d-flex align-items-center justify-content-center p-4">
+            <img
+              src={resolverImagen()}
+              alt={producto.nombre}
+              className="img-fluid rounded"
+              style={{ maxHeight: '380px', objectFit: 'contain' }}
+            />
           </div>
-        </div>
+          <div className="col-md-7">
+            <div className="card-body p-4 p-lg-5">
+              <span className="badge bg-secondary mb-2">{producto.categoria}</span>
+              <h2 className="fw-bold mb-2">{producto.nombre}</h2>
+              <p className="fs-3 fw-bold text-primary mb-3">
+                ${producto.precio?.toLocaleString('es-CL')}
+              </p>
 
-        <div className="card-body p-4">
-          {producto.stock === 0 && (
-            <div className="alert alert-danger mb-4">
-              <strong>Agotado:</strong> Sin unidades disponibles en stock.
-            </div>
-          )}
-          {producto.stock > 0 && producto.stock < 3 && (
-            <div className="alert alert-warning mb-4">
-              <strong>Stock Crítico:</strong> Quedan solo {producto.stock} unidades disponibles.
-            </div>
-          )}
-          {producto.stock >= 3 && (
-            <div className="alert alert-success mb-4">
-              <strong>Stock Normal:</strong> {producto.stock} unidades disponibles.
-            </div>
-          )}
+              {producto.stock === 0 && (
+                <div className="alert alert-danger py-2 mb-3">
+                  <i className="bi bi-x-circle me-2"></i>Producto fuera de stock.
+                </div>
+              )}
+              {producto.stock > 0 && producto.stock < 3 && (
+                <div className="alert alert-warning py-2 mb-3">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  Quedan: {producto.stock} unidades disponibles.
+                </div>
+              )}
+              {producto.stock >= 3 && (
+                <div className="alert alert-success py-2 mb-3">
+                  <i className="bi bi-check-circle me-2"></i>
+                  Disponibilidad inmediata en bodega ({producto.stock} en stock).
+                </div>
+              )}
 
-          <div className="row g-4">
-            <div className="col-12 col-md-6">
-              <h2 className="h5 border-bottom pb-2 mb-3">Especificaciones Técnicas</h2>
-              <ul className="list-group list-group-flush">
-                <li className="list-group-item d-flex justify-content-between">
+              <hr />
+
+              <h5 className="fw-semibold mb-3">Ficha Técnica</h5>
+              <ul className="list-group list-group-flush mb-4">
+                <li className="list-group-item d-flex justify-content-between px-0">
                   <span className="text-muted">Código:</span>
-                  <span className="fw-semibold">{producto.codigo}</span>
+                  <span className="fw-semibold">{producto.codigo || `PROD-${producto.id}`}</span>
                 </li>
-                <li className="list-group-item d-flex justify-content-between">
-                  <span className="text-muted">Nombre:</span>
-                  <span className="fw-semibold">{producto.nombre}</span>
-                </li>
-                <li className="list-group-item d-flex justify-content-between">
+                <li className="list-group-item d-flex justify-content-between px-0">
                   <span className="text-muted">Marca:</span>
-                  <span className="fw-semibold">{producto.marca}</span>
+                  <span className="fw-semibold">{producto.marca || 'Genérica'}</span>
                 </li>
-                <li className="list-group-item d-flex justify-content-between">
+                <li className="list-group-item d-flex justify-content-between px-0">
                   <span className="text-muted">Modelo:</span>
-                  <span className="fw-semibold">{producto.modelo}</span>
+                  <span className="fw-semibold">{producto.modelo || 'Standard'}</span>
                 </li>
-                <li className="list-group-item d-flex justify-content-between">
+                <li className="list-group-item d-flex justify-content-between px-0">
                   <span className="text-muted">Categoría:</span>
-                  <span className="badge bg-info text-dark">{producto.categoria}</span>
+                  <span className="fw-semibold">{producto.categoria}</span>
                 </li>
               </ul>
-            </div>
 
-            <div className="col-12 col-md-6">
-              <h2 className="h5 border-bottom pb-2 mb-3">Disponibilidad</h2>
-              <div className="p-3 bg-light rounded border mb-3">
-                <span className="text-muted d-block small">Precio:</span>
-                <span className="h3 text-primary fw-bold">
-                  ${producto.precio.toLocaleString("es-CL")}
-                </span>
-                <span className="text-muted d-block small mt-2">Stock en bodega:</span>
-                <span className="fw-bold fs-5">{producto.stock} unidades</span>
-              </div>
-              <p className="text-muted small mb-0">{producto.descripcion}</p>
+              <Link to="/" className="btn btn-outline-secondary">
+                <i className="bi bi-arrow-left me-2"></i>Volver al Catálogo
+              </Link>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

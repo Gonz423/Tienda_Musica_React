@@ -1,23 +1,10 @@
-<<<<<<< HEAD
-
-import { Routes, Route } from "react-router-dom";
-import VistaEmpleado from "./components/VistaEmpleado";
-import DetalleProducto from "./pages/DetalleProducto";
-import Footer from "./components/Footer";
-
-function App() {
-  return (
-    <div className="App d-flex flex-column min-vh-100">
-      <main className="flex-grow-1">
-        <Routes>
-          <Route path="/" element={<VistaEmpleado />} />
-          <Route path="/producto/:id" element={<DetalleProducto />} />
-        </Routes>
-=======
 import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
 import VistaJefe from './components/VistaJefe'
+import VistaEmpleado from './components/VistaEmpleado'
+import DetalleProducto from './pages/DetalleProducto'
 import Footer from './components/Footer'
 import { productosIniciales } from './data/productos'
 import { pedidosIniciales } from './data/pedidos'
@@ -88,20 +75,10 @@ function App() {
 
         {/* VISTA 2: TRABAJADOR (Preparado para Itsa - Issue #8) */}
         {rolActual === 'trabajador' && (
-          <div className="container py-5">
-            <div className="p-4 bg-white rounded-3 shadow-sm border">
-              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 className="fw-bold text-dark mb-0">
-                  <i className="bi bi-briefcase text-info me-2"></i>
-                  Panel de Operacion - Trabajadores de Tienda
-                </h2>
-                <span className="badge bg-info text-dark">Rol: Personal de Bodega y Ventas</span>
-              </div>
-              <p className="text-muted mb-0">
-                Modulo de recepcion de pedidos y control rapido de stock.
-              </p>
-            </div>
-          </div>
+<Routes>
+            <Route path="/" element={<VistaEmpleado />} />
+            <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
+          </Routes>
         )}
 
         {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
@@ -118,7 +95,6 @@ function App() {
             onCambiarSeccion={setSeccionJefe}
           />
         )}
->>>>>>> main
       </main>
 
 

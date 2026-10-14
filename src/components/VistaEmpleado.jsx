@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const pedidosIniciales = [
+export const pedidosIniciales = [
   {
     id: 101,
     cliente: "Juan Perez",
@@ -43,8 +43,8 @@ const pedidosIniciales = [
     estado: "Pendiente",
     tipoEntrega: "Retiro local",
     productos: [
-      { codigo: "GA003", nombre: "Guitarra Acústica Clásica 4/4", cantidad: 1, stock: 1 },
-      { codigo: "AC002", nombre: "Cuerdas Guitarra Acústica 12-53", cantidad: 1, stock: 3 }
+      { codigo: "GA003", nombre: "Guitarra Acústica Clásica 4/4", cantidad: 1},
+      { codigo: "AC002", nombre: "Cuerdas Guitarra Acústica 12-53", cantidad: 1}
     ]
   },
   {
@@ -55,7 +55,7 @@ const pedidosIniciales = [
     estado: "Despachado",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { codigo: "ES001", nombre: "Interfaz de Audio 2x2 USB", cantidad: 1, stock: 8 }
+      { codigo: "ES001", nombre: "Interfaz de Audio 2x2 USB", cantidad: 1}
     ]
   },
     {
@@ -66,30 +66,35 @@ const pedidosIniciales = [
     estado: "Despachado",
     tipoEntrega: "Envío a domicilio",
     productos: [
-      { codigo: "PE006", nombre: "Pedal Overdrive", cantidad: 1, stock: 8 }
+      { codigo: "PE006", nombre: "Pedal Overdrive", cantidad: 1}
     ]
   }
 ];
 
-function VistaEmpleado() {
+function VistaEmpleado({ pedidosExternos, onActualizarEstado }){
  
-  const [pedidos, setPedidos] = useState(pedidosIniciales);
+  const [pedidosLocales, setPedidosLocales] = useState(pedidosIniciales);
+  const pedidos = pedidosExternos || pedidosLocales;
+
   const avanzarEstado = (id) => {
-    setPedidos((prevPedidos) =>
-      prevPedidos.map((pedido) => {
-        if (pedido.id !== id) return pedido;
+    const pedidoActual = pedidos.find((p) => p.id === id);
+    if (!pedidoActual) return;
 
-        let nuevoEstado = pedido.estado;
-        if (pedido.estado === "Pendiente") {
-          nuevoEstado = "En preparación";
-        } else if (pedido.estado === "En preparación") {
-          nuevoEstado = "Despachado";
-        }
+  let nuevoEstado = pedidoActual.estado;
+      if (pedidoActual.estado === "Pendiente") {
+        nuevoEstado = "En preparación";
+      } else if (pedidoActual.estado === "En preparación") {
+        nuevoEstado = "Despachado";
+      }
 
-        return { ...pedido, estado: nuevoEstado };
-      })
-    );
-  };
+      if (onActualizarEstado) {
+        onActualizarEstado(id, nuevoEstado);
+      } else {
+        setPedidosLocales((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p))
+        );
+      }
+    };
 
   const obtenerColorBadge = (estado) => {
     switch (estado) {
@@ -108,11 +113,12 @@ function VistaEmpleado() {
     <section className="container my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 className="h3 mb-1">Panel de estado de pedidos</h2>
+          <h2 className="h3 mb-1">Panel operativo de estado de pedidos</h2>
           <p className="text-muted mb-0">
-        Recepción, preparación y despacho de pedidos solicitados
+        Recepción, preparación y despacho de pedidos solicitados en tiempo real. Mantenga actualizado el estado de cada pedido para garantizar una experiencia de cliente satisfactoria.
           </p>
         </div>
+
         <span className="badge bg-dark fs-6">
           Pedidos activos: {pedidos.filter((p) => p.estado !== "Despachado").length}
         </span>
@@ -122,7 +128,7 @@ function VistaEmpleado() {
         <table className="table table-hover table-striped align-middle mb-0">
           <thead className="table-dark">
             <tr>
-              <th scope="col"># ID pedido</th>
+              <th scope="col"># ID </th>
               <th scope="col">Fecha</th>
               <th scope="col">Cliente</th>
               <th scope="col">Tipo de entrega</th>
@@ -184,7 +190,7 @@ function VistaEmpleado() {
                       className="btn btn-outline-primary btn-sm"
                       onClick={() => avanzarEstado(pedido.id)}
                     >
-                      Comenzar Preparación
+                      Preparar
                     </button>
                   )}
 
