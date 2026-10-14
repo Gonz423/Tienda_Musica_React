@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { guardarCarritoStorage, cargarCarritoStorage } from '../utils/persistencia'
 
 // Carga dinamica y robusta de imagenes locales desde src/assets/img mediante Vite
@@ -175,14 +176,16 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
             <div key={producto.codigo || producto.id} className="col">
               <article className="card-producto-sv text-center">
                 {/* Imagen del producto cargada desde assets locales */}
-                <figure>
-                  <img
-                    src={obtenerImagen(producto.codigo)}
-                    alt={`${producto.nombre} - ${producto.marca}`}
-                    loading="lazy"
-                  />
+                  <figure className="mb-0">
+                  <Link to={`/producto/${producto.codigo || producto.id}`}>
+                    <img
+                      src={obtenerImagen(producto.codigo)}
+                      alt={`${producto.nombre} ${producto.marca}`}
+                      loading="lazy"
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Link>
                 </figure>
-
                 {/* Categoria */}
                 <div className="p-2 px-3 bg-light text-center border-bottom">
                   <span
@@ -200,7 +203,13 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
                       className="card-title fw-bold mb-1 fs-6 text-center producto-titulo"
                       style={{ color: 'var(--color-texto)' }}
                     >
-                      {producto.nombre}
+                      <Link 
+                        to={`/producto/${producto.codigo || producto.id}`}
+                        className="text-decoration-none text-dark"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {producto.nombre}
+                      </Link>
                     </h5>
                     <p className="text-muted small mb-2 text-center text-truncate">
                       <strong>{producto.marca}</strong> | Modelo: {producto.modelo}

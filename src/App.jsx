@@ -11,7 +11,7 @@ import { pedidosIniciales } from './data/pedidos'
 
 function App() {
   // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
-  const [rolActual, setRolActual] = useState('trabajador')
+  const [rolActual, setRolActual] = useState('cliente')
 
 
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
@@ -69,10 +69,21 @@ function App() {
       <main className="flex-grow-1">
         {/* VISTA 1: CLIENTE */}
         {rolActual === 'cliente' && (
-          <VistaCliente
-            productos={productos}
-            onAgregarAlCarrito={handleAgregarAlCarrito}
-          />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <VistaCliente
+                  productos={productos}
+                  onAgregarAlCarrito={handleAgregarAlCarrito}
+                />
+              }
+            />
+            <Route 
+              path="/producto/:id" 
+              element={<DetalleProducto productos={productos} />} 
+            />
+          </Routes>
         )}
 
         {/* VISTA 2: TRABAJADOR*/}

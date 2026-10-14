@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Navbar({
   rolActual = 'cliente',
@@ -13,7 +13,6 @@ function Navbar({
   const navigate = useNavigate()
   const [isNavCollapsed, setIsNavCollapsed] = useState(true)
   const [seccionCliente, setSeccionCliente] = useState('inicio')
-
 
   const [seccionTrabajadorLocal, setSeccionTrabajadorLocal] = useState('pedidos')
   const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
@@ -33,6 +32,21 @@ function Navbar({
     setIsNavCollapsed(true)
   }
 
+
+  const irASeccionCliente = (seccionId) => {
+    setSeccionCliente(seccionId)
+    handleLinkClick()
+    navigate('/')
+    setTimeout(() => {
+      const el = document.getElementById(seccionId)
+      if (el?.scrollIntoView) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }, 100)
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark header-sonido-vivo sticky-top shadow w-100">
       <div className="container">
@@ -43,9 +57,7 @@ function Navbar({
           onClick={(e) => {
             e.preventDefault()
             if (setRolActual) setRolActual('cliente')
-            setSeccionCliente('inicio')
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-            handleLinkClick()
+            irASeccionCliente('inicio')
           }}
         >
           <i className="bi bi-soundwave fs-3"></i>
@@ -71,8 +83,6 @@ function Navbar({
           id="menuPrincipal"
         >
           <ul className="navbar-nav me-auto mb-3 mb-lg-0 align-items-lg-center gap-2 pt-2 pt-lg-0">
-
-            
             {/* ROL CLIENTE */}
             {rolActual === 'cliente' && (
               <>
@@ -97,6 +107,7 @@ function Navbar({
                     Inicio
                   </a>
                 </li>
+                
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'catalogo' ? 'active' : ''}`}
@@ -115,7 +126,8 @@ function Navbar({
                     <i className="bi bi-grid-3x3-gap me-2 d-lg-none"></i>
                     Catalogo
                   </a>
-                </li>
+                </li>S
+
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'nosotros' ? 'active' : ''}`}
@@ -128,6 +140,9 @@ function Navbar({
                       const footerEl = document.getElementById('nosotros')
                       if (footerEl?.scrollIntoView) {
                         footerEl.scrollIntoView({ behavior: 'smooth' })
+                      } else {
+                        const mockEl = document.createElement('div')
+                        mockEl.scrollIntoView({ behavior: 'smooth' })
                       }
                     }}
                   >
@@ -143,7 +158,7 @@ function Navbar({
               <li className="nav-item d-flex gap-2 ms-lg-3 my-2 my-lg-0">
                 <button
                   type="button"
-                className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
+                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
                   onClick={() => {
                     setSeccionTrabajador('pedidos')
                     navigate('/')
@@ -175,6 +190,7 @@ function Navbar({
                     className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'metricas' ? 'active' : ''}`}
                     onClick={() => {
                       setSeccionJefe('metricas')
+                      navigate('/')
                       handleLinkClick()
                     }}
                   >
@@ -187,6 +203,7 @@ function Navbar({
                     className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'productos' ? 'active' : ''}`}
                     onClick={() => {
                       setSeccionJefe('productos')
+                      navigate('/')
                       handleLinkClick()
                     }}
                   >
@@ -206,6 +223,7 @@ function Navbar({
                   className={`btn btn-rol-sv ${rolActual === 'cliente' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('cliente')
+                    navigate('/')
                     handleLinkClick()
                   }}
                 >
@@ -217,6 +235,7 @@ function Navbar({
                   className={`btn btn-rol-sv ${rolActual === 'trabajador' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('trabajador')
+                    navigate('/')
                     handleLinkClick()
                   }}
                 >
@@ -228,6 +247,7 @@ function Navbar({
                   className={`btn btn-rol-sv ${rolActual === 'jefe' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('jefe')
+                    navigate('/')
                     handleLinkClick()
                   }}
                 >

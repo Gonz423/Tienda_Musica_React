@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import productosIniciales from "../data/productos";
 
 
@@ -7,8 +7,9 @@ const imagenesDisponibles = import.meta.glob("../assets/img/*", {
   as: "url",
 });
 
-function DetalleProducto({ productos = productosIniciales }) {
+function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito }) {
   const { id } = useParams();
+  const navigate = useNavigate();
 
 const producto = productos.find(
     (p) =>
@@ -80,19 +81,17 @@ const resolverImagen = () => {
 
               {producto.stock === 0 && (
                 <div className="alert alert-danger py-2 mb-3">
-                  <i className="bi bi-x-circle me-2"></i>Producto fuera de stock.
+                    Producto fuera de stock.
                 </div>
               )}
               {producto.stock > 0 && producto.stock < 3 && (
                 <div className="alert alert-warning py-2 mb-3">
-                  <i className="bi bi-exclamation-triangle me-2"></i>
                   Quedan: {producto.stock} unidades disponibles.
                 </div>
               )}
               {producto.stock >= 3 && (
                 <div className="alert alert-success py-2 mb-3">
-                  <i className="bi bi-check-circle me-2"></i>
-                  Disponibilidad inmediata en bodega ({producto.stock} en stock).
+                  Disponibles: {producto.stock} en stock.
                 </div>
               )}
 
