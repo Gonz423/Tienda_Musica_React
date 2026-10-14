@@ -211,7 +211,6 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
                         {producto.nombre}
                       </Link>
                     </h5>
-                    
                     <p className="text-muted small mb-2 text-center text-truncate">
                       <strong>{producto.marca}</strong> | Modelo: {producto.modelo}
                     </p>

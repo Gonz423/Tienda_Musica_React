@@ -93,7 +93,14 @@ function Navbar({
                     href="#inicio"
                     onClick={(e) => {
                       e.preventDefault()
-                      irASeccionCliente('inicio')
+                      setSeccionCliente('inicio')
+                      handleLinkClick()
+                      const inicioEl = document.getElementById('inicio')
+                      if (inicioEl?.scrollIntoView) {
+                        inicioEl.scrollIntoView({ behavior: 'smooth' })
+                      } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-house-door me-2 d-lg-none"></i>
@@ -108,13 +115,18 @@ function Navbar({
                     href="#catalogo"
                     onClick={(e) => {
                       e.preventDefault()
-                      irASeccionCliente('catalogo')
+                      setSeccionCliente('catalogo')
+                      handleLinkClick()
+                      const catEl = document.getElementById('catalogo')
+                      if (catEl?.scrollIntoView) {
+                        catEl.scrollIntoView({ behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-grid-3x3-gap me-2 d-lg-none"></i>
                     Catalogo
                   </a>
-                </li>
+                </li>S
 
                 <li className="nav-item w-100 w-lg-auto">
                   <a
