@@ -91,8 +91,7 @@ const resolverImagen = () => {
               )}
               {producto.stock >= 3 && (
                 <div className="alert alert-success py-2 mb-3">
-                  <i className="bi bi-check-circle me-2"></i>
-                  Disponibles ({producto.stock} en stock).
+                  Disponibles: {producto.stock} en stock.
                 </div>
               )}
 

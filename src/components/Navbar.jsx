@@ -100,6 +100,7 @@ function Navbar({
                     Inicio
                   </a>
                 </li>
+                
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'catalogo' ? 'active' : ''}`}
@@ -114,6 +115,7 @@ function Navbar({
                     Catalogo
                   </a>
                 </li>
+
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'nosotros' ? 'active' : ''}`}
@@ -121,7 +123,15 @@ function Navbar({
                     href="#nosotros"
                     onClick={(e) => {
                       e.preventDefault()
-                      irASeccionCliente('nosotros')
+                      setSeccionCliente('nosotros')
+                      handleLinkClick()
+                      const footerEl = document.getElementById('nosotros')
+                      if (footerEl?.scrollIntoView) {
+                        footerEl.scrollIntoView({ behavior: 'smooth' })
+                      } else {
+                        const mockEl = document.createElement('div')
+                        mockEl.scrollIntoView({ behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-people me-2 d-lg-none"></i>
