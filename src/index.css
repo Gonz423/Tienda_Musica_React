@@ -17,6 +17,16 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+#inicio,
+#catalogo,
+#nosotros {
+  scroll-margin-top: 80px;
+}
+
 html,
 body,
 #root {
@@ -256,6 +266,7 @@ body {
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 2.5em;
@@ -266,6 +277,7 @@ body {
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

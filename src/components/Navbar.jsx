@@ -69,9 +69,16 @@ function Navbar({
                     className={`nav-link nav-btn-link ${seccionCliente === 'inicio' ? 'active' : ''}`}
                     aria-current={seccionCliente === 'inicio' ? 'page' : undefined}
                     href="#inicio"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
                       setSeccionCliente('inicio')
                       handleLinkClick()
+                      const inicioEl = document.getElementById('inicio')
+                      if (inicioEl?.scrollIntoView) {
+                        inicioEl.scrollIntoView({ behavior: 'smooth' })
+                      } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-house-door me-2 d-lg-none"></i>
@@ -83,9 +90,14 @@ function Navbar({
                     className={`nav-link nav-btn-link ${seccionCliente === 'catalogo' ? 'active' : ''}`}
                     aria-current={seccionCliente === 'catalogo' ? 'page' : undefined}
                     href="#catalogo"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
                       setSeccionCliente('catalogo')
                       handleLinkClick()
+                      const catEl = document.getElementById('catalogo')
+                      if (catEl?.scrollIntoView) {
+                        catEl.scrollIntoView({ behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-grid-3x3-gap me-2 d-lg-none"></i>
@@ -97,9 +109,14 @@ function Navbar({
                     className={`nav-link nav-btn-link ${seccionCliente === 'nosotros' ? 'active' : ''}`}
                     aria-current={seccionCliente === 'nosotros' ? 'page' : undefined}
                     href="#nosotros"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
                       setSeccionCliente('nosotros')
                       handleLinkClick()
+                      const footerEl = document.getElementById('nosotros')
+                      if (footerEl?.scrollIntoView) {
+                        footerEl.scrollIntoView({ behavior: 'smooth' })
+                      }
                     }}
                   >
                     <i className="bi bi-people me-2 d-lg-none"></i>

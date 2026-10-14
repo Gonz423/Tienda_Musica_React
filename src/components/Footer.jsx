@@ -7,7 +7,7 @@ function Footer() {
   }
 
   return (
-    <footer className="footer-sonido-vivo mt-auto text-light pt-5 pb-3">
+    <footer id="nosotros" className="footer-sonido-vivo mt-auto text-light pt-5 pb-3">
       <div className="container">
         {/* Fila principal con 4 columnas */}
         <div className="row g-4 mb-4">

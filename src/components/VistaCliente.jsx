@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { guardarCarritoStorage, cargarCarritoStorage } from '../utils/persistencia'
 
 // Carga dinamica y robusta de imagenes locales desde src/assets/img mediante Vite
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
@@ -9,16 +10,19 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
   const [orden, setOrden] = useState('destacados')
   const [mensajeAlerta, setMensajeAlerta] = useState('')
 
-  // Manejar agregar al carrito
+  // Manejar agregar al carrito y persistencia local
   const handleAgregar = (producto) => {
     if (onAgregarAlCarrito) {
       onAgregarAlCarrito(producto)
     }
+    const carritoActual = cargarCarritoStorage()
+    guardarCarritoStorage([...carritoActual, producto])
     setMensajeAlerta(`Agregaste "${producto.nombre}" al carrito de compras.`)
     setTimeout(() => {
       setMensajeAlerta('')
     }, 2500)
   }
+
 
   // Lista de categorias unicas presentes en los datos
   const categorias = ['todas', ...new Set(productos.map((p) => p.categoria))]
@@ -51,7 +55,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito }) {
   // Obtener ruta de imagen local empaquetada
   const obtenerImagen = (codigo) => {
     const clave = `../assets/img/${codigo}.jpg`
-    return imagenesLocales[clave] || imagenesLocales['../assets/img/GA001.jpg'] || ''
+    return imagenesLocales[clave] || imagenesLocales['../assets/img/GA001.jpg']
   }
 
   return (
