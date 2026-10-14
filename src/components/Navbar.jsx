@@ -1,16 +1,26 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Navbar({
   rolActual = 'cliente',
   setRolActual,
   cantidadCarrito = 0,
   seccionJefe: seccionJefeProp,
-  setSeccionJefe: setSeccionJefeProp
+  setSeccionJefe: setSeccionJefeProp,
+  seccionTrabajador: seccionTrabajadorProp,
+  setSeccionTrabajador: setSeccionTrabajadorProp,
 }) {
+  const navigate = useNavigate()
   const [isNavCollapsed, setIsNavCollapsed] = useState(true)
   const [seccionCliente, setSeccionCliente] = useState('inicio')
-  const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
+
+
+  const [seccionTrabajadorLocal, setSeccionTrabajadorLocal] = useState('pedidos')
   const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
+
+  const seccionTrabajador =
+    seccionTrabajadorProp !== undefined ? seccionTrabajadorProp : seccionTrabajadorLocal
+  const setSeccionTrabajador = setSeccionTrabajadorProp || setSeccionTrabajadorLocal
 
   const seccionJefe = seccionJefeProp !== undefined ? seccionJefeProp : seccionJefeLocal
   const setSeccionJefe = setSeccionJefeProp || setSeccionJefeLocal
@@ -42,7 +52,7 @@ function Navbar({
           <span>Sonido Vivo</span>
         </a>
 
-        {/* Boton Hamburguesa para moviles con diseno accesible */}
+        {/* Boton Hamburguesa */}
         <button
           className="navbar-toggler border-0 p-2 shadow-sm"
           type="button"
@@ -55,13 +65,15 @@ function Navbar({
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menu Colapsable con navegacion reactiva y estado activo */}
+        {/* Menu Colapsable */}
         <div
           className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`}
           id="menuPrincipal"
         >
-          {/* Enlaces para Rol Cliente: Inicio, Catalogo, Nosotros con seleccion activa */}
           <ul className="navbar-nav me-auto mb-3 mb-lg-0 align-items-lg-center gap-2 pt-2 pt-lg-0">
+
+            
+            {/* ROL CLIENTE */}
             {rolActual === 'cliente' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
@@ -109,37 +121,35 @@ function Navbar({
               </>
             )}
 
-            {/* Enlaces para Rol Trabajador */}
+            {/* ROL TRABAJADOR*/}
             {rolActual === 'trabajador' && (
-              <>
-                <li className="nav-item w-100 w-lg-auto">
-                  <button
-                    type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionTrabajador('pedidos')
-                      handleLinkClick()
-                    }}
-                  >
-                    <i className="bi bi-box-seam me-2"></i> Recepcion de Pedidos
-                  </button>
-                </li>
-                <li className="nav-item w-100 w-lg-auto">
-                  <button
-                    type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'stock' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionTrabajador('stock')
-                      handleLinkClick()
-                    }}
-                  >
-                    <i className="bi bi-clipboard-check me-2"></i> Control de Stock
-                  </button>
-                </li>
-              </>
+              <li className="nav-item d-flex gap-2 ms-lg-3 my-2 my-lg-0">
+                <button
+                  type="button"
+                className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
+                  onClick={() => {
+                    setSeccionTrabajador('pedidos')
+                    navigate('/')
+                    handleLinkClick()
+                  }}
+                >
+                  Recepción de Pedidos
+                </button>
+                <button
+                  type="button"
+                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'stock' ? 'active' : ''}`}
+                  onClick={() => {
+                    setSeccionTrabajador('stock')
+                    navigate('/')
+                    handleLinkClick()
+                  }}
+                >
+                  Control de Stock
+                </button>
+              </li>
             )}
 
-            {/* Enlaces para Rol Jefe */}
+            {/* ROL JEFE */}
             {rolActual === 'jefe' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
@@ -170,18 +180,9 @@ function Navbar({
             )}
           </ul>
 
-          {/* Acciones de la derecha: Selector de Roles uniforme + Carrito */}
+          {/* Selector de Roles y Carrito */}
           <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 pt-2 pt-lg-0 border-top border-secondary border-opacity-25 border-top-lg-0">
-            {/* Contenedor selector de roles */}
             <div className="contenedor-roles-mobile">
-              <div className="d-flex align-items-center justify-content-between mb-2 d-lg-none">
-                <span className="text-white-50 small fw-semibold">
-                  <i className="bi bi-person-badge me-1"></i> Rol del Sistema:
-                </span>
-                <span className="badge bg-light text-dark text-capitalize">
-                  {rolActual}
-                </span>
-              </div>
               <div className="grupo-roles-grid d-flex gap-2" role="group" aria-label="Selector de rol de usuario">
                 <button
                   type="button"
@@ -190,7 +191,6 @@ function Navbar({
                     if (setRolActual) setRolActual('cliente')
                     handleLinkClick()
                   }}
-                  title="Vista publica para compradores"
                 >
                   <i className="bi bi-person me-1"></i>
                   <span>Cliente</span>
@@ -202,7 +202,6 @@ function Navbar({
                     if (setRolActual) setRolActual('trabajador')
                     handleLinkClick()
                   }}
-                  title="Vista operativa para trabajadores"
                 >
                   <i className="bi bi-briefcase me-1"></i>
                   <span>Trabajador</span>
@@ -214,7 +213,6 @@ function Navbar({
                     if (setRolActual) setRolActual('jefe')
                     handleLinkClick()
                   }}
-                  title="Vista de administracion y metricas"
                 >
                   <i className="bi bi-shield-lock me-1"></i>
                   <span>Jefe</span>
@@ -222,7 +220,6 @@ function Navbar({
               </div>
             </div>
 
-            {/* Carrito de Compras visible para Cliente */}
             {rolActual === 'cliente' && (
               <button
                 type="button"

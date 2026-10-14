@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
-import VistaJefe from './components/VistaJefe'
 import VistaEmpleado from './components/VistaEmpleado'
+import VistaJefe from './components/VistaJefe'
 import DetalleProducto from './pages/DetalleProducto'
 import Footer from './components/Footer'
 import { productosIniciales } from './data/productos'
@@ -11,15 +11,16 @@ import { pedidosIniciales } from './data/pedidos'
 
 function App() {
   // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
-  const [rolActual, setRolActual] = useState('cliente')
+  const [rolActual, setRolActual] = useState('trabajador')
 
-  // Estado para el inventario de productos
+
+  const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
+  const [seccionJefe, setSeccionJefe] = useState('metricas')
+
   const [productos, setProductos] = useState(productosIniciales)
   const [pedidos, setPedidos] = useState(pedidosIniciales)
-  const [seccionJefe, setSeccionJefe] = useState('metricas')
   const [carrito, setCarrito] = useState([])
 
-  // Agregar producto al carrito
   const handleAgregarAlCarrito = (producto) => {
     setCarrito((prev) => [...prev, producto])
   }
@@ -54,18 +55,19 @@ function App() {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      {/* Barra de navegacion con selector de rol y badge de carrito */}
+     
       <Navbar
         rolActual={rolActual}
         setRolActual={setRolActual}
         cantidadCarrito={carrito.length}
         seccionJefe={seccionJefe}
         setSeccionJefe={setSeccionJefe}
+        seccionTrabajador={seccionTrabajador}
+        setSeccionTrabajador={setSeccionTrabajador}
       />
 
-      {/* Contenido principal con renderizado condicional segun el rol */}
       <main className="flex-grow-1">
-        {/* VISTA 1: CLIENTE (Gonzalo - Issue #7) */}
+        {/* VISTA 1: CLIENTE */}
         {rolActual === 'cliente' && (
           <VistaCliente
             productos={productos}
@@ -73,15 +75,27 @@ function App() {
           />
         )}
 
-        {/* VISTA 2: TRABAJADOR (Preparado para Itsa - Issue #8) */}
+        {/* VISTA 2: TRABAJADOR*/}
         {rolActual === 'trabajador' && (
-<Routes>
-            <Route path="/" element={<VistaEmpleado />} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <VistaEmpleado
+                  productos={productos}
+                  pedidos={pedidos}
+                  seccionActiva={seccionTrabajador}
+                  onCambiarSeccion={setSeccionTrabajador}
+                  onActualizarStock={handleActualizarStock}
+                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
+                />
+              }
+            />
             <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
           </Routes>
         )}
 
-        {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
+        {/* VISTA 3: JEFE */}
         {rolActual === 'jefe' && (
           <VistaJefe
             productos={productos}
@@ -97,10 +111,9 @@ function App() {
         )}
       </main>
 
-
-      <Footer /> 
+      <Footer />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

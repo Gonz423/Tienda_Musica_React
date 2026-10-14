@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-function ProductCard({ producto, onAgregarAlCarrito }) {
+function VistaProducto({ producto, onAgregarAlCarrito }) {
   const stockCritico = producto.stock > 0 && producto.stock < 3;
 
   return (
@@ -53,4 +53,4 @@ function ProductCard({ producto, onAgregarAlCarrito }) {
   );
 }
 
-export default ProductCard;
+export default VistaProducto;
