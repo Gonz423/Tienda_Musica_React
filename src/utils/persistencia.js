@@ -12,3 +12,18 @@ export function cargarProductosStorage() {
     return []
   }
 }
+
+// Persistencia del carrito de compras (Perfil Cliente)
+export function guardarCarritoStorage(carrito) {
+  localStorage.setItem('carrito_compras', JSON.stringify(carrito))
+}
+
+export function cargarCarritoStorage() {
+  try {
+    const data = localStorage.getItem('carrito_compras')
+    return data ? JSON.parse(data) : []
+  } catch {
+    return []
+  }
+}
+
