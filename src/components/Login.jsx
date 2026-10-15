@@ -1,39 +1,31 @@
 import { useState } from 'react'
+import { usuariosIniciales } from '../data/usuarios'
+import { cargarUsuariosStorage } from '../utils/persistencia'
 
-const USUARIOS_DEMO = [
-  {
-    email: 'gonzalo@sonidovivo.cl',
-    password: 'admin123',
-    nombre: 'Gonzalo',
-    rol: 'jefe',
+const DEMOS_METADATA = {
+  jefe: {
     etiquetaRol: 'Jefe / Administrador',
     badgeClase: 'bg-danger text-white',
     icono: 'bi-shield-check',
     descripcion: 'Control total de métricas, pedidos e inventario'
   },
-  {
-    email: 'trabajador@sonidovivo.cl',
-    password: 'trabajo123',
-    nombre: 'Carlos',
-    rol: 'trabajador',
+  trabajador: {
     etiquetaRol: 'Trabajador',
     badgeClase: 'bg-primary text-white',
     icono: 'bi-briefcase',
     descripcion: 'Recepción de pedidos y control de stock'
   },
-  {
-    email: 'cliente@mail.cl',
-    password: 'cliente123',
-    nombre: 'Francisca',
-    rol: 'cliente',
+  cliente: {
     etiquetaRol: 'Cliente',
     badgeClase: 'bg-success text-white',
     icono: 'bi-person',
     descripcion: 'Catálogo de instrumentos y compras en línea'
   }
-]
+}
 
-function Login({ onIniciarSesion, onCerrar }) {
+function Login({ onIniciarSesion, onCerrar, usuarios }) {
+  const listaUsuarios = usuarios && usuarios.length > 0 ? usuarios : cargarUsuariosStorage(usuariosIniciales)
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
@@ -55,20 +47,27 @@ function Login({ onIniciarSesion, onCerrar }) {
     setCargando(true)
 
     setTimeout(() => {
-      // Validar usuario demo
-      const usuarioEncontrado = USUARIOS_DEMO.find(
+      // Validar contra la lista de usuarios del sistema
+      const usuarioEncontrado = listaUsuarios.find(
         (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
       )
 
       if (usuarioEncontrado) {
+        if (usuarioEncontrado.activo === false) {
+          setError('Esta cuenta ha sido desactivada por el Administrador. Contacta a soporte.')
+          setCargando(false)
+          return
+        }
         onIniciarSesion(usuarioEncontrado)
       } else {
-        // Inicio libre como cliente
+        // Inicio libre como cliente si la clave tiene al menos 4 caracteres
         if (passLimpio.length >= 4) {
           onIniciarSesion({
+            id: `USR-${Date.now()}`,
             email: emailLimpio,
             nombre: emailLimpio.split('@')[0],
-            rol: 'cliente'
+            rol: 'cliente',
+            activo: true
           })
         } else {
           setError('Contraseña muy corta o credenciales inválidas. Puedes usar los accesos rápidos de abajo.')
@@ -78,9 +77,9 @@ function Login({ onIniciarSesion, onCerrar }) {
     }, 300)
   }
 
-  const seleccionarDemo = (usuario) => {
-    setEmail(usuario.email)
-    setPassword(usuario.password)
+  const seleccionarDemo = (usr) => {
+    setEmail(usr.email)
+    setPassword(usr.password)
     setError('')
   }
 
@@ -268,11 +267,18 @@ function Login({ onIniciarSesion, onCerrar }) {
               </div>
 
               <div className="d-flex flex-column gap-2">
-                {USUARIOS_DEMO.map((usr) => {
+                {['jefe', 'trabajador', 'cliente'].map((rol) => {
+                  const meta = DEMOS_METADATA[rol]
+                  const usr = listaUsuarios.find((u) => u.rol === rol) || {
+                    email: `${rol}@sonidovivo.cl`,
+                    password: `${rol}123`,
+                    nombre: rol,
+                    activo: true
+                  }
                   const estaSeleccionado = email === usr.email
                   return (
                     <button
-                      key={usr.rol}
+                      key={rol}
                       type="button"
                       onClick={() => seleccionarDemo(usr)}
                       className="btn text-start p-2 border d-flex align-items-center justify-content-between w-100 transition-all"
@@ -280,7 +286,8 @@ function Login({ onIniciarSesion, onCerrar }) {
                         backgroundColor: estaSeleccionado ? '#fbf7f4' : '#ffffff',
                         borderColor: estaSeleccionado ? '#b96622' : '#e5dfd8',
                         borderRadius: '0.6rem',
-                        boxShadow: estaSeleccionado ? '0 0 0 2px rgba(185, 102, 34, 0.2)' : 'none'
+                        boxShadow: estaSeleccionado ? '0 0 0 2px rgba(185, 102, 34, 0.2)' : 'none',
+                        opacity: usr.activo === false ? 0.6 : 1
                       }}
                     >
                       <div className="d-flex align-items-center gap-2">
@@ -293,17 +300,22 @@ function Login({ onIniciarSesion, onCerrar }) {
                             color: estaSeleccionado ? '#ffffff' : '#7B4B3A'
                           }}
                         >
-                          <i className={`bi ${usr.icono}`}></i>
+                          <i className={`bi ${meta.icono}`}></i>
                         </div>
                         <div>
                           <div className="d-flex align-items-center gap-2">
                             <span className="fw-semibold text-dark small">{usr.nombre}</span>
-                            <span className={`badge ${usr.badgeClase} py-0 px-2`} style={{ fontSize: '0.65rem' }}>
-                              {usr.etiquetaRol}
+                            <span className={`badge ${meta.badgeClase} py-0 px-2`} style={{ fontSize: '0.65rem' }}>
+                              {meta.etiquetaRol}
                             </span>
+                            {usr.activo === false && (
+                              <span className="badge bg-secondary py-0 px-1" style={{ fontSize: '0.6rem' }}>
+                                Desactivado
+                              </span>
+                            )}
                           </div>
                           <span className="text-muted d-block" style={{ fontSize: '0.72rem' }}>
-                            {usr.descripcion}
+                            {meta.descripcion}
                           </span>
                         </div>
                       </div>
