@@ -10,7 +10,13 @@ import CarritoModal from './components/CarritoModal'
 import Login from './components/Login'
 import { productosIniciales } from './data/productos'
 import { pedidosIniciales } from './data/pedidos'
-import { cargarCarritoStorage, guardarCarritoStorage } from './utils/persistencia'
+import { usuariosIniciales } from './data/usuarios'
+import {
+  cargarCarritoStorage,
+  guardarCarritoStorage,
+  cargarUsuariosStorage,
+  guardarUsuariosStorage
+} from './utils/persistencia'
 
 function App() {
   // Rol activo: 'cliente' | 'trabajador' | 'jefe'
@@ -24,9 +30,10 @@ function App() {
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
   const [seccionJefe, setSeccionJefe] = useState('metricas')
 
-  // Productos y pedidos
+  // Productos, pedidos y usuarios
   const [productos, setProductos] = useState(productosIniciales)
   const [pedidos, setPedidos] = useState(pedidosIniciales)
+  const [usuarios, setUsuarios] = useState(() => cargarUsuariosStorage(usuariosIniciales))
 
   // Carrito
   const [carrito, setCarrito] = useState(() => cargarCarritoStorage())
@@ -130,6 +137,75 @@ function App() {
     )
   }
 
+  // Handlers de gestión de usuarios
+  const handleCrearUsuario = (nuevoUsuario) => {
+    setUsuarios((prev) => {
+      const nuevo = [nuevoUsuario, ...prev]
+      guardarUsuariosStorage(nuevo)
+      return nuevo
+    })
+  }
+
+  const handleActualizarUsuario = (usuarioActualizado) => {
+    setUsuarios((prev) => {
+      const nuevo = prev.map((u) => (u.id === usuarioActualizado.id ? usuarioActualizado : u))
+      guardarUsuariosStorage(nuevo)
+      return nuevo
+    })
+  }
+
+  const handleAlternarEstadoUsuario = (id) => {
+    setUsuarios((prev) => {
+      const ahora = new Date()
+      const fechaStr = `${ahora.toLocaleDateString('es-CL')} ${ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+      const nuevo = prev.map((u) => {
+        if (u.id === id) {
+          const nuevoEstado = !u.activo
+          const evento = {
+            id: Date.now(),
+            fecha: fechaStr,
+            accion: nuevoEstado ? 'Activación de cuenta' : 'Desactivación de cuenta',
+            detalle: nuevoEstado
+              ? 'Cuenta reactivada por el Administrador'
+              : 'Cuenta desactivada por el Administrador'
+          }
+          return {
+            ...u,
+            activo: nuevoEstado,
+            historial: [evento, ...(u.historial || [])]
+          }
+        }
+        return u
+      })
+      guardarUsuariosStorage(nuevo)
+      return nuevo
+    })
+  }
+
+  const handleAgregarHistorialUsuario = (id, { accion, detalle }) => {
+    setUsuarios((prev) => {
+      const ahora = new Date()
+      const fechaStr = `${ahora.toLocaleDateString('es-CL')} ${ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
+      const nuevo = prev.map((u) => {
+        if (u.id === id) {
+          const evento = {
+            id: Date.now(),
+            fecha: fechaStr,
+            accion,
+            detalle
+          }
+          return {
+            ...u,
+            historial: [evento, ...(u.historial || [])]
+          }
+        }
+        return u
+      })
+      guardarUsuariosStorage(nuevo)
+      return nuevo
+    })
+  }
+
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
       <Navbar
@@ -193,12 +269,19 @@ function App() {
           <VistaJefe
             productos={productos}
             pedidos={pedidos}
+            usuarios={usuarios}
+            usuarioActual={usuarioActual}
             onAgregarProducto={handleAgregarProducto}
             onActualizarProducto={handleActualizarProducto}
             onEliminarProducto={handleEliminarProducto}
             onActualizarStock={handleActualizarStock}
             onActualizarEstadoPedido={handleActualizarEstadoPedido}
+            onCrearUsuario={handleCrearUsuario}
+            onActualizarUsuario={handleActualizarUsuario}
+            onAlternarEstadoUsuario={handleAlternarEstadoUsuario}
+            onAgregarHistorialUsuario={handleAgregarHistorialUsuario}
             seccionActiva={seccionJefe}
+            onCambiarSeccion={setSeccionJefe}
             onCambinarSeccion={setSeccionJefe}
           />
         )}
@@ -219,6 +302,7 @@ function App() {
       {/* Login */}
       {mostrarLogin && (
         <Login
+          usuarios={usuarios}
           onIniciarSesion={handleIniciarSesion}
           onCerrar={() => setMostrarLogin(false)}
         />

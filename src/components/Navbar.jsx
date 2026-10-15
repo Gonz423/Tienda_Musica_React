@@ -215,6 +215,19 @@ function Navbar({
                     <i className="bi bi-gear me-2"></i> Administracion de Productos
                   </button>
                 </li>
+                <li className="nav-item w-100 w-lg-auto">
+                  <button
+                    type="button"
+                    className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'usuarios' ? 'active' : ''}`}
+                    onClick={() => {
+                      setSeccionJefe('usuarios')
+                      navigate('/')
+                      handleLinkClick()
+                    }}
+                  >
+                    <i className="bi bi-people me-2"></i> Gestión de Usuarios
+                  </button>
+                </li>
               </>
             )}
           </ul>

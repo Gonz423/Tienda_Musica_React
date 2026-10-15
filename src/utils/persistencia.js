@@ -53,3 +53,17 @@ export function ajustarStock(stockActual, delta) {
   const resultado = Number(stockActual) + Number(delta);
   return resultado < 0 ? 0 : resultado;
 }
+
+// Usuarios
+export function guardarUsuariosStorage(usuarios) {
+  localStorage.setItem('usuarios_sistema', JSON.stringify(usuarios))
+}
+
+export function cargarUsuariosStorage(fallback = []) {
+  try {
+    const data = localStorage.getItem('usuarios_sistema')
+    return data ? JSON.parse(data) : fallback
+  } catch {
+    return fallback
+  }
+}

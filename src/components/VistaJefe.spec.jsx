@@ -274,4 +274,125 @@ describe('Perfil Jefe - Guía 14: 10 Pruebas Unitarias', () => {
     expect(servicioRemotoMock.guardar).toHaveBeenCalledTimes(1)
     expect(resultadoGuardado.exito).toBe(true)
   })
+
+  // Pruebas añadidas para el nuevo apartado de Gestión de Usuarios
+  describe('Gestión de Usuarios en Vista Jefe', () => {
+    const usuariosPrueba = [
+      {
+        id: 'USR-001',
+        nombre: 'Admin Principal',
+        email: 'admin@sonidovivo.cl',
+        password: 'pass',
+        rol: 'jefe',
+        activo: true,
+        fechaCreacion: '2026-09-01',
+        historial: [
+          { id: 1, fecha: '2026-09-01 10:00', accion: 'Creación de cuenta', detalle: 'Cuenta creada como Jefe' }
+        ]
+      },
+      {
+        id: 'USR-002',
+        nombre: 'Pedro Cliente',
+        email: 'pedro@cliente.cl',
+        password: 'pass',
+        rol: 'cliente',
+        activo: false,
+        fechaCreacion: '2026-09-05',
+        historial: [
+          { id: 1, fecha: '2026-09-05 12:00', accion: 'Creación de cuenta', detalle: 'Cuenta cliente' },
+          { id: 2, fecha: '2026-09-10 15:00', accion: 'Desactivación', detalle: 'Cuenta suspendida' }
+        ]
+      }
+    ]
+
+    it('11. Renderiza la sección de Gestión de Usuarios, directorio y KPIs de usuarios', () => {
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          seccionActiva="usuarios"
+        />
+      )
+
+      expect(screen.getByRole('heading', { level: 1, name: /Gestión de Usuarios/i })).toBeInTheDocument()
+      expect(screen.getByText('Directorio de Usuarios (2)')).toBeInTheDocument()
+      expect(screen.getByText('Admin Principal')).toBeInTheDocument()
+      expect(screen.getByText('pedro@cliente.cl')).toBeInTheDocument()
+    })
+
+    it('12. Permite alternar el estado (activar / desactivar) de un usuario', async () => {
+      const usuario = userEvent.setup()
+      const onAlternarEstadoMock = vi.fn()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          onAlternarEstadoUsuario={onAlternarEstadoMock}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const btnDesactivar = screen.getByTitle('Desactivar usuario')
+      await usuario.click(btnDesactivar)
+
+      expect(onAlternarEstadoMock).toHaveBeenCalledWith('USR-001')
+    })
+
+    it('13. Abre el modal de historial y muestra los eventos registrados', async () => {
+      const usuario = userEvent.setup()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const btnsHistorial = screen.getAllByTitle('Ver historial de actividad')
+      await usuario.click(btnsHistorial[1]) // Pedro Cliente
+
+      expect(screen.getByText(/Historial de Auditoría: Pedro Cliente/i)).toBeInTheDocument()
+      expect(screen.getByText('Cuenta suspendida')).toBeInTheDocument()
+    })
+
+    it('14. Abre el modal de nuevo usuario y permite su creación', async () => {
+      const usuario = userEvent.setup()
+      const onCrearUsuarioMock = vi.fn()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          onCrearUsuario={onCrearUsuarioMock}
+          seccionActiva="usuarios"
+        />
+      )
+
+      await usuario.click(screen.getByRole('button', { name: /Nuevo Usuario/i }))
+      expect(screen.getByRole('heading', { name: /Crear Nuevo Usuario/i })).toBeInTheDocument()
+
+      await usuario.type(screen.getByLabelText(/Nombre Completo/i), 'Nuevo Trabajador')
+      await usuario.type(screen.getByLabelText(/Correo Electrónico/i), 'trabajador.nuevo@sonidovivo.cl')
+      await usuario.type(screen.getByLabelText(/^Contraseña/i), 'clave123')
+      await usuario.selectOptions(screen.getByLabelText(/Rol Asignado/i), 'trabajador')
+
+      await usuario.click(screen.getByRole('button', { name: /Crear Usuario/i }))
+
+      expect(onCrearUsuarioMock).toHaveBeenCalledTimes(1)
+      expect(onCrearUsuarioMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          nombre: 'Nuevo Trabajador',
+          email: 'trabajador.nuevo@sonidovivo.cl',
+          rol: 'trabajador',
+          activo: true
+        })
+      )
+    })
+  })
 })
