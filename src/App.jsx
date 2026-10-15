@@ -1,27 +1,50 @@
 import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
+import VistaEmpleado from './components/VistaEmpleado'
 import VistaJefe from './components/VistaJefe'
+import DetalleProducto from './pages/DetalleProducto'
 import Footer from './components/Footer'
 import CarritoModal from './components/CarritoModal'
+import Login from './components/Login'
 import { productosIniciales } from './data/productos'
 import { pedidosIniciales } from './data/pedidos'
 import { cargarCarritoStorage, guardarCarritoStorage } from './utils/persistencia'
 
 function App() {
-  // Estado para el rol activo: 'cliente', 'trabajador', 'jefe'
+  // Rol activo: 'cliente' | 'trabajador' | 'jefe'
   const [rolActual, setRolActual] = useState('cliente')
 
-  // Estado para el inventario de productos y pedidos
-  const [productos, setProductos] = useState(productosIniciales)
-  const [pedidos, setPedidos] = useState(pedidosIniciales)
+  // Sesión
+  const [sesionAbierta, setSesionAbierta] = useState(false)
+  const [usuarioActual, setUsuarioActual] = useState(null)
+  const [mostrarLogin, setMostrarLogin] = useState(false)
+
+  const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
   const [seccionJefe, setSeccionJefe] = useState('metricas')
 
-  // Estado para el carrito de compras y visibilidad del modal/sidebar
+  // Productos y pedidos
+  const [productos, setProductos] = useState(productosIniciales)
+  const [pedidos, setPedidos] = useState(pedidosIniciales)
+
+  // Carrito
   const [carrito, setCarrito] = useState(() => cargarCarritoStorage())
   const [modalCarritoAbierto, setModalCarritoAbierto] = useState(false)
 
-  // Agregar producto al carrito
+  const handleIniciarSesion = (usuario) => {
+    setUsuarioActual(usuario)
+    setSesionAbierta(true)
+    setMostrarLogin(false)
+    if (usuario.rol) setRolActual(usuario.rol)
+  }
+
+  const handleCerrarSesion = () => {
+    setUsuarioActual(null)
+    setSesionAbierta(false)
+    setRolActual('cliente')
+  }
+
   const handleAgregarAlCarrito = (producto) => {
     setCarrito((prev) => {
       const nuevo = [...prev, producto]
@@ -30,7 +53,7 @@ function App() {
     })
   }
 
-  // Restar una unidad de un producto del carrito
+  // Disminuir cantidad
   const handleRestarUno = (codigo) => {
     setCarrito((prev) => {
       const index = prev.findIndex((p) => p.codigo === codigo)
@@ -42,7 +65,7 @@ function App() {
     })
   }
 
-  // Eliminar todas las unidades de un producto
+  // Quitar producto
   const handleEliminarDelCarrito = (codigo) => {
     setCarrito((prev) => {
       const nuevo = prev.filter((p) => p.codigo !== codigo)
@@ -57,12 +80,10 @@ function App() {
     guardarCarritoStorage([])
   }
 
-  // Finalizar compra: agrega pedido a la lista global y descuenta stock
+  // Finalizar compra y descontar stock
   const handleFinalizarCompra = (nuevaOrden) => {
-    // 1. Agregar pedido a la lista global para que Jefe y Trabajador lo visualicen
     setPedidos((prev) => [nuevaOrden, ...prev])
 
-    // 2. Descontar stock de los productos comprados
     if (nuevaOrden.productos && nuevaOrden.productos.length > 0) {
       nuevaOrden.productos.forEach((itemComprado) => {
         setProductos((prev) =>
@@ -78,7 +99,6 @@ function App() {
       })
     }
 
-    // 3. Vaciar carrito en estado y almacenamiento local
     handleVaciarCarrito()
   }
 
@@ -112,7 +132,6 @@ function App() {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      {/* Barra de navegacion con selector de rol y badge de carrito */}
       <Navbar
         rolActual={rolActual}
         setRolActual={setRolActual}
@@ -120,38 +139,56 @@ function App() {
         onAbrirCarrito={() => setModalCarritoAbierto(true)}
         seccionJefe={seccionJefe}
         setSeccionJefe={setSeccionJefe}
+        seccionTrabajador={seccionTrabajador}
+        setSeccionTrabajador={setSeccionTrabajador}
+        sesionAbierta={sesionAbierta}
+        usuarioActual={usuarioActual}
+        onAbrirLogin={() => setMostrarLogin(true)}
+        onCerrarSesion={handleCerrarSesion}
       />
 
-      {/* Contenido principal con renderizado condicional segun el rol */}
       <main className="flex-grow-1">
-        {/* VISTA 1: CLIENTE (Gonzalo - Issue #7) */}
+        {/* Vista Cliente */}
         {rolActual === 'cliente' && (
-          <VistaCliente
-            productos={productos}
-            onAgregarAlCarrito={handleAgregarAlCarrito}
-            onAbrirCarrito={() => setModalCarritoAbierto(true)}
-          />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <VistaCliente
+                  productos={productos}
+                  onAgregarAlCarrito={handleAgregarAlCarrito}
+                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
+                />
+              }
+            />
+            <Route
+              path="/producto/:id"
+              element={<DetalleProducto productos={productos} />}
+            />
+          </Routes>
         )}
 
-        {/* VISTA 2: TRABAJADOR (Preparado para Itsa - Issue #8) */}
+        {/* Vista Trabajador */}
         {rolActual === 'trabajador' && (
-          <div className="container py-5">
-            <div className="p-4 bg-white rounded-3 shadow-sm border">
-              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 className="fw-bold text-dark mb-0">
-                  <i className="bi bi-briefcase text-info me-2"></i>
-                  Panel de Operacion - Trabajadores de Tienda
-                </h2>
-                <span className="badge bg-info text-dark">Rol: Personal de Bodega y Ventas</span>
-              </div>
-              <p className="text-muted mb-0">
-                Modulo de recepcion de pedidos y control rapido de stock.
-              </p>
-            </div>
-          </div>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <VistaEmpleado
+                  productos={productos}
+                  pedidos={pedidos}
+                  seccionActiva={seccionTrabajador}
+                  onCambiarSeccion={setSeccionTrabajador}
+                  onActualizarStock={handleActualizarStock}
+                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
+                />
+              }
+            />
+            <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
+          </Routes>
         )}
 
-        {/* VISTA 3: JEFE (Preparado para Damian - Issue #9) */}
+        {/* Vista Jefe */}
         {rolActual === 'jefe' && (
           <VistaJefe
             productos={productos}
@@ -162,12 +199,12 @@ function App() {
             onActualizarStock={handleActualizarStock}
             onActualizarEstadoPedido={handleActualizarEstadoPedido}
             seccionActiva={seccionJefe}
-            onCambiarSeccion={setSeccionJefe}
+            onCambinarSeccion={setSeccionJefe}
           />
         )}
       </main>
 
-      {/* Modal interactivo del Carrito de Compras */}
+      {/* Carrito */}
       <CarritoModal
         abierto={modalCarritoAbierto}
         onCerrar={() => setModalCarritoAbierto(false)}
@@ -179,7 +216,15 @@ function App() {
         onFinalizarCompra={handleFinalizarCompra}
       />
 
-      {/* Pie de pagina institucional */}
+      {/* Login */}
+      {mostrarLogin && (
+        <Login
+          onIniciarSesion={handleIniciarSesion}
+          onCerrar={() => setMostrarLogin(false)}
+        />
+      )}
+
+      {/* Footer */}
       <Footer />
     </div>
   )

@@ -9,9 +9,8 @@ function Footer() {
   return (
     <footer id="nosotros" className="footer-sonido-vivo mt-auto text-light pt-5 pb-3">
       <div className="container">
-        {/* Fila principal con 4 columnas */}
         <div className="row g-4 mb-4">
-          {/* Columna 1: Identidad y Descripcion */}
+          {/* Identidad */}
           <div className="col-12 col-md-6 col-lg-3">
             <div className="d-flex align-items-center gap-2 mb-3">
               <i className="bi bi-soundwave fs-2" style={{ color: 'var(--color-acento)' }}></i>
@@ -20,7 +19,7 @@ function Footer() {
             <p className="text-white-50 small mb-3" style={{ lineHeight: '1.6' }}>
               Tu tienda de musica y equipamiento de audio profesional en Viña del Mar. Calidad garantizada, asesoría técnica experta y las mejores marcas para músicos y creadores.
             </p>
-            {/* Redes Sociales */}
+            {/* Redes */}
             <div className="d-flex gap-2 mb-3">
               <a
                 href="https://instagram.com"
@@ -59,7 +58,7 @@ function Footer() {
                 <i className="bi bi-whatsapp"></i>
               </a>
             </div>
-            {/* Sellos de Confianza */}
+            {/* Garantía */}
             <div className="d-flex flex-wrap gap-1 mt-2">
               <span className="badge bg-dark border border-secondary text-white-50 small">
                 <i className="bi bi-truck me-1 text-warning"></i> Envíos a todo Chile
@@ -70,7 +69,7 @@ function Footer() {
             </div>
           </div>
 
-          {/* Columna 2: Enlaces Rápidos y Categorías */}
+          {/* Navegación */}
           <div className="col-6 col-md-3 col-lg-2">
             <h6 className="text-uppercase fw-bold mb-3 pb-1 border-bottom border-secondary text-white" style={{ letterSpacing: '1px' }}>
               Navegación
@@ -109,7 +108,7 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Columna 3: Información de Contacto y Horarios */}
+          {/* Contacto */}
           <div className="col-6 col-md-3 col-lg-3">
             <h6 className="text-uppercase fw-bold mb-3 pb-1 border-bottom border-secondary text-white" style={{ letterSpacing: '1px' }}>
               Sucursal y Contacto
@@ -167,7 +166,7 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Columna 4: Mapa Interactivo Embebido (Google Maps) */}
+          {/* Mapa */}
           <div className="col-12 col-md-12 col-lg-4">
             <h6 className="text-uppercase fw-bold mb-3 pb-1 border-bottom border-secondary text-white d-flex justify-content-between align-items-center" style={{ letterSpacing: '1px' }}>
               <span>Ubicación en Viña del Mar</span>
@@ -199,7 +198,6 @@ function Footer() {
           </div>
         </div>
 
-        {/* Separador y Barra Inferior */}
         <hr className="border-secondary opacity-50 my-3" />
 
         <div className="row align-items-center gy-2">
@@ -210,7 +208,7 @@ function Footer() {
             </p>
           </div>
 
-          {/* Medios de Pago y Boton Arriba */}
+          {/* Pagos */}
           <div className="col-12 col-md-6 text-center text-md-end d-flex justify-content-center justify-content-md-end align-items-center gap-3">
             <div className="d-flex align-items-center gap-2 text-white-50 small">
               <span>Medios de Pago:</span>
@@ -236,4 +234,3 @@ function Footer() {
 }
 
 export default Footer
-

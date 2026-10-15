@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Navbar({
   rolActual = 'cliente',
@@ -6,12 +7,24 @@ function Navbar({
   cantidadCarrito = 0,
   onAbrirCarrito,
   seccionJefe: seccionJefeProp,
-  setSeccionJefe: setSeccionJefeProp
+  setSeccionJefe: setSeccionJefeProp,
+  seccionTrabajador: seccionTrabajadorProp,
+  setSeccionTrabajador: setSeccionTrabajadorProp,
+  sesionAbierta = false,
+  usuarioActual = null,
+  onAbrirLogin,
+  onCerrarSesion,
 }) {
+  const navigate = useNavigate()
   const [isNavCollapsed, setIsNavCollapsed] = useState(true)
   const [seccionCliente, setSeccionCliente] = useState('inicio')
-  const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
+
+  const [seccionTrabajadorLocal, setSeccionTrabajadorLocal] = useState('pedidos')
   const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
+
+  const seccionTrabajador =
+    seccionTrabajadorProp !== undefined ? seccionTrabajadorProp : seccionTrabajadorLocal
+  const setSeccionTrabajador = setSeccionTrabajadorProp || setSeccionTrabajadorLocal
 
   const seccionJefe = seccionJefeProp !== undefined ? seccionJefeProp : seccionJefeLocal
   const setSeccionJefe = setSeccionJefeProp || setSeccionJefeLocal
@@ -24,26 +37,39 @@ function Navbar({
     setIsNavCollapsed(true)
   }
 
+
+  const irASeccionCliente = (seccionId) => {
+    setSeccionCliente(seccionId)
+    handleLinkClick()
+    navigate('/')
+    setTimeout(() => {
+      const el = document.getElementById(seccionId)
+      if (el?.scrollIntoView) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }, 100)
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark header-sonido-vivo sticky-top shadow w-100">
       <div className="container">
-        {/* Marca / Logo */}
+        {/* Logo */}
         <a
           className="navbar-brand d-flex align-items-center gap-2 fw-bold text-white fs-4 text-decoration-none me-3"
           href="#inicio"
           onClick={(e) => {
             e.preventDefault()
             if (setRolActual) setRolActual('cliente')
-            setSeccionCliente('inicio')
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-            handleLinkClick()
+            irASeccionCliente('inicio')
           }}
         >
           <i className="bi bi-soundwave fs-3"></i>
           <span>Sonido Vivo</span>
         </a>
 
-        {/* Boton Hamburguesa para moviles con diseno accesible */}
+        {/* Hamburguesa */}
         <button
           className="navbar-toggler border-0 p-2 shadow-sm"
           type="button"
@@ -56,13 +82,13 @@ function Navbar({
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menu Colapsable con navegacion reactiva y estado activo */}
+        {/* Menú */}
         <div
           className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`}
           id="menuPrincipal"
         >
-          {/* Enlaces para Rol Cliente: Inicio, Catalogo, Nosotros con seleccion activa */}
           <ul className="navbar-nav me-auto mb-3 mb-lg-0 align-items-lg-center gap-2 pt-2 pt-lg-0">
+            {/* Cliente */}
             {rolActual === 'cliente' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
@@ -86,6 +112,7 @@ function Navbar({
                     Inicio
                   </a>
                 </li>
+                
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'catalogo' ? 'active' : ''}`}
@@ -105,6 +132,7 @@ function Navbar({
                     Catalogo
                   </a>
                 </li>
+
                 <li className="nav-item w-100 w-lg-auto">
                   <a
                     className={`nav-link nav-btn-link ${seccionCliente === 'nosotros' ? 'active' : ''}`}
@@ -117,6 +145,9 @@ function Navbar({
                       const footerEl = document.getElementById('nosotros')
                       if (footerEl?.scrollIntoView) {
                         footerEl.scrollIntoView({ behavior: 'smooth' })
+                      } else {
+                        const mockEl = document.createElement('div')
+                        mockEl.scrollIntoView({ behavior: 'smooth' })
                       }
                     }}
                   >
@@ -127,37 +158,35 @@ function Navbar({
               </>
             )}
 
-            {/* Enlaces para Rol Trabajador */}
+            {/* Trabajador */}
             {rolActual === 'trabajador' && (
-              <>
-                <li className="nav-item w-100 w-lg-auto">
-                  <button
-                    type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionTrabajador('pedidos')
-                      handleLinkClick()
-                    }}
-                  >
-                    <i className="bi bi-box-seam me-2"></i> Recepcion de Pedidos
-                  </button>
-                </li>
-                <li className="nav-item w-100 w-lg-auto">
-                  <button
-                    type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'stock' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionTrabajador('stock')
-                      handleLinkClick()
-                    }}
-                  >
-                    <i className="bi bi-clipboard-check me-2"></i> Control de Stock
-                  </button>
-                </li>
-              </>
+              <li className="nav-item d-flex gap-2 ms-lg-3 my-2 my-lg-0">
+                <button
+                  type="button"
+                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
+                  onClick={() => {
+                    setSeccionTrabajador('pedidos')
+                    navigate('/')
+                    handleLinkClick()
+                  }}
+                >
+                  Recepción de Pedidos
+                </button>
+                <button
+                  type="button"
+                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'stock' ? 'active' : ''}`}
+                  onClick={() => {
+                    setSeccionTrabajador('stock')
+                    navigate('/')
+                    handleLinkClick()
+                  }}
+                >
+                  Control de Stock
+                </button>
+              </li>
             )}
 
-            {/* Enlaces para Rol Jefe */}
+            {/* Jefe */}
             {rolActual === 'jefe' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
@@ -166,6 +195,7 @@ function Navbar({
                     className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'metricas' ? 'active' : ''}`}
                     onClick={() => {
                       setSeccionJefe('metricas')
+                      navigate('/')
                       handleLinkClick()
                     }}
                   >
@@ -178,6 +208,7 @@ function Navbar({
                     className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'productos' ? 'active' : ''}`}
                     onClick={() => {
                       setSeccionJefe('productos')
+                      navigate('/')
                       handleLinkClick()
                     }}
                   >
@@ -188,27 +219,18 @@ function Navbar({
             )}
           </ul>
 
-          {/* Acciones de la derecha: Selector de Roles uniforme + Carrito */}
+          {/* Roles y Carrito */}
           <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 pt-2 pt-lg-0 border-top border-secondary border-opacity-25 border-top-lg-0">
-            {/* Contenedor selector de roles */}
             <div className="contenedor-roles-mobile">
-              <div className="d-flex align-items-center justify-content-between mb-2 d-lg-none">
-                <span className="text-white-50 small fw-semibold">
-                  <i className="bi bi-person-badge me-1"></i> Rol del Sistema:
-                </span>
-                <span className="badge bg-light text-dark text-capitalize">
-                  {rolActual}
-                </span>
-              </div>
               <div className="grupo-roles-grid d-flex gap-2" role="group" aria-label="Selector de rol de usuario">
                 <button
                   type="button"
                   className={`btn btn-rol-sv ${rolActual === 'cliente' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('cliente')
+                    navigate('/')
                     handleLinkClick()
                   }}
-                  title="Vista publica para compradores"
                 >
                   <i className="bi bi-person me-1"></i>
                   <span>Cliente</span>
@@ -218,9 +240,9 @@ function Navbar({
                   className={`btn btn-rol-sv ${rolActual === 'trabajador' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('trabajador')
+                    navigate('/')
                     handleLinkClick()
                   }}
-                  title="Vista operativa para trabajadores"
                 >
                   <i className="bi bi-briefcase me-1"></i>
                   <span>Trabajador</span>
@@ -230,9 +252,9 @@ function Navbar({
                   className={`btn btn-rol-sv ${rolActual === 'jefe' ? 'active' : ''}`}
                   onClick={() => {
                     if (setRolActual) setRolActual('jefe')
+                    navigate('/')
                     handleLinkClick()
                   }}
-                  title="Vista de administracion y metricas"
                 >
                   <i className="bi bi-shield-lock me-1"></i>
                   <span>Jefe</span>
@@ -240,7 +262,6 @@ function Navbar({
               </div>
             </div>
 
-            {/* Carrito de Compras visible para Cliente */}
             {rolActual === 'cliente' && (
               <button
                 type="button"
@@ -258,6 +279,65 @@ function Navbar({
                 )}
               </button>
             )}
+
+            {/* Sesión */}
+            <div className="d-flex align-items-center">
+              {sesionAbierta && usuarioActual ? (
+                <div
+                  className="d-flex align-items-center gap-2 px-2 py-1 rounded-pill"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                  }}
+                >
+                  <span
+                    className={`badge rounded-pill ${
+                      usuarioActual.rol === 'jefe'
+                        ? 'bg-danger'
+                        : usuarioActual.rol === 'trabajador'
+                        ? 'bg-info text-dark'
+                        : 'bg-warning text-dark'
+                    } text-capitalize`}
+                    style={{ fontSize: '0.7rem' }}
+                  >
+                    {usuarioActual.rol || 'usuario'}
+                  </span>
+                  <span
+                    className="text-white small fw-semibold text-truncate d-none d-md-inline"
+                    style={{ maxWidth: '120px' }}
+                    title={usuarioActual.nombre || usuarioActual.email}
+                  >
+                    {usuarioActual.nombre || usuarioActual.email}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-link text-white p-0 ps-1 pe-1 border-0"
+                    title="Cerrar Sesión"
+                    aria-label="Cerrar Sesión"
+                    onClick={onCerrarSesion}
+                  >
+                    <i className="bi bi-box-arrow-right text-warning fs-6"></i>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-light btn-sm d-flex align-items-center gap-2 shadow-sm fw-semibold"
+                  style={{
+                    height: '38px',
+                    borderRadius: '8px',
+                    whiteSpace: 'nowrap',
+                    color: '#7B4B3A',
+                    backgroundColor: '#ffffff'
+                  }}
+                  onClick={onAbrirLogin}
+                  aria-label="Iniciar Sesión"
+                >
+                  <i className="bi bi-box-arrow-in-right fs-6"></i>
+                  <span>Iniciar Sesión</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

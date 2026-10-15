@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-// Carga dinamica de imagenes locales con Vite
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
 
 function CarritoModal({
@@ -17,7 +16,7 @@ function CarritoModal({
   const [cargandoPago, setCargandoPago] = useState(false)
   const [ordenGenerada, setOrdenGenerada] = useState(null)
 
-  // Datos del formulario de checkout
+  // Formulario checkout
   const [formulario, setFormulario] = useState({
     nombre: '',
     email: '',
@@ -29,7 +28,7 @@ function CarritoModal({
 
   if (!abierto) return null
 
-  // Agrupar items repetidos en el carrito para mostrar cantidades
+  // Agrupar items
   const itemsAgrupados = carrito.reduce((acc, prod) => {
     const key = prod.codigo || prod.id || prod.nombre
     if (!acc[key]) {
@@ -42,7 +41,7 @@ function CarritoModal({
 
   const listaItems = Object.values(itemsAgrupados)
 
-  // Calculo de totales
+  // Totales
   const total = listaItems.reduce(
     (sum, item) => sum + (Number(item.precio) || 0) * item.cantidad,
     0
@@ -84,7 +83,7 @@ function CarritoModal({
     if (!handleValidarFormulario()) return
 
     setCargandoPago(true)
-    // Simulacion de transaccion y checkout
+    // Simulación pago
     setTimeout(() => {
       const nuevaOrden = {
         id: Math.floor(1000 + Math.random() * 9000),
@@ -149,7 +148,7 @@ function CarritoModal({
         aria-modal="true"
         aria-labelledby="titulo-carrito"
       >
-        {/* Cabecera del Carrito */}
+        {/* Cabecera */}
         <div
           className="p-3 text-white d-flex align-items-center justify-content-between header-sonido-vivo"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
@@ -177,9 +176,8 @@ function CarritoModal({
           </button>
         </div>
 
-        {/* Contenido segun el paso actual */}
         <div className="flex-grow-1 overflow-auto p-3 p-md-4">
-          {/* PASO 1: LISTADO DEL CARRITO */}
+          {/* Paso 1: Carrito */}
           {paso === 'carrito' && (
             <>
               {listaItems.length === 0 ? (
@@ -249,7 +247,7 @@ function CarritoModal({
                           {item.marca} {item.modelo ? `· ${item.modelo}` : ''}
                         </div>
                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                          {/* Controles de cantidad */}
+                          {/* Cantidad */}
                           <div className="btn-group btn-group-sm border rounded bg-white" role="group">
                             <button
                               type="button"
@@ -272,7 +270,7 @@ function CarritoModal({
                               +
                             </button>
                           </div>
-                          {/* Subtotal por producto */}
+                          {/* Subtotal */}
                           <div className="fw-bold text-end" style={{ color: 'var(--color-primario)' }}>
                             {formatearPrecio(item.precio * item.cantidad)}
                           </div>
@@ -285,7 +283,7 @@ function CarritoModal({
             </>
           )}
 
-          {/* PASO 2: FORMULARIO DE CHECKOUT */}
+          {/* Paso 2: Checkout */}
           {paso === 'checkout' && (
             <form onSubmit={handleSubmitCheckout} className="d-flex flex-column gap-3">
               <div className="alert alert-info py-2 px-3 small border-0 mb-1">
@@ -371,7 +369,7 @@ function CarritoModal({
             </form>
           )}
 
-          {/* PASO 3: CONFIRMACION EXITOSA */}
+          {/* Paso 3: Éxito */}
           {paso === 'exito' && ordenGenerada && (
             <div className="text-center py-4">
               <div
@@ -418,7 +416,7 @@ function CarritoModal({
           )}
         </div>
 
-        {/* Pie del Carrito: Totales y Acciones */}
+        {/* Totales y acciones */}
         {paso === 'carrito' && listaItems.length > 0 && (
           <div className="p-3 bg-light border-top shadow-sm">
             <div className="d-flex justify-content-between align-items-center mb-1 text-muted small">

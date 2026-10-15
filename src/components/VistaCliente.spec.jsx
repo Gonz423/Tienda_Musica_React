@@ -48,7 +48,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     vi.useRealTimers()
   })
 
-  // 1. Prueba de renderizado correcto de la lista de productos en el catalogo
+  // 1. Renderizado
   it('1. Renderiza correctamente los productos en el catalogo con marcas, precios y stock', () => {
     render(<VistaCliente productos={productosPrueba} />)
 
@@ -61,37 +61,37 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(screen.getByText(/Mostrando/i)).toHaveTextContent('Mostrando 3 de 3 productos')
   })
 
-  // 2. Prueba del buscador reactivo en tiempo real (por nombre, marca y modelo) y boton de limpiar
+  // 2. Buscador y limpieza
   it('2. Filtra productos mediante el buscador por nombre, marca y modelo, permitiendo limpiar el campo', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
 
     const inputBuscar = screen.getByLabelText(/Buscar producto/i)
 
-    // Busqueda por nombre
+    // Búsqueda nombre
     await usuario.type(inputBuscar, 'folk')
     expect(screen.getByText('Guitarra Folk')).toBeInTheDocument()
     expect(screen.queryByText('Batería Acústica Stage')).not.toBeInTheDocument()
 
-    // Limpiar busqueda con el boton de la cruz
+    // Limpiar
     const botonLimpiar = screen.getByTitle(/Limpiar busqueda/i)
     await usuario.click(botonLimpiar)
     expect(inputBuscar).toHaveValue('')
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
 
-    // Busqueda por marca
+    // Búsqueda marca
     await usuario.type(inputBuscar, 'Pearl')
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
     expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
     await usuario.clear(inputBuscar)
 
-    // Busqueda por modelo
+    // Búsqueda modelo
     await usuario.type(inputBuscar, 'CA-50')
     expect(screen.getByText('Afinador Cromático')).toBeInTheDocument()
     expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
   })
 
-  // 3. Prueba del filtro interactivo por categorias
+  // 3. Filtro por categoría
   it('3. Filtra la lista de productos al seleccionar una categoria especifica', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
@@ -103,32 +103,32 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
     expect(screen.queryByText('Afinador Cromático')).not.toBeInTheDocument()
 
-    // Volver a todas
+    // Todas
     const botonTodas = screen.getByRole('button', { name: /^todas$/i })
     await usuario.click(botonTodas)
     expect(screen.getByText('Guitarra Folk')).toBeInTheDocument()
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
   })
 
-  // 4. Prueba del ordenamiento de productos por menor y mayor precio
+  // 4. Orden por precio
   it('4. Ordena correctamente los productos por precio de menor a mayor y viceversa', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
 
     const selectOrden = screen.getByLabelText(/Ordenar:/i)
 
-    // Menor a mayor precio (15.990 -> 129.990 -> 499.990)
+    // Menor precio
     await usuario.selectOptions(selectOrden, 'menor-precio')
     const titulosMenor = screen.getAllByRole('heading', { level: 5 }).map((h) => h.textContent)
     expect(titulosMenor).toEqual(['Afinador Cromático', 'Guitarra Folk', 'Batería Acústica Stage'])
 
-    // Mayor a menor precio (499.990 -> 129.990 -> 15.990)
+    // Mayor precio
     await usuario.selectOptions(selectOrden, 'mayor-precio')
     const titulosMayor = screen.getAllByRole('heading', { level: 5 }).map((h) => h.textContent)
     expect(titulosMayor).toEqual(['Batería Acústica Stage', 'Guitarra Folk', 'Afinador Cromático'])
   })
 
-  // 5. Prueba del ordenamiento alfabetico por nombre (A - Z)
+  // 5. Orden A-Z
   it('5. Ordena alfabeticamente los productos de A a Z por su nombre', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
@@ -140,7 +140,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(titulosAZ).toEqual(['Afinador Cromático', 'Batería Acústica Stage', 'Guitarra Folk'])
   })
 
-  // 6. Prueba del estado vacio cuando no hay coincidencias y boton de restablecer filtros
+  // 6. Estado vacío y restablecer
   it('6. Muestra mensaje accesible de estado vacio y permite restablecer los filtros', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
@@ -158,7 +158,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(inputBuscar).toHaveValue('')
   })
 
-  // 7. Prueba de agregar al carrito, ejecucion de callback y alerta con temporizador
+  // 7. Agregar al carrito y alerta
   it('7. Ejecuta callback onAgregarAlCarrito y muestra alerta temporal al agregar producto', async () => {
     vi.useFakeTimers()
     const onAgregarMock = vi.fn()
@@ -174,20 +174,20 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(onAgregarMock).toHaveBeenCalledWith(productosPrueba[0])
     expect(screen.getByText(/Agregaste "Guitarra Folk" al carrito de compras/i)).toBeInTheDocument()
 
-    // Probar boton Ver Carrito en la alerta
+    // Ver carrito
     const botonVerCarrito = screen.getByRole('button', { name: /Ver Carrito/i })
     await act(async () => {
       botonVerCarrito.click()
     })
     expect(onAbrirCarritoMock).toHaveBeenCalled()
 
-    // Avanzar temporizador para comprobar que la alerta desaparece
+    // Temporizador alerta
     act(() => {
       vi.advanceTimersByTime(2500)
     })
     expect(screen.queryByText(/Agregaste "Guitarra Folk" al carrito/i)).not.toBeInTheDocument()
 
-    // Probar agregar sin callback prop definida
+    // Sin callback
     render(<VistaCliente productos={[productosPrueba[0]]} />)
     const botonSinCallback = screen.getAllByRole('button', { name: /Agregar al Carrito/i })[0]
     await act(async () => {
@@ -197,23 +197,23 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     vi.useRealTimers()
   })
 
-  // 8. Prueba del manejo de stock critico y producto agotado con boton deshabilitado
+  // 8. Stock crítico y agotado
   it('8. Deshabilita boton de compra para productos sin stock y resalta stock critico', () => {
     render(<VistaCliente productos={productosPrueba} />)
 
-    // Producto sin stock (AC001: stock 0)
+    // Agotado
     expect(screen.getByText('Sin Stock')).toBeInTheDocument()
     const botonAgotado = screen.getByRole('button', { name: /Agotado/i })
     expect(botonAgotado).toBeDisabled()
 
-    // Producto con stock critico (BT001: stock 2)
+    // Crítico
     expect(screen.getByText('Stock: 2 un.')).toHaveClass('bg-warning')
 
-    // Producto con stock normal (GA001: stock 5)
+    // Normal
     expect(screen.getByText('Stock: 5 un.')).toHaveClass('bg-success')
   })
 
-  // 9. Prueba con espia vi.spyOn(Storage.prototype, 'setItem') al persistir en localStorage
+  // 9. Espía localStorage
   it('9. Utiliza un espia vi.spyOn para comprobar la persistencia del carrito en localStorage', async () => {
     const espiaLocalStorage = vi.spyOn(Storage.prototype, 'setItem')
     const usuario = userEvent.setup()
@@ -228,7 +228,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
       expect.stringContaining('GA001')
     )
 
-    // Probar funciones utilitarias directas de persistencia del carrito
+    // Utilidades persistencia
     guardarCarritoStorage([productosPrueba[1]])
     expect(espiaLocalStorage).toHaveBeenCalledWith(
       'carrito_compras',
@@ -238,7 +238,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     const carritoRecuperado = cargarCarritoStorage()
     expect(carritoRecuperado).toEqual([productosPrueba[1]])
 
-    // Manejo de error cuando el JSON de localStorage es corrupto
+    // JSON inválido
     localStorage.setItem('carrito_compras', 'invalido{json')
     expect(cargarCarritoStorage()).toEqual([])
 
@@ -248,9 +248,9 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     espiaLocalStorage.mockRestore()
   })
 
-  // 10. Prueba con mock asincrono vi.fn().mockResolvedValue(...) para servicios de usuario
+  // 10. Mocks asíncronos
   it('10. Utiliza un mock asincrono vi.fn().mockResolvedValue para simular consulta de stock y checkout del cliente', async () => {
-    // Mock simulando consulta de stock remota
+    // Mock stock
     const servicioStockMock = {
       consultarStock: vi.fn().mockResolvedValue({ codigo: 'GA001', disponible: true, unidades: 8 })
     }
@@ -260,7 +260,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(resultadoStock.disponible).toBe(true)
     expect(resultadoStock.unidades).toBe(8)
 
-    // Mock simulando proceso de checkout y creacion de orden
+    // Mock checkout
     const servicioCheckoutMock = {
       crearPedido: vi.fn().mockResolvedValue({ exito: true, orderId: 8841, mensaje: 'Pedido recibido' })
     }

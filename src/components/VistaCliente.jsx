@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { guardarCarritoStorage, cargarCarritoStorage } from '../utils/persistencia'
 
-// Carga dinamica y robusta de imagenes locales desde src/assets/img mediante Vite
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
 
 function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
@@ -10,7 +10,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
   const [orden, setOrden] = useState('destacados')
   const [mensajeAlerta, setMensajeAlerta] = useState('')
 
-  // Manejar agregar al carrito y persistencia local
+  // Agregar al carrito
   const handleAgregar = (producto) => {
     if (onAgregarAlCarrito) {
       onAgregarAlCarrito(producto)
@@ -23,11 +23,10 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
     }, 2500)
   }
 
-
-  // Lista de categorias unicas presentes en los datos
+  // Categorías
   const categorias = ['todas', ...new Set(productos.map((p) => p.categoria))]
 
-  // Filtrado reactivo de productos
+  // Filtros
   let productosFiltrados = productos.filter((producto) => {
     const coincideCategoria =
       categoriaFiltro === 'todas' ||
@@ -43,7 +42,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
     return coincideCategoria && coincideBusqueda
   })
 
-  // Ordenamiento interactivo
+  // Ordenamiento
   if (orden === 'menor-precio') {
     productosFiltrados = [...productosFiltrados].sort((a, b) => a.precio - b.precio)
   } else if (orden === 'mayor-precio') {
@@ -52,7 +51,6 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
     productosFiltrados = [...productosFiltrados].sort((a, b) => a.nombre.localeCompare(b.nombre))
   }
 
-  // Obtener ruta de imagen local empaquetada
   const obtenerImagen = (codigo) => {
     const clave = `../assets/img/${codigo}.jpg`
     return imagenesLocales[clave] || imagenesLocales['../assets/img/GA001.jpg']
@@ -60,7 +58,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
 
   return (
     <div className="vista-cliente pb-5">
-      {/* Encabezado Superior del Catalogo */}
+      {/* Hero */}
       <section className="hero-sonido-vivo py-5 mb-4 shadow-sm text-center" id="inicio">
         <div className="container py-4">
           <div className="badge bg-light text-dark px-3 py-2 fs-6 mb-3 rounded-pill fw-semibold shadow-sm">
@@ -76,7 +74,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
       </section>
 
       <div className="container" id="catalogo">
-        {/* Mensaje de alerta reactiva al agregar producto */}
+        {/* Alerta */}
         {mensajeAlerta && (
           <div
             className="alert alert-success alert-dismissible fade show shadow-sm text-center mb-4 border-0 d-flex align-items-center justify-content-center flex-wrap gap-2"
@@ -99,10 +97,9 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
         )}
 
-        {/* Barra de Filtros, Buscador y Ordenamiento */}
+        {/* Filtros y buscador */}
         <div className="bg-white p-3 p-md-4 rounded-3 shadow-sm border mb-4">
           <div className="row g-3 align-items-center">
-            {/* Buscador de Productos */}
             <div className="col-12 col-md-5 col-lg-4">
               <div className="input-group">
                 <span className="input-group-text bg-light border-end-0">
@@ -129,7 +126,6 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
               </div>
             </div>
 
-            {/* Selector de Orden */}
             <div className="col-12 col-sm-6 col-md-4 col-lg-3">
               <div className="d-flex align-items-center gap-2">
                 <label htmlFor="ordenarPor" className="small text-muted mb-0 text-nowrap">
@@ -149,12 +145,11 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
               </div>
             </div>
 
-            {/* Contador de Productos */}
             <div className="col-12 col-sm-6 col-md-3 col-lg-5 text-sm-end text-muted small">
               Mostrando <strong>{productosFiltrados.length}</strong> de <strong>{productos.length}</strong> productos
             </div>
 
-            {/* Botones de Categorias con scroll horizontal en mobile */}
+            {/* Categorías */}
             <div className="col-12 pt-2 border-top">
               <div className="d-flex align-items-center gap-2">
                 <span className="small fw-bold me-1 text-nowrap d-none d-sm-inline" style={{ color: 'var(--color-secundario)' }}>
@@ -181,21 +176,21 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
         </div>
 
-        {/* Grilla Responsiva de Productos */}
+        {/* Catálogo */}
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 g-md-4">
           {productosFiltrados.map((producto) => (
             <div key={producto.codigo || producto.id} className="col">
               <article className="card-producto-sv text-center">
-                {/* Imagen del producto cargada desde assets locales */}
-                <figure>
-                  <img
-                    src={obtenerImagen(producto.codigo)}
-                    alt={`${producto.nombre} - ${producto.marca}`}
-                    loading="lazy"
-                  />
+                <figure className="mb-0">
+                  <Link to={`/producto/${producto.codigo || producto.id}`}>
+                    <img
+                      src={obtenerImagen(producto.codigo)}
+                      alt={`${producto.nombre} ${producto.marca}`}
+                      loading="lazy"
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Link>
                 </figure>
-
-                {/* Categoria */}
                 <div className="p-2 px-3 bg-light text-center border-bottom">
                   <span
                     className="badge text-uppercase"
@@ -205,14 +200,19 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
                   </span>
                 </div>
 
-                {/* Cuerpo de la Tarjeta con nombre y textos centrados */}
                 <div className="card-body d-flex flex-column justify-content-between p-3 text-center">
                   <div>
                     <h5
                       className="card-title fw-bold mb-1 fs-6 text-center producto-titulo"
                       style={{ color: 'var(--color-texto)' }}
                     >
-                      {producto.nombre}
+                      <Link 
+                        to={`/producto/${producto.codigo || producto.id}`}
+                        className="text-decoration-none text-dark"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {producto.nombre}
+                      </Link>
                     </h5>
                     <p className="text-muted small mb-2 text-center text-truncate">
                       <strong>{producto.marca}</strong> | Modelo: {producto.modelo}
@@ -261,7 +261,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           ))}
         </div>
 
-        {/* Estado cuando no hay productos coincidentes */}
+        {/* Sin resultados */}
         {productosFiltrados.length === 0 && (
           <div className="text-center py-5 bg-white rounded-3 border my-4">
             <i className="bi bi-search fs-1 text-muted d-block mb-2"></i>

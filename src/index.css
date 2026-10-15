@@ -1,4 +1,4 @@
-/* Estilos globales - Tienda Sonido Vivo */
+/* Estilos globales */
 :root {
   --fuente-principal: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   --color-primario: #7B4B3A;
@@ -42,20 +42,20 @@ body {
   color: var(--color-texto);
 }
 
-/* Encabezado y Navbar con gradiente corporativo */
+/* Navbar */
 .header-sonido-vivo {
   background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%) !important;
   border-bottom: 2px solid var(--color-secundario);
 }
 
-/* Hero Section */
+/* Hero */
 .hero-sonido-vivo {
   background: linear-gradient(rgba(53, 27, 22, 0.85), rgba(75, 46, 43, 0.9)), url('./assets/img/AM001.jpg') center/cover no-repeat;
   color: #ffffff;
   border-bottom: 3px solid var(--color-acento);
 }
 
-/* Tarjetas de Producto */
+/* Tarjeta producto */
 .card-producto-sv {
   background: var(--color-blanco);
   border: 1px solid rgba(75, 46, 43, 0.15);
@@ -91,7 +91,7 @@ body {
   object-fit: contain;
 }
 
-/* Tarjetas Multimedia (Audio y Video) */
+/* Multimedia */
 .media-card-sv {
   background: var(--color-blanco);
   border: 1px solid rgba(75, 46, 43, 0.15);
@@ -113,7 +113,7 @@ body {
   color: var(--color-secundario);
 }
 
-/* Botones personalizados con la paleta oficial */
+/* Botones */
 .btn-sv-primary {
   background-color: var(--color-acento);
   border-color: var(--color-acento);
@@ -146,15 +146,7 @@ body {
   color: #ffffff;
 }
 
-/* Pie de pagina */
-.footer-sonido-vivo {
-  background-color: var(--color-secundario);
-  color: var(--color-claro);
-  border-top: 3px solid var(--color-acento);
-}
-
-
-/* Botones de navegacion en header con altura uniforme y borde */
+/* Nav links */
 .header-sonido-vivo .nav-btn-link {
   display: inline-flex !important;
   align-items: center !important;
@@ -187,7 +179,7 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Botones de Selector de Rol - Letras y bordes blancos de alto contraste */
+/* Selector de rol */
 .btn-rol-sv {
   display: inline-flex !important;
   align-items: center !important;
@@ -232,7 +224,7 @@ body {
   color: #ffffff !important;
 }
 
-/* Optimizaciones Responsivas del Catalogo de Productos */
+/* Categorías */
 .categorias-scroll-bar {
   display: flex;
   gap: 0.5rem;
@@ -284,7 +276,7 @@ body {
   min-height: 2.7em;
 }
 
-/* Optimizacion Mobile para Menu y Botones de Navegacion */
+/* Mobile */
 @media (max-width: 991.98px) {
   .navbar-collapse {
     background: rgba(53, 27, 22, 0.95);
@@ -390,10 +382,7 @@ body {
   }
 }
 
-
-/* ========================================================
-   ESTILOS INSTITUCIONALES DEL FOOTER - SONIDO VIVO
-   ======================================================== */
+/* Footer */
 .footer-sonido-vivo {
   background: linear-gradient(180deg, #2b1814 0%, #160c0a 100%);
   border-top: 3px solid var(--color-acento);
@@ -450,7 +439,7 @@ body {
   border-color: var(--color-acento);
 }
 
-/* Estilos y animaciones del Carrito de Compras */
+/* Carrito modal */
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
@@ -486,5 +475,3 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(53, 27, 22, 0.08) !important;
 }
-
-
