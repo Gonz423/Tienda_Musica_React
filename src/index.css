@@ -50,9 +50,90 @@ body {
 
 /* Hero */
 .hero-sonido-vivo {
-  background: linear-gradient(rgba(53, 27, 22, 0.85), rgba(75, 46, 43, 0.9)), url('./assets/img/AM001.jpg') center/cover no-repeat;
+  background-image: linear-gradient(rgba(20, 10, 8, 0.35), rgba(40, 20, 15, 0.45)), var(--hero-banner, url('./assets/img/baner.png'));
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #ffffff;
   border-bottom: 3px solid var(--color-acento);
+}
+
+@media (max-width: 768px) {
+  .hero-sonido-vivo {
+    background-image: linear-gradient(rgba(20, 10, 8, 0.35), rgba(40, 20, 15, 0.45)), var(--hero-banner-mobile, url('./assets/img/banercelular.png')) !important;
+    background-position: center center !important;
+  }
+}
+
+.hero-sonido-vivo h1 {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.hero-sonido-vivo p {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+  color: #ffffff !important;
+}
+
+/* Banner de Contacto y Fondo General */
+.pagina-contacto-wrapper {
+  background-image: linear-gradient(rgba(35, 18, 14, 0.68), rgba(25, 12, 10, 0.78)), var(--contacto-bg, url('./assets/img/banercelular2.png'));
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: calc(100vh - 120px);
+}
+
+@media (max-width: 768px) {
+  .pagina-contacto-wrapper {
+    background-image: linear-gradient(rgba(35, 18, 14, 0.70), rgba(25, 12, 10, 0.80)), var(--contacto-bg-mobile, url('./assets/img/banercelular2.png')) !important;
+  }
+}
+
+.card-contacto-glass {
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28) !important;
+}
+
+.hero-contacto-sv {
+  background: linear-gradient(135deg, var(--color-secundario) 0%, var(--color-primario) 100%);
+  border: 1px solid rgba(75, 46, 43, 0.2);
+}
+
+.hero-contacto-sv h1 {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.hero-contacto-sv p {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+}
+
+@media (max-width: 768px) {
+  .hero-contacto-sv {
+    background-image: linear-gradient(rgba(20, 10, 8, 0.40), rgba(40, 20, 15, 0.50)), var(--contacto-bg-mobile, url('./assets/img/banercelular2.png')) !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+}
+
+/* Banner CTA Contacto en Inicio */
+.banner-cta-contacto {
+  background: linear-gradient(135deg, var(--color-secundario) 0%, var(--color-primario) 100%);
+  border: 2px solid var(--color-acento);
+}
+
+@media (max-width: 768px) {
+  .banner-cta-contacto {
+    background-image: linear-gradient(rgba(20, 10, 8, 0.45), rgba(40, 20, 15, 0.55)), var(--cta-bg-mobile, url('./assets/img/banercelular2.png')) !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+  }
 }
 
 /* Tarjeta producto */
@@ -224,6 +305,60 @@ body {
   color: #ffffff !important;
 }
 
+/* Panel de Filtros del Catálogo - Estilo Estudio */
+.panel-filtros-catalogo {
+  background: linear-gradient(135deg, #ffffff 0%, #f7f3ee 100%);
+  border: 1px solid rgba(123, 75, 58, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(75, 46, 43, 0.06);
+}
+
+.search-box-sv {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(123, 75, 58, 0.2);
+  transition: all 0.2s ease;
+}
+
+.search-box-sv:focus-within {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px rgba(123, 75, 58, 0.15) !important;
+}
+
+.search-box-sv input {
+  font-size: 0.95rem;
+}
+
+.search-box-sv input:focus {
+  box-shadow: none;
+}
+
+.orden-box-sv {
+  border: 1px solid rgba(123, 75, 58, 0.2) !important;
+  transition: all 0.2s ease;
+}
+
+.orden-box-sv:focus-within {
+  border-color: var(--color-primario) !important;
+  box-shadow: 0 0 0 2px rgba(123, 75, 58, 0.15) !important;
+}
+
+.contador-pill-sv {
+  display: inline-block;
+  white-space: nowrap;
+  background: #ffffff;
+  border: 1px solid rgba(123, 75, 58, 0.2);
+  border-radius: 50px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--color-secundario);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
 /* Categorías */
 .categorias-scroll-bar {
   display: flex;
@@ -245,11 +380,35 @@ body {
 
 .btn-categoria-chip {
   white-space: nowrap;
-  border-radius: 20px !important;
-  padding: 0.35rem 0.85rem !important;
-  font-size: 0.85rem !important;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  border-radius: 999px !important;
+  padding: 0.45rem 1rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 600;
+  border: 1px solid rgba(123, 75, 58, 0.25) !important;
+  background-color: #ffffff !important;
+  color: var(--color-secundario) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.btn-categoria-chip:hover {
+  background-color: var(--color-fondo) !important;
+  border-color: var(--color-primario) !important;
+  color: var(--color-primario) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(123, 75, 58, 0.15);
+}
+
+.btn-categoria-chip.active {
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(185, 102, 34, 0.35) !important;
+  transform: translateY(-2px);
+}
+
+.btn-categoria-chip.active i {
+  color: #ffffff !important;
 }
 
 .card-producto-sv .producto-titulo {

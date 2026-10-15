@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
 import VistaEmpleado from './components/VistaEmpleado'
 import VistaJefe from './components/VistaJefe'
 import DetalleProducto from './pages/DetalleProducto'
+import Inicio from './pages/Inicio'
+import Contacto from './pages/Contacto'
 import Footer from './components/Footer'
 import CarritoModal from './components/CarritoModal'
 import Login from './components/Login'
@@ -13,6 +15,8 @@ import { pedidosIniciales } from './data/pedidos'
 import { cargarCarritoStorage, guardarCarritoStorage } from './utils/persistencia'
 
 function App() {
+  const navigate = useNavigate()
+
   // Rol activo: 'cliente' | 'trabajador' | 'jefe'
   const [rolActual, setRolActual] = useState('cliente')
 
@@ -36,13 +40,22 @@ function App() {
     setUsuarioActual(usuario)
     setSesionAbierta(true)
     setMostrarLogin(false)
-    if (usuario.rol) setRolActual(usuario.rol)
+    if (usuario.rol) {
+      setRolActual(usuario.rol)
+      if (usuario.rol === 'trabajador') {
+        setSeccionTrabajador('pedidos')
+      } else if (usuario.rol === 'jefe') {
+        setSeccionJefe('metricas')
+      }
+    }
+    navigate('/')
   }
 
   const handleCerrarSesion = () => {
     setUsuarioActual(null)
     setSesionAbierta(false)
     setRolActual('cliente')
+    navigate('/')
   }
 
   const handleAgregarAlCarrito = (producto) => {
@@ -154,7 +167,7 @@ function App() {
             <Route
               path="/"
               element={
-                <VistaCliente
+                <Inicio
                   productos={productos}
                   onAgregarAlCarrito={handleAgregarAlCarrito}
                   onAbrirCarrito={() => setModalCarritoAbierto(true)}
@@ -162,8 +175,25 @@ function App() {
               }
             />
             <Route
+              path="/catalogo"
+              element={
+                <VistaCliente
+                  productos={productos}
+                  onAgregarAlCarrito={handleAgregarAlCarrito}
+                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
+                />
+              }
+            />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route
               path="/producto/:id"
-              element={<DetalleProducto productos={productos} />}
+              element={
+                <DetalleProducto
+                  productos={productos}
+                  onAgregarAlCarrito={handleAgregarAlCarrito}
+                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
+                />
+              }
             />
           </Routes>
         )}
@@ -185,6 +215,19 @@ function App() {
               }
             />
             <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
+            <Route
+              path="*"
+              element={
+                <VistaEmpleado
+                  productos={productos}
+                  pedidos={pedidos}
+                  seccionActiva={seccionTrabajador}
+                  onCambiarSeccion={setSeccionTrabajador}
+                  onActualizarStock={handleActualizarStock}
+                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
+                />
+              }
+            />
           </Routes>
         )}
 

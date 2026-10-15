@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 function Navbar({
   rolActual = 'cliente',
@@ -16,8 +16,12 @@ function Navbar({
   onCerrarSesion,
 }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isNavCollapsed, setIsNavCollapsed] = useState(true)
-  const [seccionCliente, setSeccionCliente] = useState('inicio')
+
+  const esInicio = location.pathname === '/'
+  const esCatalogo = location.pathname === '/catalogo'
+  const esContacto = location.pathname === '/contacto'
 
   const [seccionTrabajadorLocal, setSeccionTrabajadorLocal] = useState('pedidos')
   const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
@@ -37,19 +41,33 @@ function Navbar({
     setIsNavCollapsed(true)
   }
 
-
-  const irASeccionCliente = (seccionId) => {
-    setSeccionCliente(seccionId)
+  const irAInicio = () => {
     handleLinkClick()
+    if (setRolActual) setRolActual('cliente')
     navigate('/')
-    setTimeout(() => {
-      const el = document.getElementById(seccionId)
-      if (el?.scrollIntoView) {
-        el.scrollIntoView({ behavior: 'smooth' })
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-    }, 100)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const irACatalogo = () => {
+    handleLinkClick()
+    if (setRolActual) setRolActual('cliente')
+    navigate('/catalogo')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const irAContacto = () => {
+    handleLinkClick()
+    if (setRolActual) setRolActual('cliente')
+    navigate('/contacto')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const irANosotros = () => {
+    handleLinkClick()
+    const footerEl = document.getElementById('nosotros')
+    if (footerEl?.scrollIntoView) {
+      footerEl.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   return (
@@ -61,8 +79,7 @@ function Navbar({
           href="#inicio"
           onClick={(e) => {
             e.preventDefault()
-            if (setRolActual) setRolActual('cliente')
-            irASeccionCliente('inicio')
+            irAInicio()
           }}
         >
           <i className="bi bi-soundwave fs-3"></i>
@@ -92,68 +109,50 @@ function Navbar({
             {rolActual === 'cliente' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
-                  <a
-                    className={`nav-link nav-btn-link ${seccionCliente === 'inicio' ? 'active' : ''}`}
-                    aria-current={seccionCliente === 'inicio' ? 'page' : undefined}
-                    href="#inicio"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setSeccionCliente('inicio')
-                      handleLinkClick()
-                      const inicioEl = document.getElementById('inicio')
-                      if (inicioEl?.scrollIntoView) {
-                        inicioEl.scrollIntoView({ behavior: 'smooth' })
-                      } else {
-                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                      }
-                    }}
+                  <button
+                    type="button"
+                    className={`nav-link nav-btn-link btn btn-link text-start text-lg-center ${esInicio ? 'active' : ''}`}
+                    aria-current={esInicio ? 'page' : undefined}
+                    onClick={irAInicio}
                   >
                     <i className="bi bi-house-door me-2 d-lg-none"></i>
                     Inicio
-                  </a>
+                  </button>
                 </li>
                 
                 <li className="nav-item w-100 w-lg-auto">
-                  <a
-                    className={`nav-link nav-btn-link ${seccionCliente === 'catalogo' ? 'active' : ''}`}
-                    aria-current={seccionCliente === 'catalogo' ? 'page' : undefined}
-                    href="#catalogo"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setSeccionCliente('catalogo')
-                      handleLinkClick()
-                      const catEl = document.getElementById('catalogo')
-                      if (catEl?.scrollIntoView) {
-                        catEl.scrollIntoView({ behavior: 'smooth' })
-                      }
-                    }}
+                  <button
+                    type="button"
+                    className={`nav-link nav-btn-link btn btn-link text-start text-lg-center ${esCatalogo ? 'active' : ''}`}
+                    aria-current={esCatalogo ? 'page' : undefined}
+                    onClick={irACatalogo}
                   >
                     <i className="bi bi-grid-3x3-gap me-2 d-lg-none"></i>
-                    Catalogo
-                  </a>
+                    Catálogo
+                  </button>
                 </li>
 
                 <li className="nav-item w-100 w-lg-auto">
-                  <a
-                    className={`nav-link nav-btn-link ${seccionCliente === 'nosotros' ? 'active' : ''}`}
-                    aria-current={seccionCliente === 'nosotros' ? 'page' : undefined}
-                    href="#nosotros"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setSeccionCliente('nosotros')
-                      handleLinkClick()
-                      const footerEl = document.getElementById('nosotros')
-                      if (footerEl?.scrollIntoView) {
-                        footerEl.scrollIntoView({ behavior: 'smooth' })
-                      } else {
-                        const mockEl = document.createElement('div')
-                        mockEl.scrollIntoView({ behavior: 'smooth' })
-                      }
-                    }}
+                  <button
+                    type="button"
+                    className={`nav-link nav-btn-link btn btn-link text-start text-lg-center ${esContacto ? 'active' : ''}`}
+                    aria-current={esContacto ? 'page' : undefined}
+                    onClick={irAContacto}
+                  >
+                    <i className="bi bi-chat-dots me-2 d-lg-none"></i>
+                    Contáctanos
+                  </button>
+                </li>
+
+                <li className="nav-item w-100 w-lg-auto">
+                  <button
+                    type="button"
+                    className="nav-link nav-btn-link btn btn-link text-start text-lg-center"
+                    onClick={irANosotros}
                   >
                     <i className="bi bi-people me-2 d-lg-none"></i>
                     Nosotros
-                  </a>
+                  </button>
                 </li>
               </>
             )}
@@ -219,48 +218,8 @@ function Navbar({
             )}
           </ul>
 
-          {/* Roles y Carrito */}
+          {/* Acciones y Carrito */}
           <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 pt-2 pt-lg-0 border-top border-secondary border-opacity-25 border-top-lg-0">
-            <div className="contenedor-roles-mobile">
-              <div className="grupo-roles-grid d-flex gap-2" role="group" aria-label="Selector de rol de usuario">
-                <button
-                  type="button"
-                  className={`btn btn-rol-sv ${rolActual === 'cliente' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (setRolActual) setRolActual('cliente')
-                    navigate('/')
-                    handleLinkClick()
-                  }}
-                >
-                  <i className="bi bi-person me-1"></i>
-                  <span>Cliente</span>
-                </button>
-                <button
-                  type="button"
-                  className={`btn btn-rol-sv ${rolActual === 'trabajador' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (setRolActual) setRolActual('trabajador')
-                    navigate('/')
-                    handleLinkClick()
-                  }}
-                >
-                  <i className="bi bi-briefcase me-1"></i>
-                  <span>Trabajador</span>
-                </button>
-                <button
-                  type="button"
-                  className={`btn btn-rol-sv ${rolActual === 'jefe' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (setRolActual) setRolActual('jefe')
-                    navigate('/')
-                    handleLinkClick()
-                  }}
-                >
-                  <i className="bi bi-shield-lock me-1"></i>
-                  <span>Jefe</span>
-                </button>
-              </div>
-            </div>
 
             {rolActual === 'cliente' && (
               <button

@@ -1,0 +1,146 @@
+ESTRUCTURA DE LA PRESENTACIÓN (15 MINUTOS - 5 MINUTOS POR INTEGRANTE)
+Cumplimiento de indicadores: IE2.1.3 (Diseño Frontend Moderno), IE2.1.4 (React, Props, useState, Bootstrap), IE2.2.2 (Testing de Lógica y Componentes), IE2.3.2 (Proceso de Testeo, Mocks, Entorno JSDOM)
+
+================================================================================
+INTEGRANTE 1 (Minuto 0:00 a 5:00)
+Tema: Arquitectura del Proyecto, Configuración de Vite, Vista Cliente y Pruebas del Catálogo
+================================================================================
+
+1. Introducción y División en Componentes [IE2.1.3] (Min 0:00 - 1:20)
+"Buenos días profesor/a. Nuestro proyecto es Sonido Vivo, una tienda web moderna de instrumentos musicales desarrollada como una Single Page Application (SPA) con React 19, Vite y Bootstrap 5.
+
+Para que el proyecto fuera ordenado y fácil de mantener, dividimos el código en capas bien definidas:
+- En la carpeta /pages dejamos las pantallas que ve cualquier visitante: Inicio, Contacto y el Detalle del Producto con su reproductor de audio.
+- En la carpeta /components creamos las vistas específicas para cada rol: la VistaCliente para compras, la VistaEmpleado para la bodega y la VistaJefe para la administración.
+- Y en App.jsx centralizamos el cerebro de la aplicación: maneja las rutas de navegación con React Router y guarda el estado global de productos, pedidos y carrito de compras."
+
+2. Cómo modificamos Vite y preparamos las pruebas [IE2.1.3 / IE2.3.2] (Min 1:20 - 2:15)
+(Mostrar en pantalla vite.config.js y package.json)
+
+"Para el entorno de desarrollo utilizamos Vite, pero no lo dejamos con la configuración básica, sino que lo modificamos en vite.config.js para integrar nuestro sistema de pruebas con Vitest:
+- Agregamos el entorno 'jsdom': esto es muy importante porque simula el navegador web dentro de la terminal de Node.js, permitiéndonos probar botones y formularios de forma ultrarrápida sin tener que abrir una ventana real.
+- Configuramos un archivo de inicio llamado setup.js: allí dejamos listos validadores visuales para inspeccionar el HTML y creamos funciones simuladas para que llamadas de pantalla como window.scrollTo no fallen al ejecutarse en la consola.
+- En package.json creamos los comandos npm run dev para trabajar en local, npm run build para compilar y npm test para correr todas las pruebas automáticamente."
+
+3. Props, useState y Diseño Responsivo en la Vista Cliente [IE2.1.4] (Min 2:15 - 3:30)
+(Mostrar el catálogo en el navegador y el código de VistaCliente.jsx)
+
+"En la VistaCliente pusimos en práctica los conceptos fundamentales de React:
+- Usamos useState para controlar lo que el usuario hace en vivo: la palabra que escribe en el buscador, la categoría que selecciona en el menú desplegable y si quiere ordenar los precios de menor a mayor.
+- Mediante Props, este componente recibe la lista de instrumentos desde App.jsx y también recibe las funciones necesarias para poder agregar productos y abrir el modal del carrito.
+- Para el diseño usamos Bootstrap 5: organizamos los productos con un sistema de rejilla (row y col-12 col-md-6 col-lg-4). Esto hace que en un teléfono se vea una sola columna cómoda para el dedo, y en un computador se aproveche el ancho con tres columnas.
+- Además, resolvimos un detalle visual real: el badge que indica cuántos productos se están mostrando se deformaba en pantallas pequeñas; lo corregimos en index.css usando display: inline-block para que siempre mantenga su forma de píldora ordenada."
+
+4. Testing Explicado: Vista Cliente [IE2.2.2 / IE2.3.2] (Min 3:30 - 4:45)
+(Mostrar VistaCliente.spec.jsx en pantalla o la terminal corriendo los tests)
+
+"En VistaCliente.spec.jsx creamos 10 pruebas unitarias con Vitest y React Testing Library. ¿Qué comprobamos exactamente para asegurar que el catálogo funcione bien?
+1. Que los productos aparezcan en pantalla con su nombre, marca, stock y precio en pesos chilenos.
+2. Que el buscador funcione de verdad: con la herramienta userEvent simulamos a una persona real escribiendo la palabra 'Folk'. Verificamos que las guitarras aparezcan y que las baterías desaparezcan de la vista. Y si el usuario presiona el botón 'Limpiar', comprobamos que todos los productos vuelvan a mostrarse.
+3. Que el filtro por categorías responda inmediatamente al seleccionar guitarras, teclados o percusión.
+4. Y probamos el botón de compra: simulamos el clic en 'Agregar al carrito' y comprobamos que el componente intente enviar exactamente el instrumento seleccionado.
+Antes de cada prueba ejecutamos un beforeEach que limpia el localStorage y resetea las funciones simuladas, asegurando que cada test sea 100% independiente."
+
+5. Transición (Min 4:45 - 5:00)
+"A continuación, mi compañero explicará el módulo del Trabajador, cómo solucionamos un problema real con las rutas y el formulario de contacto."
+
+
+================================================================================
+INTEGRANTE 2 (Minuto 5:00 a 10:00)
+Tema: Módulo del Trabajador, Solución al Bug de Rutas, Formulario de Contacto y Testing
+================================================================================
+
+1. Módulo del Trabajador y la Solución al Bug de Rutas [IE2.1.3] (Min 5:00 - 6:30)
+(Mostrar App.jsx y la vista del Trabajador)
+
+"Gracias. En el módulo del Trabajador (VistaEmpleado.jsx), nos encontramos con un desafío real de navegación en React Router:
+- El problema que detectamos: cuando estábamos en el catálogo como clientes, la URL del navegador quedaba en /catalogo. Al iniciar sesión como Trabajador, la pantalla se quedaba totalmente en blanco. Solo al hacer clic en 'Control de Stock' y luego volver a 'Recepción de Pedidos' aparecía la información.
+- ¿Por qué ocurría esto? Porque en App.jsx las rutas del trabajador solo tenían configurada la ruta exacta path='/'. Como la URL seguía diciendo /catalogo, React Router no encontraba ninguna coincidencia y no dibujaba nada en pantalla. Al hacer clic en 'Control de Stock', ese botón ejecutaba un navigate('/') forzado que recién ahí corregía la URL.
+- ¿Cómo lo solucionamos de raíz?
+  1. En App.jsx usamos el hook useNavigate para que, al momento exacto de iniciar o cerrar sesión, la aplicación te redirija automáticamente al inicio ('/').
+  2. Y agregamos una ruta comodín con asterisco (<Route path='*' />) como respaldo de seguridad: esto garantiza que aunque el usuario ingrese desde cualquier sub-ruta, la vista del trabajador siempre se cargue de inmediato sin quedarse en blanco."
+
+2. Props, useState y Diseño Responsivo en VistaEmpleado [IE2.1.4] (Min 6:30 - 7:45)
+(Mostrar la tabla de recepción de pedidos y control de stock)
+
+"En VistaEmpleado.jsx gestionamos la operativa diaria de la tienda:
+- Por Props recibimos la lista de pedidos de los clientes, los productos de bodega y las funciones para actualizar el inventario y cambiar el estado de las órdenes.
+- Con useState controlamos la pestaña activa para alternar fluidamente entre 'Recepción de Pedidos' y 'Control de Stock'.
+- La lógica permite avanzar los pedidos en su ciclo real: pasa de 'Pendiente' a 'En preparación' cuando se empaqueta, y luego a 'Despachado' cuando sale a reparto.
+- Para el diseño con Bootstrap: como una tabla de bodega tiene muchas columnas (cliente, fecha, productos, estado), la envolvimos en la clase table-responsive. Así, en un teléfono celular la tabla se puede deslizar hacia los lados suavemente con el dedo sin romper el diseño de la página, acompañada de tarjetas KPI arriba que resumen cuántos pedidos faltan por atender."
+
+3. Formulario de Contacto con Validaciones Reales [IE2.1.4] (Min 7:45 - 8:45)
+(Mostrar Contacto.jsx y probar las validaciones en pantalla)
+
+"En la página Contacto.jsx construimos un formulario pensado para una atención al cliente confiable:
+- Guardamos los datos con useState en un objeto que reúne nombre, correo, teléfono, motivo de consulta y mensaje.
+- Implementamos dos validaciones estrictas muy importantes:
+  1. El correo electrónico no solo pide que tenga un arroba, sino que valida la estructura completa (nombre@dominio.com) mediante una expresión regular.
+  2. El teléfono o WhatsApp lo definimos como campo obligatorio y validamos que contenga al menos 8 dígitos numéricos reales.
+- Si el usuario comete un error, usamos las clases de Bootstrap is-invalid e invalid-feedback para pintar el borde en rojo y mostrar el mensaje explicativo abajo del campo."
+
+4. Testing Explicado: Vista Empleado [IE2.2.2 / IE2.3.2] (Min 8:45 - 9:45)
+(Mostrar VistaEmpleado.spec.jsx)
+
+"En VistaEmpleado.spec.jsx desarrollamos 10 pruebas unitarias para garantizar que la bodega no cometa errores:
+1. Verificamos que la tabla de pedidos se dibuje con todas sus columnas: ID de orden, cliente, productos y botón de acción.
+2. Probamos el cambio de estados: usamos una función simulada o mock con vi.fn(). Esto actúa como un registrador que comprueba que, al hacer clic en 'Comenzar preparación', el sistema realmente intente cambiar el estado del pedido correcto.
+3. Probamos los botones de ajuste rápido de stock (+1 y -1): verificamos que sumen y resten unidades, y testeamos la regla de negocio que desactiva el botón de restar si el stock llega a cero, impidiendo que tengamos inventario negativo.
+4. Y comprobamos que los productos con menos de 3 unidades muestren automáticamente una alerta visual de stock crítico."
+
+5. Transición (Min 9:45 - 10:00)
+"Ahora mi compañero presentará la administración del Jefe, las pruebas con espías de memoria y cómo pusimos la aplicación a funcionar en un servidor real en la nube."
+
+
+================================================================================
+INTEGRANTE 3 (Minuto 10:00 a 15:00)
+Tema: Módulo del Jefe (CRUD y Métricas), Espías de Testing y Despliegue en AWS
+================================================================================
+
+1. Autenticación por Roles y Vista del Jefe [IE2.1.3] (Min 10:00 - 11:15)
+(Mostrar Login.jsx y VistaJefe.jsx)
+
+"Buenas tardes. Para culminar la presentación, explicaré el módulo administrativo de mayor jerarquía: la VistaJefe y la seguridad del sistema.
+- Diseñamos un componente modal Login.jsx que permite autenticar al usuario. Si las credenciales corresponden al administrador, App.jsx le otorga los permisos y despliega la interfaz del jefe.
+- Esta pantalla está dividida en dos paneles estratégicos:
+  1. Un panel financiero que calcula en tiempo real el dinero total vendido sumando los pedidos despachados, y compara órdenes completadas versus pendientes.
+  2. Y un panel de inventario con un sistema CRUD completo, donde el jefe puede crear nuevos instrumentos, editarlos o darlos de baja."
+
+2. Props, useState y Validación del Formulario de Productos [IE2.1.4] (Min 11:15 - 12:30)
+(Mostrar el formulario en modo creación y luego pulsar el botón de editar)
+
+"En VistaJefe.jsx la gestión del estado es de alta precisión:
+- Con useState manejamos un formulario compuesto con 8 campos (código, nombre, marca, precio, stock, etc.).
+- Tenemos un estado clave llamado editandoCodigo: cuando está vacío, el botón dice 'Guardar Producto' y crea uno nuevo. Pero si el jefe hace clic en el lápiz de cualquier producto de la tabla, los datos de ese instrumento se copian automáticamente a los inputs y el botón cambia a 'Actualizar Producto'.
+- Por Props recibimos las funciones onAgregarProducto, onActualizarProducto y onEliminarProducto para que cualquier cambio se sincronice con el estado general de la tienda.
+- Agregamos validaciones en vivo: si el jefe intenta poner un precio de cero o negativo, o deja el nombre vacío, el sistema bloquea el envío y muestra alertas claras en pantalla.
+- Con Bootstrap usamos un diseño en dos columnas (col-12 col-lg-5 para el formulario y col-lg-7 para el catálogo) y le pusimos sticky-top a los encabezados para no perder de vista los títulos al revisar listados largos."
+
+3. Testing Explicado: Espías de Memoria y Métricas [IE2.2.2 / IE2.3.2] (Min 12:30 - 13:30)
+(Ejecutar npm test en la terminal mostrando los 30 tests en verde)
+
+"En VistaJefe.spec.jsx completamos la suite con 10 pruebas unitarias avanzadas:
+1. Probamos las matemáticas del negocio: creamos pedidos simulados con distintos precios y comprobamos que el panel muestre exactamente la suma total formateada en moneda nacional ($200.000).
+2. Probamos que el formulario rechace precios negativos o letras en el campo de unidades, mostrando el mensaje de error correspondiente.
+3. Probamos la edición: que al hacer clic en el botón de editar, el título cambie a 'Editar Producto' y cargue los datos del modelo elegido.
+4. Y usamos una técnica muy potente llamada espía con vi.spyOn: pusimos un espía sobre el localStorage del navegador. ¿Para qué? Para verificar que cuando el jefe guarda un producto, la función setItem realmente se ejecute y guarde la información en la memoria del navegador.
+Con esto alcanzamos 30 pruebas unitarias en total (10 de Cliente, 10 de Empleado y 10 de Jefe) y todas pasan exitosamente con cero errores."
+
+4. Compilación y Despliegue Real en la Nube con AWS EC2 [IE2.1.3] (Min 13:30 - 14:30)
+(Mostrar la terminal con la conexión SSH abierta a AWS EC2 y la página abierta en la IP pública)
+
+"Como valor agregado fundamental, nuestro proyecto no se quedó solo en nuestras computadoras:
+- Primero ejecutamos npm run build: Vite tomó todo nuestro código en React, lo optimizó, minificó el JavaScript y el CSS, y generó los archivos estáticos listos para producción en la carpeta /dist.
+- Luego, levantamos una máquina virtual con Linux Ubuntu en la nube de Amazon Web Services (AWS EC2).
+- Mediante una sesión segura por terminal con SSH y llaves criptográficas .pem, transferimos el proyecto usando el comando scp y lo dejamos corriendo sobre un servidor web Nginx en una dirección IP pública.
+- Esto demuestra que nuestra aplicación web es funcional, segura y está lista para atender a usuarios reales en internet."
+
+5. Conclusiones y Cierre (Min 14:30 - 15:00)
+"En conclusión:
+1. Diseñamos una arquitectura modular y reactiva con React 19 y Bootstrap 5.
+2. Gestionamos estados y propiedades de forma limpia y personalizada para 3 roles de negocio.
+3. Configuramos Vite y Vitest con JSDOM para pruebas automatizadas.
+4. Desarrollamos 30 pruebas unitarias que verifican la lógica, las alertas y la persistencia de datos.
+5. Y desplegamos la solución completa en la nube de AWS.
+
+Muchas gracias por su tiempo, quedamos atentos a cualquier pregunta que tengan."

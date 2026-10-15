@@ -76,17 +76,19 @@ export const pedidosIniciales = [
 function VistaEmpleado({
   productos: productosProp = productosIniciales,
   seccionActiva = "pedidos",
+  pedidos: pedidosProp,
   pedidosExternos,
   onActualizarEstado,
+  onActualizarEstadoPedido,
   onActualizarStock: onActualizarStockProp
 }) {
-
-
   const [pedidosLocales, setPedidosLocales] = useState(pedidosIniciales);
   const [productosLocales, setProductosLocales] = useState(productosProp);
 
-  const pedidos = pedidosExternos || pedidosLocales;
+  const pedidos = pedidosProp || pedidosExternos || pedidosLocales;
   const productos = productosProp || productosLocales;
+
+  const callbackEstado = onActualizarEstadoPedido || onActualizarEstado;
 
   const obtenerStockReal = (codigo) => {
     const item = productos.find(
@@ -96,24 +98,25 @@ function VistaEmpleado({
   };
 
   const agruparProductos = (listaProductos = []) => {
-  const contador = {};
+    const contador = {};
 
-  listaProductos.forEach((prod) => {
-    const clave = prod.codigo;
-    const cantidadSumar = prod.cantidad ?? prod.cant ?? 1;
+    listaProductos.forEach((prod, index) => {
+      const clave = prod.codigo || prod.id || `${prod.nombre}-${index}`;
 
-    if (!contador[clave]) {
-      contador[clave] = {
-        ...prod,
-        cantidad: cantidadSumar,
-      };
-    } else {
-      contador[clave].cantidad += cantidadSumar;
-    }
-  });
+      if (!contador[clave]) {
+        contador[clave] = {
+          ...prod,
+          id: prod.id || prod.codigo || clave,
+          cantidad: Number(prod.cantidad || prod.cant || 1),
+          stock: obtenerStockReal(prod.codigo),
+        };
+      } else {
+        contador[clave].cantidad += Number(prod.cantidad || prod.cant || 1);
+      }
+    });
 
-  return Object.values(contador);
-};
+    return Object.values(contador);
+  };
 
   const avanzarEstado = (id) => {
     const pedidoActual = pedidos.find((p) => p.id === id);
@@ -122,12 +125,15 @@ function VistaEmpleado({
     let nuevoEstado = pedidoActual.estado;
     if (pedidoActual.estado === "Pendiente") {
       nuevoEstado = "En preparación";
-    } else if (pedidoActual.estado === "En preparación") {
+    } else if (
+      pedidoActual.estado === "En preparación" ||
+      pedidoActual.estado === "En preparacion"
+    ) {
       nuevoEstado = "Despachado";
     }
 
-    if (onActualizarEstado) {
-      onActualizarEstado(id, nuevoEstado);
+    if (callbackEstado) {
+      callbackEstado(id, nuevoEstado);
     } else {
       setPedidosLocales((prev) =>
         prev.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p))
@@ -140,9 +146,7 @@ function VistaEmpleado({
       onActualizarStockProp(codigo, nuevoStock);
     } else {
       setProductosLocales((prev) =>
-        prev.map((p) =>
-          p.codigo === codigo ? { ...p, stock: Number(nuevoStock) } : p
-        )
+        prev.map((p) => (p.codigo === codigo ? { ...p, stock: nuevoStock } : p))
       );
     }
   };
@@ -152,7 +156,7 @@ function VistaEmpleado({
       case "Pendiente":
         return "bg-warning text-dark";
       case "En preparación":
-        return "bg-primary";
+        return "btn-sv-primary";
       case "Despachado":
         return "bg-success";
       default:
@@ -160,146 +164,238 @@ function VistaEmpleado({
     }
   };
 
-  return (
-    <section className="container my-5">
-      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-          <h2 className="h3 mb-1">Panel operativo de tienda </h2>
-          <p className="text-muted mb-0">
-            Recepción, preparación y despacho de pedidos solicitados en tiempo real. 
-            Mantenga actualizado el estado de cada pedido para garantizar una experiencia de cliente satisfactoria.
-          </p>
-        </div>
+  const totalPendientes = pedidos.filter((p) => p.estado === "Pendiente").length;
+  const totalPreparacion = pedidos.filter((p) => p.estado === "En preparación").length;
+  const totalDespachados = pedidos.filter((p) => p.estado === "Despachado").length;
+  const stockBajoCount = productos.filter((p) => p.stock < 3).length;
 
-        {seccionActiva === "pedidos" && (
-          <span className="badge bg-dark fs-6">
-            Pedidos activos: {pedidos.filter((p) => p.estado !== "Despachado").length}
-          </span>
-        )}
+  return (
+    <section className="container py-4 py-md-5">
+      {/* Encabezado con identidad Sonido Vivo */}
+      <div className="mb-4">
+        <span className="badge btn-sv-secondary text-uppercase px-3 py-2 rounded-pill mb-2 shadow-sm">
+          <i className="bi bi-briefcase me-1"></i> Rol: Trabajador de Tienda
+        </span>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <h1 className="h3 fw-bold mb-1" style={{ color: 'var(--color-secundario)' }}>
+              {seccionActiva === "pedidos" ? "Recepción y Despacho de Pedidos" : "Control de Stock e Inventario"}
+            </h1>
+            <p className="text-muted small mb-0">
+              Gestión operativa en tiempo real para optimizar la entrega de instrumentos y accesorios.
+            </p>
+          </div>
+          {seccionActiva === "pedidos" && (
+            <span className="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm">
+              <i className="bi bi-box-seam me-1 text-warning"></i>
+              Pedidos activos: <strong>{totalPendientes + totalPreparacion}</strong>
+            </span>
+          )}
+        </div>
       </div>
 
+      {/* Tarjetas KPI Operativas */}
       {seccionActiva === "pedidos" && (
-        <div className="table-responsive shadow-sm rounded">
-          <table className="table table-hover table-striped align-middle mb-0">
-            <thead className="table-dark">
-              <tr>
-                <th scope="col"># ID</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Cliente</th>
-                <th scope="col">Tipo de entrega</th>
-                <th scope="col">Artículos</th>
-                <th scope="col">Total venta</th>
-                <th scope="col">Estado de venta</th>
-                <th scope="col" className="text-center">Acción Operativa</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pedidos.map((pedido) => (
-                <tr key={pedido.id}>
-                  <td className="fw-bold">#{pedido.id}</td>
-                  <td>{pedido.fecha}</td>
-                  <td>{pedido.cliente}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        pedido.tipoEntrega === "Envío a domicilio"
-                          ? "bg-info text-dark"
-                          : "bg-secondary"
-                      }`}
-                    >
-                      {pedido.tipoEntrega}
-                    </span>
-                  </td>
-                  <td>
-                    <ul className="list-unstyled mb-0">
-                      {agruparProductos(pedido.productos).map((prod) => {
-                        
-                        return (
-                          <li key={prod.id} className="py-1">
-                            <span>
-                              {prod.cantidad ?? prod.cant ?? 1}x{" "}
-                              <Link to={`/producto/${prod.codigo}`}> 
-                                  {prod.nombre}
-                                </Link>
-                              </span>{" "}
-                        {prod.stock < 3 && (
-                          <span className="badge bg-danger ms-1">
-                            Stock bajo: {prod.stock} disp.
-                          </span>
-                        )}
-                      </li>
-                        );
-})}
-                  </ul>
-                </td>
-
-                                <td className="fw-semibold">
-                  ${pedido.total.toLocaleString("es-CL")}
-                </td>
-
-                  
-                  <td>
-                    <span className={`badge ${obtenerColorBadge(pedido.estado)}`}>
-                      {pedido.estado}
-                    </span>
-                  </td>
-                  <td className="text-center">
-                    {pedido.estado === "Pendiente" && (
-                      <button
-                        type="button"
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => avanzarEstado(pedido.id)}
-                      >
-                        Preparar
-                      </button>
-                    )}
-
-                    {pedido.estado === "En preparación" && (
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => avanzarEstado(pedido.id)}
-                      >
-                        Despachar
-                      </button>
-                    )}
-
-                    {pedido.estado === "Despachado" && (
-                      <span className="text-muted small fw-bold">Completado</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="row g-3 mb-4">
+          <div className="col-12 col-md-4">
+            <div className="p-3 bg-white rounded-3 shadow-sm border h-100 d-flex justify-content-between align-items-center">
+              <div>
+                <span className="text-muted small text-uppercase fw-bold">Por Preparar</span>
+                <h3 className="fw-bold my-1 text-warning">{totalPendientes}</h3>
+                <span className="text-muted small">Estado pendiente</span>
+              </div>
+              <div
+                className="p-3 rounded-circle shadow-sm"
+                style={{ backgroundColor: '#fffbeb', color: '#d97706' }}
+              >
+                <i className="bi bi-hourglass-split fs-4"></i>
+              </div>
+            </div>
+          </div>
+          <div className="col-12 col-md-4">
+            <div className="p-3 bg-white rounded-3 shadow-sm border h-100 d-flex justify-content-between align-items-center">
+              <div>
+                <span className="text-muted small text-uppercase fw-bold">En Preparación</span>
+                <h3 className="fw-bold my-1" style={{ color: 'var(--color-acento)' }}>{totalPreparacion}</h3>
+                <span className="text-muted small">Listos para empaque</span>
+              </div>
+              <div
+                className="p-3 rounded-circle shadow-sm"
+                style={{ backgroundColor: 'var(--color-fondo)', color: 'var(--color-acento)' }}
+              >
+                <i className="bi bi-box-seam fs-4"></i>
+              </div>
+            </div>
+          </div>
+          <div className="col-12 col-md-4">
+            <div className="p-3 bg-white rounded-3 shadow-sm border h-100 d-flex justify-content-between align-items-center">
+              <div>
+                <span className="text-muted small text-uppercase fw-bold">Despachados</span>
+                <h3 className="fw-bold my-1 text-success">{totalDespachados}</h3>
+                <span className="text-muted small">Entregados con éxito</span>
+              </div>
+              <div
+                className="p-3 rounded-circle shadow-sm"
+                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
+              >
+                <i className="bi bi-check2-circle fs-4"></i>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-
-      {seccionActiva === "stock" && (
-        <div className="card shadow-sm border-0">
-          <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-            <h5 className="mb-0">Inventario y Disponibilidad en Bodega</h5>
-            <span className="badge bg-danger">
-              Cantidad de productos con stock bajo: {productos.filter((p) => p.stock < 3).length}
+      {/* SECCION 1: TABLA DE PEDIDOS */}
+      {seccionActiva === "pedidos" && (
+        <div
+          className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4"
+          style={{ border: '1px solid rgba(75, 46, 43, 0.15)' }}
+        >
+          <div
+            className="p-3 header-sonido-vivo text-white d-flex justify-content-between align-items-center"
+          >
+            <h5 className="mb-0 fw-bold fs-6">
+              <i className="bi bi-list-check me-2"></i>Cola de Despacho y Retiro en Tienda
+            </h5>
+            <span className="badge bg-light text-dark rounded-pill fw-bold">
+              {pedidos.length} órdenes
             </span>
           </div>
+
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
-              <thead className="table-light">
+              <thead className="table-light border-bottom">
                 <tr>
-                  <th>Código</th>
+                  <th scope="col" className="ps-3"># ID</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Tipo de entrega</th>
+                  <th scope="col">Artículos</th>
+                  <th scope="col">Total venta</th>
+                  <th scope="col">Estado de venta</th>
+                  <th scope="col" className="text-center pe-3">Acción Operativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pedidos.map((pedido) => (
+                  <tr key={pedido.id}>
+                    <td className="fw-bold ps-3 text-dark">#{pedido.id}</td>
+                    <td className="small text-muted">{pedido.fecha}</td>
+                    <td className="fw-semibold">{pedido.cliente}</td>
+                    <td>
+                      <span
+                        className={`badge rounded-pill ${
+                          pedido.tipoEntrega?.toLowerCase().includes("domicilio")
+                            ? "bg-light text-dark border border-secondary"
+                            : "btn-sv-secondary"
+                        }`}
+                        style={{ fontSize: '0.75rem' }}
+                      >
+                        <i className={`bi ${pedido.tipoEntrega?.toLowerCase().includes("domicilio") ? 'bi-truck' : 'bi-shop'} me-1`}></i>
+                        {pedido.tipoEntrega}
+                      </span>
+                    </td>
+                    <td>
+                      <ul className="list-unstyled mb-0 small">
+                        {agruparProductos(pedido.productos).map((prod, idx) => (
+                          <li key={`${prod.codigo || prod.id || idx}-${idx}`} className="py-1">
+                            <span>
+                              <strong>{prod.cantidad ?? prod.cant ?? 1}x</strong>{" "}
+                              <Link
+                                to={`/producto/${prod.codigo}`}
+                                className="text-decoration-none text-dark fw-medium"
+                              >
+                                {prod.nombre}
+                              </Link>
+                            </span>{" "}
+                            {prod.stock < 3 && (
+                              <span className="badge bg-danger ms-1" style={{ fontSize: '0.68rem' }}>
+                                Stock bajo: {prod.stock} disp.
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+
+                    <td className="fw-bold" style={{ color: 'var(--color-primario)' }}>
+                      ${pedido.total.toLocaleString("es-CL")}
+                    </td>
+
+                    <td>
+                      <span className={`badge ${obtenerColorBadge(pedido.estado)} px-2 py-1`}>
+                        {pedido.estado}
+                      </span>
+                    </td>
+                    <td className="text-center pe-3">
+                      {pedido.estado === "Pendiente" && (
+                        <button
+                          type="button"
+                          className="btn btn-warning btn-sm fw-semibold shadow-sm text-dark"
+                          onClick={() => avanzarEstado(pedido.id)}
+                        >
+                          Preparar
+                        </button>
+                      )}
+
+                      {(pedido.estado === "En preparación" || pedido.estado === "En preparacion") && (
+                        <button
+                          type="button"
+                          className="btn btn-sv-primary btn-sm fw-semibold shadow-sm"
+                          onClick={() => avanzarEstado(pedido.id)}
+                        >
+                          Despachar
+                        </button>
+                      )}
+
+                      {pedido.estado === "Despachado" && (
+                        <span className="badge bg-success px-2 py-1">
+                          Completado
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* SECCION 2: TABLA DE STOCK */}
+      {seccionActiva === "stock" && (
+        <div
+          className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white"
+          style={{ border: '1px solid rgba(75, 46, 43, 0.15)' }}
+        >
+          <div
+            className="p-3 header-sonido-vivo text-white d-flex justify-content-between align-items-center flex-wrap gap-2"
+          >
+            <h5 className="mb-0 fw-bold fs-6">
+              <i className="bi bi-boxes me-2"></i>Inventario y Disponibilidad en Bodega
+            </h5>
+            <span className="badge bg-danger text-white rounded-pill px-3 py-1 shadow-sm">
+              <i className="bi bi-exclamation-triangle-fill me-1"></i>
+              Cantidad de productos con stock bajo: {stockBajoCount}
+            </span>
+          </div>
+
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0">
+              <thead className="table-light border-bottom">
+                <tr>
+                  <th className="ps-3">Código</th>
                   <th>Producto</th>
                   <th>Categoría</th>
                   <th>Estado Stock</th>
                   <th>Unidades</th>
-                  <th className="text-center">Ajuste Rápido</th>
+                  <th className="text-center pe-3">Ajuste Rápido</th>
                 </tr>
               </thead>
               <tbody>
                 {productos.map((prod) => (
                   <tr key={prod.id || prod.codigo}>
-                    <td className="fw-bold">{prod.codigo}</td>
+                    <td className="fw-bold ps-3">{prod.codigo}</td>
                     <td>
                       <Link
                         to={`/producto/${prod.codigo}`}
@@ -309,7 +405,7 @@ function VistaEmpleado({
                       </Link>
                     </td>
                     <td>
-                      <span className="badge bg-secondary">{prod.categoria}</span>
+                      <span className="badge bg-light text-dark border">{prod.categoria}</span>
                     </td>
                     <td>
                       {prod.stock === 0 ? (
@@ -320,12 +416,14 @@ function VistaEmpleado({
                         <span className="badge bg-success">Disponible</span>
                       )}
                     </td>
-                    <td className="fw-bold fs-6">{prod.stock}</td>
-                    <td className="text-center">
-                      <div className="btn-group btn-group-sm">
+                    <td className="fw-bold fs-6" style={{ color: 'var(--color-primario)' }}>
+                      {prod.stock}
+                    </td>
+                    <td className="text-center pe-3">
+                      <div className="btn-group btn-group-sm border rounded bg-white shadow-sm">
                         <button
                           type="button"
-                          className="btn btn-outline-danger"
+                          className="btn btn-light px-3 py-1 border-end text-danger fw-bold"
                           onClick={() =>
                             handleAjustarStock(prod.codigo, Math.max(0, prod.stock - 1))
                           }
@@ -335,7 +433,7 @@ function VistaEmpleado({
                         </button>
                         <button
                           type="button"
-                          className="btn btn-outline-success"
+                          className="btn btn-light px-3 py-1 text-success fw-bold"
                           onClick={() => handleAjustarStock(prod.codigo, prod.stock + 1)}
                         >
                           +1

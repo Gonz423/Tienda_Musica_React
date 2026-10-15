@@ -32,3 +32,5 @@ guias/
 # Testing y cobertura
 coverage/
 
+# Llaves y credenciales de AWS
+*.pem

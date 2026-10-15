@@ -140,7 +140,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(titulosAZ).toEqual(['Afinador Cromático', 'Batería Acústica Stage', 'Guitarra Folk'])
   })
 
-  // 6. Estado vacío y restablecer
+  // 6. Estado vacio y restablecer
   it('6. Muestra mensaje accesible de estado vacio y permite restablecer los filtros', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
