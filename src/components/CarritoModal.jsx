@@ -70,10 +70,10 @@ function CarritoModal({
     const nuevosErrores = {}
     if (!formulario.nombre.trim()) nuevosErrores.nombre = 'El nombre es obligatorio'
     if (!formulario.email.trim() || !formulario.email.includes('@')) {
-      nuevosErrores.email = 'Ingresa un correo electrónico válido'
+      nuevosErrores.email = 'Ingresa un correo electronico valido'
     }
-    if (!formulario.telefono.trim()) nuevosErrores.telefono = 'El teléfono es obligatorio'
-    if (!formulario.direccion.trim()) nuevosErrores.direccion = 'La dirección es obligatoria'
+    if (!formulario.telefono.trim()) nuevosErrores.telefono = 'El telefono es obligatorio'
+    if (!formulario.direccion.trim()) nuevosErrores.direccion = 'La direccion es obligatoria'
     setErrores(nuevosErrores)
     return Object.keys(nuevosErrores).length === 0
   }
@@ -83,7 +83,7 @@ function CarritoModal({
     if (!handleValidarFormulario()) return
 
     setCargandoPago(true)
-    // Simulación pago
+    // Simulacion pago
     setTimeout(() => {
       const nuevaOrden = {
         id: Math.floor(1000 + Math.random() * 9000),
@@ -183,7 +183,7 @@ function CarritoModal({
               {listaItems.length === 0 ? (
                 <div className="text-center py-5">
                   <div
-                    className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm"
+                    className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
                     style={{
                       width: '80px',
                       height: '80px',
@@ -369,11 +369,11 @@ function CarritoModal({
             </form>
           )}
 
-          {/* Paso 3: Éxito */}
+          {/* Paso 3: Exito */}
           {paso === 'exito' && ordenGenerada && (
             <div className="text-center py-4">
               <div
-                className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm bg-success text-white"
+                className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 bg-success text-white"
                 style={{ width: '80px', height: '80px' }}
               >
                 <i className="bi bi-check-lg fs-1"></i>

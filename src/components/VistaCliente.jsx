@@ -23,7 +23,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
     }, 2500)
   }
 
-  // Categorías
+  // Categorias
   const categorias = ['todas', ...new Set(productos.map((p) => p.categoria))]
 
   // Filtros
@@ -97,7 +97,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
         )}
 
-        {/* Panel de Filtros y Búsqueda - Rediseño estilo Ordenar */}
+        {/* Panel de Filtros y Busqueda - Rediseno estilo Ordenar */}
         <div className="panel-filtros-catalogo p-3 p-md-4 mb-4">
           <div className="row g-3 align-items-center">
             {/* Buscador Moderno */}
@@ -127,7 +127,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
               </div>
             </div>
 
-            {/* Categorías - Estilo idéntico a Ordenar */}
+            {/* Categorias - Estilo identico a Ordenar */}
             <div className="col-12 col-sm-6 col-md-3 col-lg-3">
               <div className="orden-box-sv d-flex align-items-center gap-2 p-1 px-3 bg-white rounded-pill shadow-sm">
                 <i className="bi bi-tag text-muted small" aria-hidden="true"></i>
@@ -190,7 +190,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
             </span>
           </div>
 
-          {/* Botones accesibles de categoría para soporte de pruebas */}
+          {/* Botones accesibles de categoria para soporte de pruebas */}
           <div className="visually-hidden">
             {categorias.map((cat) => (
               <button
@@ -205,7 +205,7 @@ function VistaCliente({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
         </div>
       </div>
 
-      {/* Catálogo */}
+      {/* Catalogo */}
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 g-md-4">
         {productosFiltrados.map((producto) => (
           <div key={producto.codigo || producto.id} className="col">

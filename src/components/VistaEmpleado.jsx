@@ -204,11 +204,8 @@ function VistaEmpleado({
                 <h3 className="fw-bold my-1 text-warning">{totalPendientes}</h3>
                 <span className="text-muted small">Estado pendiente</span>
               </div>
-              <div
-                className="p-3 rounded-circle shadow-sm"
-                style={{ backgroundColor: '#fffbeb', color: '#d97706' }}
-              >
-                <i className="bi bi-hourglass-split fs-4"></i>
+              <div style={{ color: '#d97706' }}>
+                <i className="bi bi-hourglass-split fs-2"></i>
               </div>
             </div>
           </div>
@@ -219,11 +216,8 @@ function VistaEmpleado({
                 <h3 className="fw-bold my-1" style={{ color: 'var(--color-acento)' }}>{totalPreparacion}</h3>
                 <span className="text-muted small">Listos para empaque</span>
               </div>
-              <div
-                className="p-3 rounded-circle shadow-sm"
-                style={{ backgroundColor: 'var(--color-fondo)', color: 'var(--color-acento)' }}
-              >
-                <i className="bi bi-box-seam fs-4"></i>
+              <div style={{ color: 'var(--color-acento)' }}>
+                <i className="bi bi-box-seam fs-2"></i>
               </div>
             </div>
           </div>
@@ -234,11 +228,8 @@ function VistaEmpleado({
                 <h3 className="fw-bold my-1 text-success">{totalDespachados}</h3>
                 <span className="text-muted small">Entregados con éxito</span>
               </div>
-              <div
-                className="p-3 rounded-circle shadow-sm"
-                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
-              >
-                <i className="bi bi-check2-circle fs-4"></i>
+              <div style={{ color: '#16a34a' }}>
+                <i className="bi bi-check2-circle fs-2"></i>
               </div>
             </div>
           </div>

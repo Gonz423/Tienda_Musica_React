@@ -74,7 +74,7 @@ function VistaJefe({
   const [formUsuario, setFormUsuario] = useState(formUsuarioInicial)
   const [erroresUsuario, setErroresUsuario] = useState({})
 
-  // Cálculos de KPIs
+  // Calculos de KPIs
   const totalVentas = pedidos.reduce((acc, p) => acc + (Number(p.total) || 0), 0)
   const atendidos = pedidos.filter((p) => p.estado === 'Despachado').length
   const pendientes = pedidos.filter((p) => p.estado !== 'Despachado').length
@@ -272,14 +272,14 @@ function VistaJefe({
         </p>
       </div>
 
-      {/* Tarjetas KPI de ventas y stock - Solo en Métricas */}
+      {/* Tarjetas KPI de ventas y stock - Solo en Metricas */}
       {seccion === 'metricas' && (
         <div className="row g-3 mb-4">
           <div className="col-12 col-md-4">
             <div className="p-3 bg-white rounded-3 shadow-sm border h-100">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span className="text-muted small text-uppercase fw-bold">Total Ventas Acumuladas</span>
-                <span className="p-2 rounded-circle" style={{ backgroundColor: 'var(--color-fondo)', color: 'var(--color-acento)' }}><i className="bi bi-cash-coin fs-5"></i></span>
+                <span style={{ color: 'var(--color-acento)' }}><i className="bi bi-cash-coin fs-4"></i></span>
               </div>
               <h2 className="h3 fw-bold my-1" style={{ color: 'var(--color-acento)' }}>{formatoMoneda(totalVentas)}</h2>
               <span className="badge bg-light text-muted border align-self-start mt-2"><i className="bi bi-receipt me-1"></i> {pedidos.length} pedidos totales</span>
@@ -289,7 +289,7 @@ function VistaJefe({
             <div className="p-3 bg-white rounded-3 shadow-sm border h-100">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span className="text-muted small text-uppercase fw-bold">Flujo de Pedidos</span>
-                <span className="p-2 rounded-circle" style={{ backgroundColor: 'var(--color-fondo)', color: 'var(--color-primario)' }}><i className="bi bi-arrow-repeat fs-5"></i></span>
+                <span style={{ color: 'var(--color-primario)' }}><i className="bi bi-arrow-repeat fs-4"></i></span>
               </div>
               <h2 className="h3 fw-bold my-1" style={{ color: 'var(--color-secundario)' }}>{atendidos} <small className="text-muted fs-6">vs</small> {pendientes}</h2>
               <div className="d-flex gap-2 mt-2">
@@ -302,7 +302,7 @@ function VistaJefe({
             <div className="p-3 bg-white rounded-3 shadow-sm border h-100">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span className="text-muted small text-uppercase fw-bold">Productos Stock Crítico</span>
-                <span className="p-2 rounded-circle bg-danger bg-opacity-10 text-danger"><i className="bi bi-exclamation-triangle-fill fs-5"></i></span>
+                <span className="text-danger"><i className="bi bi-exclamation-triangle-fill fs-4"></i></span>
               </div>
               <h2 className="h3 fw-bold my-1 text-danger">{stockCritico.length}</h2>
               <span className="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle align-self-start mt-2">Stock ≤ 3 unidades</span>
@@ -311,7 +311,7 @@ function VistaJefe({
         </div>
       )}
 
-      {/* SECCION 1: Métricas y Tablas operativas */}
+      {/* SECCION 1: Metricas y Tablas operativas */}
       {seccion === 'metricas' && (
         <div className="row g-4">
           <div className="col-12 col-lg-6">
@@ -354,7 +354,7 @@ function VistaJefe({
         </div>
       )}
 
-      {/* SECCION 2: Catálogo de productos */}
+      {/* SECCION 2: Catalogo de productos */}
       {seccion === 'productos' && (
         <div className="row g-4">
           <div className="col-12 col-lg-5">
@@ -449,7 +449,7 @@ function VistaJefe({
         </div>
       )}
 
-      {/* SECCION 3: Gestión de Usuarios */}
+      {/* SECCION 3: Gestion de Usuarios */}
       {seccion === 'usuarios' && (
         <div className="d-flex flex-column gap-4">
           {mensajeUsuario && (
@@ -468,7 +468,7 @@ function VistaJefe({
                   <h3 className="fw-bold my-1" style={{ color: 'var(--color-primario)' }}>{totalUsuarios}</h3>
                   <small className="text-muted">Cuentas registradas</small>
                 </div>
-                <div className="p-3 rounded-circle" style={{ backgroundColor: 'var(--color-fondo)', color: 'var(--color-acento)' }}><i className="bi bi-people-fill fs-4"></i></div>
+                <div style={{ color: 'var(--color-acento)' }}><i className="bi bi-people-fill fs-2"></i></div>
               </div>
             </div>
             <div className="col-12 col-md-4">
@@ -478,7 +478,7 @@ function VistaJefe({
                   <h3 className="fw-bold my-1 text-success">{usuariosActivos}</h3>
                   <small className="text-muted">Con acceso habilitado</small>
                 </div>
-                <div className="p-3 rounded-circle bg-success bg-opacity-10 text-success"><i className="bi bi-person-check-fill fs-4"></i></div>
+                <div className="text-success"><i className="bi bi-person-check-fill fs-2"></i></div>
               </div>
             </div>
             <div className="col-12 col-md-4">
@@ -488,7 +488,7 @@ function VistaJefe({
                   <h3 className="fw-bold my-1 text-danger">{usuariosInactivos}</h3>
                   <small className="text-muted">Acceso suspendido</small>
                 </div>
-                <div className="p-3 rounded-circle bg-danger bg-opacity-10 text-danger"><i className="bi bi-person-x-fill fs-4"></i></div>
+                <div className="text-danger"><i className="bi bi-person-x-fill fs-2"></i></div>
               </div>
             </div>
           </div>
@@ -539,7 +539,7 @@ function VistaJefe({
                         <tr key={usr.id || usr.email}>
                           <td>
                             <div className="d-flex align-items-center gap-3">
-                              <div className="d-flex align-items-center justify-content-center rounded-circle fw-bold text-white shadow-sm flex-shrink-0" style={{ width: '38px', height: '38px', backgroundColor: esJefe ? '#dc3545' : esTrabajador ? '#0d6efd' : '#198754', fontSize: '0.9rem' }}>
+                              <div className="d-flex align-items-center justify-content-center rounded-circle fw-bold text-white flex-shrink-0" style={{ width: '38px', height: '38px', backgroundColor: esJefe ? '#dc3545' : esTrabajador ? '#0d6efd' : '#198754', fontSize: '0.9rem' }}>
                                 {usr.nombre ? usr.nombre.charAt(0).toUpperCase() : 'U'}
                               </div>
                               <div>
@@ -634,7 +634,7 @@ function VistaJefe({
             </form>
           </Modal>
 
-          {/* Modal Historial de Auditoría */}
+          {/* Modal Historial de Auditoria */}
           <Modal
             abierto={Boolean(usuarioHistorialModal)}
             onCerrar={() => setUsuarioHistorialModal(null)}

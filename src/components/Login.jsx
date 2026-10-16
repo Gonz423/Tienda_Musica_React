@@ -254,7 +254,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
               </button>
             </form>
 
-            {/* Accesos rápidos */}
+            {/* Accesos rapidos */}
             <div className="mt-4 pt-3 border-top" style={{ borderColor: '#ece6df' }}>
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <span className="small fw-bold text-muted">

@@ -28,7 +28,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
           style={{ maxWidth: '520px', borderColor: 'rgba(75, 46, 43, 0.15)' }}
         >
           <div
-            className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm"
+            className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
             style={{ width: '64px', height: '64px', backgroundColor: '#fef2f2', color: '#dc2626' }}
           >
             <i className="bi bi-exclamation-triangle fs-2"></i>
@@ -37,7 +37,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
             Producto no encontrado
           </h2>
           <p className="text-muted small mb-4">
-            El código o identificador <strong>#{id}</strong> no existe en nuestro catálogo musical.
+            El codigo o identificador <strong>#{id}</strong> no existe en nuestro catalogo musical.
           </p>
           <Link to="/" className="btn btn-sv-primary px-4 py-2 fw-semibold">
             <i className="bi bi-arrow-left me-2"></i>
@@ -133,7 +133,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
         }}
       >
         <div className="row g-0">
-          {/* Columna Izquierda: Imagen y Garantías */}
+          {/* Columna Izquierda: Imagen y Garantias */}
           <div
             className="col-12 col-md-5 d-flex flex-column align-items-center justify-content-center p-4 p-lg-5"
             style={{
@@ -166,7 +166,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
               />
             </div>
 
-            {/* Sellos de garantía y despacho */}
+            {/* Sellos de garantia y despacho */}
             <div className="w-100 pt-3 border-top d-flex justify-content-around text-center small text-muted">
               <div>
                 <i className="bi bi-truck text-warning fs-5 d-block mb-1"></i>
@@ -183,7 +183,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
             </div>
           </div>
 
-          {/* Columna Derecha: Información y Compra */}
+          {/* Columna Derecha: Informacion y Compra */}
           <div className="col-12 col-md-7">
             <div className="card-body p-4 p-lg-5 d-flex flex-column h-100 justify-content-between">
               <div>
@@ -250,7 +250,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
                   </button>
                 </div>
 
-                {/* Ficha Técnica */}
+                {/* Ficha Tecnica */}
                 <h5 className="fw-bold fs-6 mb-3" style={{ color: 'var(--color-secundario)' }}>
                   <i className="bi bi-info-circle me-2"></i>Especificaciones
                 </h5>
@@ -274,7 +274,7 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
                 </ul>
               </div>
 
-              {/* Botón Volver */}
+              {/* Boton Volver */}
               <div>
                 <Link
                   to="/"

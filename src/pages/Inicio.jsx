@@ -29,7 +29,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
     return imagenesLocales[clave] || imagenesLocales['../assets/img/GA001.jpg']
   }
 
-  // Seleccionar 4 instrumentos destacados de diferentes categorías
+  // Seleccionar 4 instrumentos destacados de diferentes categorias
   const productosDestacados = productos.slice(0, 4)
 
   return (
@@ -97,7 +97,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
         )}
 
-        {/* SECCIÓN MULTIMEDIA: DEMOSTRACIÓN DE AUDIO Y VIDEO */}
+        {/* SECCION MULTIMEDIA: DEMOSTRACION DE AUDIO Y VIDEO */}
         <section className="mb-5">
           <div className="text-center mb-4">
             <span className="badge btn-sv-secondary text-uppercase px-3 py-2 rounded-pill mb-2 shadow-sm">
@@ -112,7 +112,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
 
           <div className="row g-4">
-            {/* Demostración de Video */}
+            {/* Demostracion de Video */}
             <div className="col-12 col-lg-7">
               <div className="media-card-sv h-100 d-flex flex-column justify-content-between">
                 <div>
@@ -155,7 +155,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
               </div>
             </div>
 
-            {/* Demostración de Audio */}
+            {/* Demostracion de Audio */}
             <div className="col-12 col-lg-5">
               <div className="media-card-sv h-100 d-flex flex-column justify-content-between">
                 <div>
@@ -177,7 +177,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
                     }}
                   >
                     <div
-                      className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow"
+                      className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
                       style={{
                         width: '64px',
                         height: '64px',
@@ -220,7 +220,7 @@ function Inicio({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           </div>
         </section>
 
-        {/* SECCIÓN DE PRODUCTOS DESTACADOS */}
+        {/* SECCION DE PRODUCTOS DESTACADOS */}
         <section className="mb-5">
           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>

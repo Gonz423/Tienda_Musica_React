@@ -58,7 +58,7 @@ function Footer() {
                 <i className="bi bi-whatsapp"></i>
               </a>
             </div>
-            {/* Garantía */}
+            {/* Garantia */}
             <div className="d-flex flex-wrap gap-1 mt-2">
               <span className="badge bg-dark border border-secondary text-white-50 small">
                 <i className="bi bi-truck me-1 text-warning"></i> Envíos a todo Chile
@@ -69,7 +69,7 @@ function Footer() {
             </div>
           </div>
 
-          {/* Navegación */}
+          {/* Navegacion */}
           <div className="col-6 col-md-3 col-lg-2">
             <h6 className="text-uppercase fw-bold mb-3 pb-1 border-bottom border-secondary text-white" style={{ letterSpacing: '1px' }}>
               Navegación
@@ -219,7 +219,7 @@ function Footer() {
 
             <button
               onClick={handleScrollTop}
-              className="btn btn-sm btn-outline-secondary text-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm"
+              className="btn btn-sm btn-outline-secondary text-light rounded-circle p-2 d-flex align-items-center justify-content-center"
               style={{ width: '32px', height: '32px' }}
               title="Volver arriba"
               aria-label="Volver arriba"

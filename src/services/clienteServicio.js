@@ -1,4 +1,4 @@
-// Servicios asíncronos cliente
+// Servicios asincronos cliente
 export async function consultarDisponibilidadStock(servicio, codigo) {
   const respuesta = await servicio.consultarStock(codigo)
   return respuesta

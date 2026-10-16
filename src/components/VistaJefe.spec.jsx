@@ -275,7 +275,7 @@ describe('Perfil Jefe - Guía 14: 10 Pruebas Unitarias', () => {
     expect(resultadoGuardado.exito).toBe(true)
   })
 
-  // Pruebas añadidas para el nuevo apartado de Gestión de Usuarios
+  // Pruebas anadidas para el nuevo apartado de Gestion de Usuarios
   describe('Gestión de Usuarios en Vista Jefe', () => {
     const usuariosPrueba = [
       {

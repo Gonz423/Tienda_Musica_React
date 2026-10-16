@@ -38,7 +38,7 @@ function Contacto() {
       err.email = 'Ingresa un correo electrónico con formato válido (ej: nombre@correo.com)'
     }
 
-    // Teléfono obligatorio
+    // Telefono obligatorio
     const regexTelefono = /^[0-9+() -]{8,}$/
     if (!formulario.telefono.trim()) {
       err.telefono = 'Ingresa tu número de teléfono de contacto'
@@ -117,13 +117,13 @@ function Contacto() {
         </div>
 
         {ticketEnviado ? (
-          /* Confirmación de Envío */
+          /* Confirmacion de Envio */
           <div
             className="card card-contacto-glass border-0 p-4 p-md-5 text-center mx-auto"
             style={{ maxWidth: '640px', borderRadius: '20px' }}
           >
             <div
-              className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm bg-success text-white mx-auto"
+              className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 bg-success text-white mx-auto"
               style={{ width: '70px', height: '70px' }}
             >
               <i className="bi bi-check-lg fs-1"></i>
@@ -242,7 +242,7 @@ function Contacto() {
                     {errores.email && <div className="invalid-feedback small">{errores.email}</div>}
                   </div>
 
-                  {/* Teléfono */}
+                  {/* Telefono */}
                   <div className="col-12 col-md-6">
                     <label htmlFor="contacto-telefono" className="form-label small fw-bold text-secondary mb-1">
                       Teléfono / WhatsApp *
@@ -295,7 +295,7 @@ function Contacto() {
                   </div>
                 </div>
 
-                {/* Botón de Envío */}
+                {/* Boton de Envio */}
                 <div className="mt-4">
                   <button
                     type="submit"

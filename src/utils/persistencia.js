@@ -1,4 +1,4 @@
-// Catálogo
+// Catalogo
 export function guardarProductoStorage(producto) {
   localStorage.setItem('productos_catalogo', JSON.stringify(producto))
 }

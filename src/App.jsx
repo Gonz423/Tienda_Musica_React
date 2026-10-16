@@ -26,7 +26,7 @@ function App() {
   // Rol activo: 'cliente' | 'trabajador' | 'jefe'
   const [rolActual, setRolActual] = useState('cliente')
 
-  // Sesión
+  // Sesion
   const [sesionAbierta, setSesionAbierta] = useState(false)
   const [usuarioActual, setUsuarioActual] = useState(null)
   const [mostrarLogin, setMostrarLogin] = useState(false)
@@ -150,7 +150,7 @@ function App() {
     )
   }
 
-  // Handlers de gestión de usuarios
+  // Handlers de gestion de usuarios
   const handleCrearUsuario = (nuevoUsuario) => {
     setUsuarios((prev) => {
       const nuevo = [nuevoUsuario, ...prev]

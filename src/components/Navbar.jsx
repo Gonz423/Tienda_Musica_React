@@ -99,7 +99,7 @@ function Navbar({
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menú */}
+        {/* Menu */}
         <div
           className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`}
           id="menuPrincipal"
@@ -252,7 +252,7 @@ function Navbar({
               </button>
             )}
 
-            {/* Sesión */}
+            {/* Sesion */}
             <div className="d-flex align-items-center">
               {sesionAbierta && usuarioActual ? (
                 <div

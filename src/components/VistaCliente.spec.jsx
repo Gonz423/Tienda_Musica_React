@@ -68,7 +68,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
 
     const inputBuscar = screen.getByLabelText(/Buscar producto/i)
 
-    // Búsqueda nombre
+    // Busqueda nombre
     await usuario.type(inputBuscar, 'folk')
     expect(screen.getByText('Guitarra Folk')).toBeInTheDocument()
     expect(screen.queryByText('Batería Acústica Stage')).not.toBeInTheDocument()
@@ -79,19 +79,19 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(inputBuscar).toHaveValue('')
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
 
-    // Búsqueda marca
+    // Busqueda marca
     await usuario.type(inputBuscar, 'Pearl')
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
     expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
     await usuario.clear(inputBuscar)
 
-    // Búsqueda modelo
+    // Busqueda modelo
     await usuario.type(inputBuscar, 'CA-50')
     expect(screen.getByText('Afinador Cromático')).toBeInTheDocument()
     expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
   })
 
-  // 3. Filtro por categoría
+  // 3. Filtro por categoria
   it('3. Filtra la lista de productos al seleccionar una categoria especifica', async () => {
     const usuario = userEvent.setup()
     render(<VistaCliente productos={productosPrueba} />)
@@ -197,7 +197,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     vi.useRealTimers()
   })
 
-  // 8. Stock crítico y agotado
+  // 8. Stock critico y agotado
   it('8. Deshabilita boton de compra para productos sin stock y resalta stock critico', () => {
     render(<VistaCliente productos={productosPrueba} />)
 
@@ -206,14 +206,14 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     const botonAgotado = screen.getByRole('button', { name: /Agotado/i })
     expect(botonAgotado).toBeDisabled()
 
-    // Crítico
+    // Critico
     expect(screen.getByText('Stock: 2 un.')).toHaveClass('bg-warning')
 
     // Normal
     expect(screen.getByText('Stock: 5 un.')).toHaveClass('bg-success')
   })
 
-  // 9. Espía localStorage
+  // 9. Espia localStorage
   it('9. Utiliza un espia vi.spyOn para comprobar la persistencia del carrito en localStorage', async () => {
     const espiaLocalStorage = vi.spyOn(Storage.prototype, 'setItem')
     const usuario = userEvent.setup()
@@ -238,7 +238,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     const carritoRecuperado = cargarCarritoStorage()
     expect(carritoRecuperado).toEqual([productosPrueba[1]])
 
-    // JSON inválido
+    // JSON invalido
     localStorage.setItem('carrito_compras', 'invalido{json')
     expect(cargarCarritoStorage()).toEqual([])
 
@@ -248,7 +248,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     espiaLocalStorage.mockRestore()
   })
 
-  // 10. Mocks asíncronos
+  // 10. Mocks asincronos
   it('10. Utiliza un mock asincrono vi.fn().mockResolvedValue para simular consulta de stock y checkout del cliente', async () => {
     // Mock stock
     const servicioStockMock = {

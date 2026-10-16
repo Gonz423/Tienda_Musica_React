@@ -305,7 +305,7 @@ body {
   color: #ffffff !important;
 }
 
-/* Panel de Filtros del Catálogo - Estilo Estudio */
+/* Panel de Filtros del Catalogo - Estilo Estudio */
 .panel-filtros-catalogo {
   background: linear-gradient(135deg, #ffffff 0%, #f7f3ee 100%);
   border: 1px solid rgba(123, 75, 58, 0.18);
@@ -359,7 +359,7 @@ body {
   line-height: 1.5;
 }
 
-/* Categorías */
+/* Categorias */
 .categorias-scroll-bar {
   display: flex;
   gap: 0.5rem;
