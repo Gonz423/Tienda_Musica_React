@@ -29,6 +29,16 @@ const productosMock = [
     stock: 6,
     descripcion: 'Set completo con atriles.',
   },
+  {
+    codigo: 'AC001',
+    nombre: 'Afinador Clip',
+    marca: 'Korg',
+    modelo: 'Clip-on',
+    categoria: 'Accesorios',
+    precio: 15990,
+    stock: 0,
+    descripcion: 'Afinador de prueba agotado.'
+  }
 ]
 
 const pedidosMock = [
@@ -38,6 +48,10 @@ const pedidosMock = [
     cliente: 'Juan Perez',
     tipoEntrega: 'Retiro local',
     articulos: [{ id: 1, nombre: 'Guitarra Acustica Folk', precio: 129990, cantidad: 1 }],
+    productos: [
+      { codigo: 'GA001', nombre: 'Guitarra Acustica Folk', precio: 129990, cantidad: 1 },
+      { codigo: 'GA001', nombre: 'Guitarra Acustica Folk', precio: 129990, cantidad: 1 }
+    ],
     total: 129990,
     estado: 'Pendiente',
   },
@@ -47,9 +61,33 @@ const pedidosMock = [
     cliente: 'Maria Lopez',
     tipoEntrega: 'Envio a domicilio',
     articulos: [{ id: 2, nombre: 'Bateria Acustica 5 piezas', precio: 599990, cantidad: 1 }],
+    productos: [
+      { codigo: 'BT001', nombre: 'Bateria Acustica 5 piezas', precio: 599990, cant: 1 },
+      { id: 'GEN-01', nombre: 'Item Generico', precio: 15000 }
+    ],
     total: 599990,
     estado: 'En preparacion',
   },
+  {
+    id: 103,
+    fecha: '2026-05-15',
+    cliente: 'Carlos Soto',
+    tipoEntrega: 'Retiro local',
+    articulos: [],
+    productos: [{ codigo: 'BT001', nombre: 'Bateria', precio: 100000, cantidad: 1 }],
+    total: 100000,
+    estado: 'Despachado',
+  },
+  {
+    id: 104,
+    fecha: '2026-05-16',
+    cliente: 'Ana Diaz',
+    tipoEntrega: 'Retiro local',
+    articulos: [],
+    productos: [{ nombre: 'Cuerda Individual', precio: 2000 }],
+    total: 2000,
+    estado: 'Otro',
+  }
 ]
 
 describe('Perfil Empleado - 10 Pruebas Unitarias', () => {
@@ -231,5 +269,98 @@ describe('Perfil Empleado - 10 Pruebas Unitarias', () => {
     await usuario.click(botonesIncrementar[0])
 
     expect(mockActualizarStock).toHaveBeenCalledWith('GA001', 2)
+  })
+
+  it('11. Decrementa el stock utilizando el botón -1 y respeta el límite inferior de cero', async () => {
+    const usuario = userEvent.setup()
+    const mockActualizarStock = vi.fn()
+
+    render(
+      <MemoryRouter>
+        <VistaEmpleado
+          pedidos={pedidosMock}
+          productos={[{ ...productosMock[0], stock: 1 }]}
+          seccionActiva="stock"
+          onActualizarStock={mockActualizarStock}
+        />
+      </MemoryRouter>
+    )
+
+    const btnDecrementar = screen.getByRole('button', { name: /-1/i })
+    await usuario.click(btnDecrementar)
+    expect(mockActualizarStock).toHaveBeenCalledWith('GA001', 0)
+  })
+
+  it('12. Actualiza el estado local de pedidos y stock cuando no se pasan callbacks externos', async () => {
+    const usuario = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <VistaEmpleado
+          pedidos={pedidosMock}
+          productos={productosMock}
+          seccionActiva="pedidos"
+        />
+      </MemoryRouter>
+    )
+
+    // Avanza estado sin callback externo (ejecuta setPedidosLocales)
+    const btnPreparar = screen.getAllByRole('button', { name: /preparar/i })[0]
+    await usuario.click(btnPreparar)
+
+    // Ahora en seccion stock actualiza stock sin callback (ejecuta setProductosLocales)
+    const { rerender } = render(
+      <MemoryRouter>
+        <VistaEmpleado
+          pedidos={pedidosMock}
+          productos={productosMock}
+          seccionActiva="stock"
+        />
+      </MemoryRouter>
+    )
+
+    const btnIncrementar = screen.getAllByRole('button', { name: /\+1/i })[0]
+    await usuario.click(btnIncrementar)
+
+    const btnDecrementar = screen.getAllByRole('button', { name: /-1/i })[0]
+    await usuario.click(btnDecrementar)
+  })
+
+  it('13. Soporta propiedades alternativas pedidosExternos y onActualizarEstado', async () => {
+    const usuario = userEvent.setup()
+    const mockActualizarEstado = vi.fn()
+
+    render(
+      <MemoryRouter>
+        <VistaEmpleado
+          pedidosExternos={pedidosMock}
+          productos={productosMock}
+          onActualizarEstado={mockActualizarEstado}
+          seccionActiva="pedidos"
+        />
+      </MemoryRouter>
+    )
+
+    const btnDespachar = screen.getAllByRole('button', { name: /despachar/i })[0]
+    await usuario.click(btnDespachar)
+
+    expect(mockActualizarEstado).toHaveBeenCalledWith(102, 'Despachado')
+  })
+
+  it('14. Renderiza con las propiedades por defecto cuando no se especifican props', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <VistaEmpleado />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByRole('heading', { name: /Recepción y Despacho de Pedidos/i })).toBeInTheDocument()
+
+    rerender(
+      <MemoryRouter>
+        <VistaEmpleado pedidos={pedidosMock} />
+      </MemoryRouter>
+    )
+    expect(screen.getByText('Juan Perez')).toBeInTheDocument()
   })
 })

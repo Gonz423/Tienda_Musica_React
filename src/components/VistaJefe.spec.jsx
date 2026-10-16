@@ -394,5 +394,245 @@ describe('Perfil Jefe - Guía 14: 10 Pruebas Unitarias', () => {
         })
       )
     })
+
+    it('15. Permite eliminar un producto del catálogo cuando se entrega onEliminarProducto', async () => {
+      const usuario = userEvent.setup()
+      const onEliminarMock = vi.fn()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={[]}
+          onEliminarProducto={onEliminarMock}
+          seccionActiva="productos"
+        />
+      )
+
+      const btnEliminar = screen.getAllByTitle('Eliminar producto')[0]
+      await usuario.click(btnEliminar)
+
+      expect(onEliminarMock).toHaveBeenCalledWith('GA001')
+    })
+
+    it('16. Valida stock inválido y permite cancelar la edición de un producto', async () => {
+      const usuario = userEvent.setup()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={[]}
+          seccionActiva="productos"
+        />
+      )
+
+      // Iniciar edición
+      const btnEditar = screen.getAllByTitle(/Editar producto/i)[0]
+      await usuario.click(btnEditar)
+      expect(screen.getByText(/Editar Producto \(GA001\)/i)).toBeInTheDocument()
+
+      // Stock inválido
+      const inputStock = screen.getByLabelText(/Stock/i)
+      await usuario.clear(inputStock)
+      await usuario.type(inputStock, '-5')
+      await usuario.click(screen.getByRole('button', { name: /Actualizar Producto/i }))
+      expect(screen.getByText(/El stock debe ser un entero no negativo/i)).toBeInTheDocument()
+
+      // Cancelar edición
+      await usuario.click(screen.getByRole('button', { name: /Cancelar/i }))
+      expect(screen.getByText('Nuevo Producto')).toBeInTheDocument()
+    })
+
+    it('17. Filtra la lista de usuarios por término de búsqueda, rol y estado', async () => {
+      const usuario = userEvent.setup()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const inputBuscar = screen.getByPlaceholderText(/Buscar por nombre o correo/i)
+
+      // Búsqueda por texto
+      await usuario.type(inputBuscar, 'Pedro')
+      expect(screen.getByText('Pedro Cliente')).toBeInTheDocument()
+      expect(screen.queryByText('Admin Principal')).not.toBeInTheDocument()
+
+      // Limpiar búsqueda
+      const btnLimpiar = screen.getByRole('button', { name: '' })
+      await usuario.click(btnLimpiar)
+      expect(screen.getByText('Admin Principal')).toBeInTheDocument()
+
+      // Filtro por rol
+      const selectRol = screen.getByLabelText('Filtrar por rol')
+      await usuario.selectOptions(selectRol, 'jefe')
+      expect(screen.getByText('Admin Principal')).toBeInTheDocument()
+      expect(screen.queryByText('Pedro Cliente')).not.toBeInTheDocument()
+
+      await usuario.selectOptions(selectRol, 'todos')
+
+      // Filtro por estado
+      const selectEstado = screen.getByLabelText('Filtrar por estado')
+      await usuario.selectOptions(selectEstado, 'inactivos')
+      expect(screen.getByText('Pedro Cliente')).toBeInTheDocument()
+      expect(screen.queryByText('Admin Principal')).not.toBeInTheDocument()
+
+      await usuario.selectOptions(selectEstado, 'activos')
+      expect(screen.getByText('Admin Principal')).toBeInTheDocument()
+      expect(screen.queryByText('Pedro Cliente')).not.toBeInTheDocument()
+    })
+
+    it('18. Permite editar un usuario existente, alternar visibilidad de contraseña y actualizarlo', async () => {
+      const usuario = userEvent.setup()
+      const onActualizarMock = vi.fn()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          onActualizarUsuario={onActualizarMock}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const btnEditarUsr = screen.getAllByTitle('Editar datos del usuario')[0]
+      await usuario.click(btnEditarUsr)
+
+      expect(screen.getByRole('heading', { name: /Editar Usuario: Admin Principal/i })).toBeInTheDocument()
+
+      // Alternar contraseña
+      const btnMostrarPassword = screen.getByRole('button', { name: /mostrar/i })
+      await usuario.click(btnMostrarPassword)
+      // Contraseña corta en edición
+      const inputPass = screen.getByLabelText(/Nueva Contraseña/i)
+      await usuario.type(inputPass, '12')
+      await usuario.click(screen.getByRole('button', { name: /Actualizar Usuario/i }))
+      expect(screen.getByText('La nueva contraseña debe tener al menos 4 caracteres')).toBeInTheDocument()
+
+      // Modificar datos con contraseña válida
+      await usuario.clear(inputPass)
+      await usuario.type(inputPass, 'nuevaClave123')
+
+      const inputNombre = screen.getByLabelText(/Nombre Completo/i)
+      await usuario.clear(inputNombre)
+      await usuario.type(inputNombre, 'Admin Actualizado')
+
+      const selectEstado = screen.getByLabelText(/Estado de la Cuenta/i)
+      await usuario.selectOptions(selectEstado, 'inactivo')
+
+      await usuario.click(screen.getByRole('button', { name: /Actualizar Usuario/i }))
+
+      expect(onActualizarMock).toHaveBeenCalledTimes(1)
+      expect(onActualizarMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          nombre: 'Admin Actualizado',
+          activo: false
+        })
+      )
+    })
+
+    it('19. Muestra validaciones en el formulario de usuario ante campos vacíos, correo inválido o duplicado', async () => {
+      const usuario = userEvent.setup()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          seccionActiva="usuarios"
+        />
+      )
+
+      await usuario.click(screen.getByRole('button', { name: /Nuevo Usuario/i }))
+
+      // Enviar vacío
+      await usuario.click(screen.getByRole('button', { name: /Crear Usuario/i }))
+      expect(screen.getByText('El nombre completo es obligatorio')).toBeInTheDocument()
+      expect(screen.getByText('El correo electrónico es obligatorio')).toBeInTheDocument()
+      expect(screen.getByText('La contraseña es obligatoria')).toBeInTheDocument()
+
+      // Formato inválido
+      await usuario.type(screen.getByLabelText(/Correo Electrónico/i), 'correoInvalido')
+      await usuario.type(screen.getByLabelText(/Nombre Completo/i), 'Nombre Valido')
+      await usuario.type(screen.getByLabelText(/^Contraseña/i), '123')
+      await usuario.click(screen.getByRole('button', { name: /Crear Usuario/i }))
+      expect(screen.getByText('Ingresa un formato de correo válido')).toBeInTheDocument()
+      expect(screen.getByText('La contraseña debe tener al menos 4 caracteres')).toBeInTheDocument()
+
+      // Correo duplicado
+      const inputEmail = screen.getByLabelText(/Correo Electrónico/i)
+      await usuario.clear(inputEmail)
+      await usuario.type(inputEmail, 'admin@sonidovivo.cl')
+      await usuario.click(screen.getByRole('button', { name: /Crear Usuario/i }))
+      expect(screen.getByText('Ya existe una cuenta con este correo')).toBeInTheDocument()
+
+      // Cerrar modal con botón X (Cerrar modal)
+      await usuario.click(screen.getByLabelText('Cerrar modal'))
+      expect(screen.queryByRole('heading', { name: /Crear Nuevo Usuario/i })).not.toBeInTheDocument()
+    })
+
+    it('20. Agrega notas administrativas en el modal de historial y valida nota vacía', async () => {
+      const usuario = userEvent.setup()
+      const onAgregarHistorialMock = vi.fn()
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          onAgregarHistorialUsuario={onAgregarHistorialMock}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const btnHistorial = screen.getAllByTitle('Ver historial de actividad')[0]
+      await usuario.click(btnHistorial)
+
+      const inputNota = screen.getByPlaceholderText(/Se validó identidad telefónicamente/i)
+      await usuario.type(inputNota, 'Nota de auditoria de prueba')
+
+      const btnAgregarNota = screen.getByRole('button', { name: /Añadir Nota/i })
+      await usuario.click(btnAgregarNota)
+
+      expect(onAgregarHistorialMock).toHaveBeenCalledTimes(1)
+      expect(screen.getByText('Nota de auditoria de prueba')).toBeInTheDocument()
+
+      // Cerrar modal usando botón X (Cerrar modal)
+      await usuario.click(screen.getByLabelText('Cerrar modal'))
+      expect(screen.queryByText(/Historial de Auditoría/i)).not.toBeInTheDocument()
+    })
+
+    it('21. Impide que el administrador actual desactive su propia cuenta activa', async () => {
+      const usuario = userEvent.setup()
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+      render(
+        <VistaJefe
+          productos={productosPrueba}
+          pedidos={pedidosPrueba}
+          usuarios={usuariosPrueba}
+          usuarioActual={{ email: 'admin@sonidovivo.cl' }}
+          seccionActiva="usuarios"
+        />
+      )
+
+      const btnDesactivar = screen.getByTitle('Desactivar usuario')
+      await usuario.click(btnDesactivar)
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Por motivos de seguridad no puedes desactivar tu propia cuenta')
+      )
+      alertSpy.mockRestore()
+    })
+
+    it('22. Renderiza correctamente con propiedades por defecto', () => {
+      render(<VistaJefe />)
+      expect(screen.getByText(/Total Ventas Acumuladas/i)).toBeInTheDocument()
+      expect(screen.getByText('$0')).toBeInTheDocument()
+    })
   })
 })

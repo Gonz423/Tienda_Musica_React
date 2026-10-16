@@ -60,12 +60,10 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
         return imagenesDisponibles[ruta];
       }
     }
-    return imagenesDisponibles["../assets/img/GA001.jpg"] || producto.imagen;
+    return imagenesDisponibles["../assets/img/GA001.jpg"];
   };
 
   const handleAgregar = () => {
-    if (producto.stock === 0) return;
-    
     // Agregar la cantidad seleccionada
     for (let i = 0; i < cantidad; i++) {
       if (onAgregarAlCarrito) {

@@ -120,15 +120,10 @@ function VistaEmpleado({
 
   const avanzarEstado = (id) => {
     const pedidoActual = pedidos.find((p) => p.id === id);
-    if (!pedidoActual) return;
-
     let nuevoEstado = pedidoActual.estado;
     if (pedidoActual.estado === "Pendiente") {
       nuevoEstado = "En preparación";
-    } else if (
-      pedidoActual.estado === "En preparación" ||
-      pedidoActual.estado === "En preparacion"
-    ) {
+    } else if (pedidoActual.estado?.toLowerCase().includes("prepara")) {
       nuevoEstado = "Despachado";
     }
 
@@ -289,9 +284,9 @@ function VistaEmpleado({
                     <td>
                       <ul className="list-unstyled mb-0 small">
                         {agruparProductos(pedido.productos).map((prod, idx) => (
-                          <li key={`${prod.codigo || prod.id || idx}-${idx}`} className="py-1">
+                          <li key={`${prod.id}-${idx}`} className="py-1">
                             <span>
-                              <strong>{prod.cantidad ?? prod.cant ?? 1}x</strong>{" "}
+                              <strong>{prod.cantidad}x</strong>{" "}
                               <Link
                                 to={`/producto/${prod.codigo}`}
                                 className="text-decoration-none text-dark fw-medium"
