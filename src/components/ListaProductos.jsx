@@ -1,71 +1,44 @@
-import { Link } from 'react-router-dom';
+import VistaProducto from './VistaProducto'
 
-function ProductCard({ producto, onAgregarAlCarrito }) {
-
-
-  
-  const { nombre, precio, imagen, categoria, stock, marca, modelo, descripcion } = producto;
-  const idProducto = producto.id || producto.codigo;
+function ListaProductos({
+  productos = [],
+  onAgregarAlCarrito,
+  obtenerImagen,
+  onRestablecerFiltros
+}) {
+  if (productos.length === 0) {
+    return (
+      <div className="text-center py-5 bg-white rounded-3 border my-4">
+        <i className="bi bi-search fs-1 text-muted d-block mb-2"></i>
+        <h5 className="fw-bold text-dark">No se encontraron productos</h5>
+        <p className="text-muted mb-3">
+          Intenta con otra palabra clave o selecciona otra categoria.
+        </p>
+        {onRestablecerFiltros && (
+          <button
+            type="button"
+            className="btn btn-sm btn-sv-primary"
+            onClick={onRestablecerFiltros}
+          >
+            Restablecer Filtros
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
-    <div className="col">
-      <div className="card h-100 shadow-sm border-0">
-
-        <Link to={`/producto/${idProducto}`} className="text-decoration-none">
-          <img 
-            src={imagen} 
-            className="card-img-top p-3" 
-            alt={nombre} 
-            style={{ height: '220px', objectFit: 'contain', cursor: 'pointer' }}
-          />
-        </Link>
-
-        <div className="card-body d-flex flex-column text-center">
-          <span 
-            className="badge mb-2 align-self-center text-uppercase"
-            style={{ backgroundColor: '#7a3e1d', fontSize: '0.75rem' }}
-          >
-            {categoria}
-          </span>
-
-          <h5 className="card-title fs-6 fw-bold">
-            <Link 
-              to={`/producto/${identificador}`} 
-              className="text-dark text-decoration-none"
-              style={{ cursor: 'pointer' }}
-            >
-              {nombre}
-            </Link>
-          </h5>
-
-          <p className="text-muted small mb-1">
-            <strong>{marca}</strong> | Modelo: {modelo}
-          </p>
-          <p className="text-muted small mb-2" style={{ fontSize: '0.8rem' }}>
-            {descripcion}
-          </p>
-
-          <div className="d-flex justify-content-between align-items-center mt-auto mb-3 px-2">
-            <span className="fw-bold fs-5 text-dark">
-              ${precio?.toLocaleString('es-CL')}
-            </span>
-            <span className={`badge ${stock <= 3 ? 'bg-warning text-dark' : 'bg-success'}`}>
-              Stock: {stock} un.
-            </span>
-          </div>
-
-          <button 
-            className="btn text-white w-100 fw-semibold"
-            style={{ backgroundColor: '#b85d19' }}
-            onClick={() => onAgregarAlCarrito && onAgregarAlCarrito(producto)}
-            disabled={stock === 0}
-          >
-            Agregar al Carrito
-          </button>
-        </div>
-      </div>
+    <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 g-md-4">
+      {productos.map((producto) => (
+        <VistaProducto
+          key={producto.codigo || producto.id}
+          producto={producto}
+          onAgregarAlCarrito={onAgregarAlCarrito}
+          obtenerImagen={obtenerImagen}
+        />
+      ))}
     </div>
-  );
+  )
 }
 
-export default ProductCard;
+export default ListaProductos

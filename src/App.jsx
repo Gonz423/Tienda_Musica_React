@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import VistaCliente from './components/VistaCliente'
-import VistaEmpleado from './components/VistaEmpleado'
-import VistaJefe from './components/VistaJefe'
+import PanelCliente from './pages/PanelCliente'
+import PanelEmpleado from './pages/PanelEmpleado'
+import PanelJefe from './pages/PanelJefe'
 import DetalleProducto from './pages/DetalleProducto'
 import Inicio from './pages/Inicio'
 import Contacto from './pages/Contacto'
 import Footer from './components/Footer'
 import CarritoModal from './components/CarritoModal'
 import Login from './components/Login'
+import LayoutApp from './components/LayoutApp'
 import { productosIniciales } from './data/productos'
 import { pedidosIniciales } from './data/pedidos'
 import { usuariosIniciales } from './data/usuarios'
@@ -220,140 +221,138 @@ function App() {
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar
-        rolActual={rolActual}
-        setRolActual={setRolActual}
-        cantidadCarrito={carrito.length}
-        onAbrirCarrito={() => setModalCarritoAbierto(true)}
-        seccionJefe={seccionJefe}
-        setSeccionJefe={setSeccionJefe}
-        seccionTrabajador={seccionTrabajador}
-        setSeccionTrabajador={setSeccionTrabajador}
-        sesionAbierta={sesionAbierta}
-        usuarioActual={usuarioActual}
-        onAbrirLogin={() => setMostrarLogin(true)}
-        onCerrarSesion={handleCerrarSesion}
-      />
-
-      <main className="flex-grow-1">
-        {/* Vista Cliente */}
-        {rolActual === 'cliente' && (
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Inicio
-                  productos={productos}
-                  onAgregarAlCarrito={handleAgregarAlCarrito}
-                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
-                />
-              }
-            />
-            <Route
-              path="/catalogo"
-              element={
-                <VistaCliente
-                  productos={productos}
-                  onAgregarAlCarrito={handleAgregarAlCarrito}
-                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
-                />
-              }
-            />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route
-              path="/producto/:id"
-              element={
-                <DetalleProducto
-                  productos={productos}
-                  onAgregarAlCarrito={handleAgregarAlCarrito}
-                  onAbrirCarrito={() => setModalCarritoAbierto(true)}
-                />
-              }
-            />
-          </Routes>
-        )}
-
-        {/* Vista Trabajador */}
-        {rolActual === 'trabajador' && (
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <VistaEmpleado
-                  productos={productos}
-                  pedidos={pedidos}
-                  seccionActiva={seccionTrabajador}
-                  onCambiarSeccion={setSeccionTrabajador}
-                  onActualizarStock={handleActualizarStock}
-                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
-                />
-              }
-            />
-            <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
-            <Route
-              path="*"
-              element={
-                <VistaEmpleado
-                  productos={productos}
-                  pedidos={pedidos}
-                  seccionActiva={seccionTrabajador}
-                  onCambiarSeccion={setSeccionTrabajador}
-                  onActualizarStock={handleActualizarStock}
-                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
-                />
-              }
-            />
-          </Routes>
-        )}
-
-        {/* Vista Jefe */}
-        {rolActual === 'jefe' && (
-          <VistaJefe
-            productos={productos}
-            pedidos={pedidos}
-            usuarios={usuarios}
-            usuarioActual={usuarioActual}
-            onAgregarProducto={handleAgregarProducto}
-            onActualizarProducto={handleActualizarProducto}
-            onEliminarProducto={handleEliminarProducto}
-            onActualizarStock={handleActualizarStock}
-            onActualizarEstadoPedido={handleActualizarEstadoPedido}
-            onCrearUsuario={handleCrearUsuario}
-            onActualizarUsuario={handleActualizarUsuario}
-            onAlternarEstadoUsuario={handleAlternarEstadoUsuario}
-            onAgregarHistorialUsuario={handleAgregarHistorialUsuario}
-            seccionActiva={seccionJefe}
-            onCambiarSeccion={setSeccionJefe}
-            onCambinarSeccion={setSeccionJefe}
-          />
-        )}
-      </main>
-
-      {/* Carrito */}
-      <CarritoModal
-        abierto={modalCarritoAbierto}
-        onCerrar={() => setModalCarritoAbierto(false)}
-        carrito={carrito}
-        onAgregarUno={handleAgregarAlCarrito}
-        onRestarUno={handleRestarUno}
-        onEliminarProducto={handleEliminarDelCarrito}
-        onVaciarCarrito={handleVaciarCarrito}
-        onFinalizarCompra={handleFinalizarCompra}
-      />
-
-      {/* Login */}
-      {mostrarLogin && (
-        <Login
-          usuarios={usuarios}
-          onIniciarSesion={handleIniciarSesion}
-          onCerrar={() => setMostrarLogin(false)}
+    <LayoutApp
+      navbar={
+        <Navbar
+          rolActual={rolActual}
+          setRolActual={setRolActual}
+          cantidadCarrito={carrito.length}
+          onAbrirCarrito={() => setModalCarritoAbierto(true)}
+          seccionJefe={seccionJefe}
+          setSeccionJefe={setSeccionJefe}
+          seccionTrabajador={seccionTrabajador}
+          setSeccionTrabajador={setSeccionTrabajador}
+          sesionAbierta={sesionAbierta}
+          usuarioActual={usuarioActual}
+          onAbrirLogin={() => setMostrarLogin(true)}
+          onCerrarSesion={handleCerrarSesion}
         />
+      }
+      footer={<Footer />}
+      modales={
+        <>
+          <CarritoModal
+            abierto={modalCarritoAbierto}
+            onCerrar={() => setModalCarritoAbierto(false)}
+            carrito={carrito}
+            onAgregarUno={handleAgregarAlCarrito}
+            onRestarUno={handleRestarUno}
+            onEliminarProducto={handleEliminarDelCarrito}
+            onVaciarCarrito={handleVaciarCarrito}
+            onFinalizarCompra={handleFinalizarCompra}
+          />
+          {mostrarLogin && (
+            <Login
+              usuarios={usuarios}
+              onIniciarSesion={handleIniciarSesion}
+              onCerrar={() => setMostrarLogin(false)}
+            />
+          )}
+        </>
+      }
+    >
+      {/* Vista Cliente */}
+      {rolActual === 'cliente' && (
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Inicio
+                productos={productos}
+                onAgregarAlCarrito={handleAgregarAlCarrito}
+                onAbrirCarrito={() => setModalCarritoAbierto(true)}
+              />
+            }
+          />
+          <Route
+            path="/catalogo"
+            element={
+              <Catalogo
+                productos={productos}
+                onAgregarAlCarrito={handleAgregarAlCarrito}
+                onAbrirCarrito={() => setModalCarritoAbierto(true)}
+              />
+            }
+          />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route
+            path="/producto/:id"
+            element={
+              <DetalleProducto
+                productos={productos}
+                onAgregarAlCarrito={handleAgregarAlCarrito}
+                onAbrirCarrito={() => setModalCarritoAbierto(true)}
+              />
+            }
+          />
+        </Routes>
       )}
 
-      {/* Footer */}
-      <Footer />
-    </div>
+      {/* Vista Trabajador */}
+      {rolActual === 'trabajador' && (
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PanelEmpleado
+                productos={productos}
+                pedidos={pedidos}
+                seccionActiva={seccionTrabajador}
+                onCambiarSeccion={setSeccionTrabajador}
+                onActualizarStock={handleActualizarStock}
+                onActualizarEstadoPedido={handleActualizarEstadoPedido}
+              />
+            }
+          />
+          <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
+          <Route
+            path="*"
+            element={
+              <PanelEmpleado
+                productos={productos}
+                pedidos={pedidos}
+                seccionActiva={seccionTrabajador}
+                onCambiarSeccion={setSeccionTrabajador}
+                onActualizarStock={handleActualizarStock}
+                onActualizarEstadoPedido={handleActualizarEstadoPedido}
+              />
+            }
+          />
+        </Routes>
+      )}
+
+      {/* Vista Jefe */}
+      {rolActual === 'jefe' && (
+        <PanelJefe
+          productos={productos}
+          pedidos={pedidos}
+          usuarios={usuarios}
+          usuarioActual={usuarioActual}
+          onAgregarProducto={handleAgregarProducto}
+          onActualizarProducto={handleActualizarProducto}
+          onEliminarProducto={handleEliminarProducto}
+          onActualizarStock={handleActualizarStock}
+          onActualizarEstadoPedido={handleActualizarEstadoPedido}
+          onCrearUsuario={handleCrearUsuario}
+          onActualizarUsuario={handleActualizarUsuario}
+          onAlternarEstadoUsuario={handleAlternarEstadoUsuario}
+          onAgregarHistorialUsuario={handleAgregarHistorialUsuario}
+          seccionActiva={seccionJefe}
+          onCambiarSeccion={setSeccionJefe}
+          onCambinarSeccion={setSeccionJefe}
+        />
+      )}
+    </LayoutApp>
   )
 }
 

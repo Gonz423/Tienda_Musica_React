@@ -6,6 +6,26 @@ import DetalleProducto from './DetalleProducto'
 import * as routerDom from 'react-router-dom'
 import { cargarCarritoStorage } from '../utils/persistencia'
 
+const { mockUseParams } = vi.hoisted(() => {
+  return { mockUseParams: vi.fn() }
+})
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useParams: mockUseParams,
+  }
+})
+
+vi.mock('react-router', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useParams: mockUseParams,
+  }
+})
+
 describe('Página DetalleProducto - Cobertura Completa', () => {
   const productoBase = {
     id: 1,
@@ -30,7 +50,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
   })
 
   it('muestra mensaje de producto no encontrado cuando el ID no coincide', () => {
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'INEXISTENTE' })
+    mockUseParams.mockReturnValue({ id: 'INEXISTENTE' })
 
     render(
       <MemoryRouter>
@@ -44,7 +64,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
   })
 
   it('renderiza correctamente el producto encontrado y sus especificaciones', () => {
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'GA001' })
+    mockUseParams.mockReturnValue({ id: 'GA001' })
 
     render(
       <MemoryRouter>
@@ -65,7 +85,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       codigo: 'HTTP01',
       imagen: 'https://ejemplo.com/foto.jpg'
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'HTTP01' })
+    mockUseParams.mockReturnValue({ id: 'HTTP01' })
 
     const { rerender } = render(
       <MemoryRouter>
@@ -82,7 +102,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       codigo: 'DATA01',
       imagen: 'data:image/png;base64,abc'
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'DATA01' })
+    mockUseParams.mockReturnValue({ id: 'DATA01' })
 
     rerender(
       <MemoryRouter>
@@ -105,7 +125,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       stock: 2,
       categoria: 'Varios'
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: '99' })
+    mockUseParams.mockReturnValue({ id: '99' })
 
     const { rerender } = render(
       <MemoryRouter>
@@ -122,7 +142,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       codigo: 'RARA01',
       imagen: 'inexistente_12345.jpg'
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'RARA01' })
+    mockUseParams.mockReturnValue({ id: 'RARA01' })
 
     rerender(
       <MemoryRouter>
@@ -135,7 +155,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
 
   it('permite incrementar y decrementar la cantidad con los botones + y - respetando los limites', async () => {
     const usuario = userEvent.setup()
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: '1' })
+    mockUseParams.mockReturnValue({ id: '1' })
 
     render(
       <MemoryRouter>
@@ -169,7 +189,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
     const onAgregarMock = vi.fn()
     const onAbrirCarritoMock = vi.fn()
 
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'GA001' })
+    mockUseParams.mockReturnValue({ id: 'GA001' })
 
     render(
       <MemoryRouter>
@@ -217,7 +237,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
 
   it('agrega 1 sola unidad mostrando el texto en singular cuando no se pasa onAgregarAlCarrito', async () => {
     const usuario = userEvent.setup()
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'GA001' })
+    mockUseParams.mockReturnValue({ id: 'GA001' })
 
     render(
       <MemoryRouter>
@@ -236,7 +256,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       ...productoBase,
       stock: 0
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'GA001' })
+    mockUseParams.mockReturnValue({ id: 'GA001' })
 
     render(
       <MemoryRouter>
@@ -261,7 +281,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
       stock: 2,
       categoria: 'Otros'
     }
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: '55' })
+    mockUseParams.mockReturnValue({ id: '55' })
 
     render(
       <MemoryRouter>
@@ -275,7 +295,7 @@ describe('Página DetalleProducto - Cobertura Completa', () => {
   })
 
   it('utiliza el catalogo por defecto de productosIniciales si no se pasa la prop productos', () => {
-    vi.spyOn(routerDom, 'useParams').mockReturnValue({ id: 'GA001' })
+    mockUseParams.mockReturnValue({ id: 'GA001' })
 
     render(
       <MemoryRouter>
