@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { crearPedido } from '../services/pedidoService'
 
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
 
@@ -15,6 +16,7 @@ function CarritoModal({
   const [paso, setPaso] = useState('carrito') // 'carrito' | 'checkout' | 'exito'
   const [cargandoPago, setCargandoPago] = useState(false)
   const [ordenGenerada, setOrdenGenerada] = useState(null)
+  const [errorCheckout, setErrorCheckout] = useState(null)
 
   // Formulario checkout
   const [formulario, setFormulario] = useState({
@@ -83,17 +85,27 @@ function CarritoModal({
     if (!handleValidarFormulario()) return
 
     setCargandoPago(true)
-    // Simulacion pago
-    setTimeout(() => {
+    setErrorCheckout(null)
+
+    try {
+      const respuesta = await crearPedido({
+        clienteId: formulario.email,
+        direccionEnvio: formulario.direccion,
+        items: listaItems.map((item) => ({
+          productoId: item.id,
+          cantidad: item.cantidad
+        }))
+      })
+
       const nuevaOrden = {
-        id: Math.floor(1000 + Math.random() * 9000),
+        id: respuesta.codigoPedido || respuesta.id,
         cliente: formulario.nombre,
         email: formulario.email,
         telefono: formulario.telefono,
         direccion: formulario.direccion,
         metodoPago: formulario.metodoPago,
-        fecha: new Date().toISOString().split('T')[0],
-        total,
+        fecha: respuesta.fecha || new Date().toISOString().split('T')[0],
+        total: respuesta.total ?? total,
         productos: listaItems.map((item) => ({
           codigo: item.codigo,
           nombre: item.nombre,
@@ -103,12 +115,14 @@ function CarritoModal({
       }
 
       setOrdenGenerada(nuevaOrden)
-      if (onFinalizarCompra) {
-        onFinalizarCompra(nuevaOrden)
-      }
-      setCargandoPago(false)
+      if (onVaciarCarrito) onVaciarCarrito()
+      if (onFinalizarCompra) onFinalizarCompra(nuevaOrden)
       setPaso('exito')
-    }, 1200)
+    } catch (err) {
+      setErrorCheckout(err.message || 'No se pudo procesar tu compra. Revisa el stock disponible.')
+    } finally {
+      setCargandoPago(false)
+    }
   }
 
   const handleSeguirComprando = () => {
@@ -286,6 +300,11 @@ function CarritoModal({
           {/* Paso 2: Checkout */}
           {paso === 'checkout' && (
             <form onSubmit={handleSubmitCheckout} className="d-flex flex-column gap-3">
+              {errorCheckout && (
+                <div className="alert alert-danger py-2 mb-0" role="alert">
+                  {errorCheckout}
+                </div>
+              )}
               <div className="alert alert-info py-2 px-3 small border-0 mb-1">
                 <i className="bi bi-shield-check me-2"></i>
                 Completa tus datos para confirmar tu pedido en Sonido Vivo Viña del Mar.
