@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import VistaCliente from './VistaCliente'
+import Catalogo from './Catalogo'
 import { guardarCarritoStorage, cargarCarritoStorage, cargarProductosStorage } from '../utils/persistencia'
 import { consultarDisponibilidadStock, procesarCheckoutCliente } from '../services/clienteServicio'
 
@@ -50,7 +50,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
 
   // 1. Renderizado
   it('1. Renderiza correctamente los productos en el catalogo con marcas, precios y stock', () => {
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     expect(screen.getByText('Guitarra Folk')).toBeInTheDocument()
     expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   // 2. Buscador y limpieza
   it('2. Filtra productos mediante el buscador por nombre, marca y modelo, permitiendo limpiar el campo', async () => {
     const usuario = userEvent.setup()
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const inputBuscar = screen.getByLabelText(/Buscar producto/i)
 
@@ -94,7 +94,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   // 3. Filtro por categoria
   it('3. Filtra la lista de productos al seleccionar una categoria especifica', async () => {
     const usuario = userEvent.setup()
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const botonBaterias = screen.getByRole('button', { name: /^baterías$/i })
     await usuario.click(botonBaterias)
@@ -113,7 +113,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   // 4. Orden por precio
   it('4. Ordena correctamente los productos por precio de menor a mayor y viceversa', async () => {
     const usuario = userEvent.setup()
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const selectOrden = screen.getByLabelText(/Ordenar:/i)
 
@@ -131,7 +131,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   // 5. Orden A-Z
   it('5. Ordena alfabeticamente los productos de A a Z por su nombre', async () => {
     const usuario = userEvent.setup()
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const selectOrden = screen.getByLabelText(/Ordenar:/i)
     await usuario.selectOptions(selectOrden, 'nombre-az')
@@ -143,7 +143,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
   // 6. Estado vacio y restablecer
   it('6. Muestra mensaje accesible de estado vacio y permite restablecer los filtros', async () => {
     const usuario = userEvent.setup()
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const inputBuscar = screen.getByLabelText(/Buscar producto/i)
     await usuario.type(inputBuscar, 'InstrumentoInexistenteXYZ')
@@ -163,7 +163,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     vi.useFakeTimers()
     const onAgregarMock = vi.fn()
     const onAbrirCarritoMock = vi.fn()
-    render(<VistaCliente productos={productosPrueba} onAgregarAlCarrito={onAgregarMock} onAbrirCarrito={onAbrirCarritoMock} />)
+    render(<Catalogo productos={productosPrueba} onAgregarAlCarrito={onAgregarMock} onAbrirCarrito={onAbrirCarritoMock} />)
 
     const botonesAgregar = screen.getAllByRole('button', { name: /Agregar al Carrito/i })
     await act(async () => {
@@ -188,7 +188,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(screen.queryByText(/Agregaste "Guitarra Folk" al carrito/i)).not.toBeInTheDocument()
 
     // Sin callback
-    render(<VistaCliente productos={[productosPrueba[0]]} />)
+    render(<Catalogo productos={[productosPrueba[0]]} />)
     const botonSinCallback = screen.getAllByRole('button', { name: /Agregar al Carrito/i })[0]
     await act(async () => {
       botonSinCallback.click()
@@ -199,7 +199,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
 
   // 8. Stock critico y agotado
   it('8. Deshabilita boton de compra para productos sin stock y resalta stock critico', () => {
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     // Agotado
     expect(screen.getByText('Sin Stock')).toBeInTheDocument()
@@ -218,7 +218,7 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     const espiaLocalStorage = vi.spyOn(Storage.prototype, 'setItem')
     const usuario = userEvent.setup()
 
-    render(<VistaCliente productos={productosPrueba} />)
+    render(<Catalogo productos={productosPrueba} />)
 
     const botonesAgregar = screen.getAllByRole('button', { name: /Agregar al Carrito/i })
     await usuario.click(botonesAgregar[0])
@@ -270,5 +270,81 @@ describe('Perfil Cliente - Guía 14: 10 Pruebas Unitarias de Vista de Usuario', 
     expect(servicioCheckoutMock.crearPedido).toHaveBeenCalledWith(datosCompra)
     expect(resultadoCheckout.exito).toBe(true)
     expect(resultadoCheckout.orderId).toBe(8841)
+  })
+
+  // Pruebas adicionales
+  it('11. Filtra productos mediante el dropdown select de categorias y maneja fallback de imagenes', async () => {
+    const usuario = userEvent.setup()
+    const productosConCodigoRaro = [
+      ...productosPrueba,
+      {
+        id: 99,
+        categoria: 'Otros',
+        nombre: 'Cencerro Metálico',
+        marca: 'LP',
+        modelo: 'Classic',
+        stock: 4,
+        precio: 25000,
+        descripcion: 'Cencerro sin codigo de imagen'
+      }
+    ]
+
+    render(<Catalogo productos={productosConCodigoRaro} />)
+
+    const selectCategoria = screen.getByLabelText(/Categoría:/i)
+    await usuario.selectOptions(selectCategoria, 'Baterías')
+
+    expect(screen.getByText('Batería Acústica Stage')).toBeInTheDocument()
+    expect(screen.queryByText('Guitarra Folk')).not.toBeInTheDocument()
+
+    // Volver a todas
+    await usuario.selectOptions(selectCategoria, 'todas')
+    expect(screen.getByText('Cencerro Metálico')).toBeInTheDocument()
+  })
+
+  it('12. Ordena los productos por menor precio, mayor precio y nombre A-Z', async () => {
+    const usuario = userEvent.setup()
+    render(<Catalogo productos={productosPrueba} />)
+
+    const selectOrden = screen.getByLabelText(/Ordenar:/i)
+
+    // Menor precio
+    await usuario.selectOptions(selectOrden, 'menor-precio')
+    expect(selectOrden).toHaveValue('menor-precio')
+
+    // Mayor precio
+    await usuario.selectOptions(selectOrden, 'mayor-precio')
+    expect(selectOrden).toHaveValue('mayor-precio')
+
+    // Nombre A-Z
+    await usuario.selectOptions(selectOrden, 'nombre-az')
+    expect(selectOrden).toHaveValue('nombre-az')
+  })
+
+  it('13. Muestra botón "Ver Carrito" en la alerta y ejecuta callback onAbrirCarrito', async () => {
+    const usuario = userEvent.setup()
+    const onAbrirCarritoMock = vi.fn()
+
+    render(
+      <Catalogo
+        productos={productosPrueba}
+        onAbrirCarrito={onAbrirCarritoMock}
+      />
+    )
+
+    const botonesAgregar = screen.getAllByRole('button', { name: /Agregar al Carrito/i })
+    await usuario.click(botonesAgregar[0])
+
+    const botonVerCarrito = screen.getByRole('button', { name: /ver carrito/i })
+    expect(botonVerCarrito).toBeInTheDocument()
+
+    await usuario.click(botonVerCarrito)
+    expect(onAbrirCarritoMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('14. Renderiza sin productos cuando no se entregan propiedades (props por defecto)', () => {
+    render(<Catalogo />)
+    expect(screen.getByText(/Mostrando/i)).toHaveTextContent('Mostrando 0 de 0 productos')
+    expect(screen.getByText('No se encontraron productos')).toBeInTheDocument()
   })
 })

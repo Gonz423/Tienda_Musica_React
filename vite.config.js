@@ -8,6 +8,19 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
     globals: true,
-    css: true
+    css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/**',
+        'src/assets/**',
+        'src/test/**',
+        '**/*.spec.jsx',
+        '**/*.spec.js',
+        '**/*.test.jsx',
+        '**/*.test.js'
+      ]
+    }
   }
 })
