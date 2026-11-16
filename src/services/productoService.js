@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_PRODUCTOS_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8083/api';
 
 // Consulta el catalogo de productos con filtros opcionales
 export async function listarProductos(filtros = {}) {
@@ -49,3 +49,60 @@ export async function obtenerProductoPorCodigo(codigo) {
 
   return respuesta.json();
 }
+
+// Crea un nuevo producto (Rol ADMIN)
+export async function crearProducto(producto, token) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const respuesta = await fetch(`${API_URL}/productos`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(producto)
+  });
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Error al crear el producto');
+  }
+
+  return respuesta.json();
+}
+
+// Actualiza un producto existente (Rol ADMIN)
+export async function actualizarProducto(id, producto, token) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const respuesta = await fetch(`${API_URL}/productos/${id}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify(producto)
+  });
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Error al actualizar el producto');
+  }
+
+  return respuesta.json();
+}
+
+// Elimina un producto por ID (Rol ADMIN)
+export async function eliminarProducto(id, token) {
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const respuesta = await fetch(`${API_URL}/productos/${id}`, {
+    method: 'DELETE',
+    headers
+  });
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Error al eliminar el producto');
+  }
+
+  return true;
+}
+
