@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import VistaCliente from './components/VistaCliente'
@@ -19,16 +19,24 @@ import {
   cargarUsuariosStorage,
   guardarUsuariosStorage
 } from './utils/persistencia'
+import {
+  cargarSesionUsuario,
+  guardarSesionUsuario,
+  cerrarSesionUsuario
+} from './services/authService'
 
 function App() {
   const navigate = useNavigate()
 
+  // Sesion inicial desde localStorage (persistencia ante F5)
+  const sesionGuardada = cargarSesionUsuario()
+
   // Rol activo: 'cliente' | 'trabajador' | 'jefe'
-  const [rolActual, setRolActual] = useState('cliente')
+  const [rolActual, setRolActual] = useState(() => sesionGuardada?.rol || 'cliente')
 
   // Sesion
-  const [sesionAbierta, setSesionAbierta] = useState(false)
-  const [usuarioActual, setUsuarioActual] = useState(null)
+  const [sesionAbierta, setSesionAbierta] = useState(() => Boolean(sesionGuardada))
+  const [usuarioActual, setUsuarioActual] = useState(() => sesionGuardada || null)
   const [mostrarLogin, setMostrarLogin] = useState(false)
 
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
@@ -47,6 +55,10 @@ function App() {
     setUsuarioActual(usuario)
     setSesionAbierta(true)
     setMostrarLogin(false)
+
+    // Guardar sesión y token en localStorage para persistencia F5
+    guardarSesionUsuario(usuario)
+
     if (usuario.rol) {
       setRolActual(usuario.rol)
       if (usuario.rol === 'trabajador') {
@@ -59,6 +71,7 @@ function App() {
   }
 
   const handleCerrarSesion = () => {
+    cerrarSesionUsuario()
     setUsuarioActual(null)
     setSesionAbierta(false)
     setRolActual('cliente')
@@ -161,7 +174,7 @@ function App() {
 
   const handleActualizarUsuario = (usuarioActualizado) => {
     setUsuarios((prev) => {
-      const nuevo = prev.map((u) => (u.id === usuarioActualizado.id ? usuarioActualizado : u))
+      const nuevo = prev.map((u) => (u.id === usuarioActualizado.id ? { ...u, ...usuarioActualizado } : u))
       guardarUsuariosStorage(nuevo)
       return nuevo
     })
@@ -169,24 +182,9 @@ function App() {
 
   const handleAlternarEstadoUsuario = (id) => {
     setUsuarios((prev) => {
-      const ahora = new Date()
-      const fechaStr = `${ahora.toLocaleDateString('es-CL')} ${ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
       const nuevo = prev.map((u) => {
         if (u.id === id) {
-          const nuevoEstado = !u.activo
-          const evento = {
-            id: Date.now(),
-            fecha: fechaStr,
-            accion: nuevoEstado ? 'Activación de cuenta' : 'Desactivación de cuenta',
-            detalle: nuevoEstado
-              ? 'Cuenta reactivada por el Administrador'
-              : 'Cuenta desactivada por el Administrador'
-          }
-          return {
-            ...u,
-            activo: nuevoEstado,
-            historial: [evento, ...(u.historial || [])]
-          }
+          return { ...u, activo: !u.activo }
         }
         return u
       })
@@ -195,10 +193,13 @@ function App() {
     })
   }
 
-  const handleAgregarHistorialUsuario = (id, { accion, detalle }) => {
+  const handleAgregarHistorialUsuario = (id, accion, detalle) => {
+    const ahora = new Date()
+    const fechaStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(
+      ahora.getDate()
+    ).padStart(2, '0')} ${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`
+
     setUsuarios((prev) => {
-      const ahora = new Date()
-      const fechaStr = `${ahora.toLocaleDateString('es-CL')} ${ahora.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
       const nuevo = prev.map((u) => {
         if (u.id === id) {
           const evento = {

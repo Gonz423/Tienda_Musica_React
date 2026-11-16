@@ -1,26 +1,41 @@
 import { useState } from 'react'
 import { usuariosIniciales } from '../data/usuarios'
 import { cargarUsuariosStorage } from '../utils/persistencia'
+import { login as loginApi } from '../services/authService'
 
 const DEMOS_METADATA = {
   jefe: {
     etiquetaRol: 'Jefe / Administrador',
     badgeClase: 'bg-danger text-white',
     icono: 'bi-shield-check',
-    descripcion: 'Control total de métricas, pedidos e inventario'
+    descripcion: 'Control total de métricas, pedidos e inventario',
+    backendCorreo: 'admin@tiendamusica.cl',
+    backendPassword: 'Admin123!'
   },
   trabajador: {
     etiquetaRol: 'Trabajador',
     badgeClase: 'bg-primary text-white',
     icono: 'bi-briefcase',
-    descripcion: 'Recepción de pedidos y control de stock'
+    descripcion: 'Recepción de pedidos y control de stock',
+    backendCorreo: 'empleado@tiendamusica.cl',
+    backendPassword: 'Vendedor123!'
   },
   cliente: {
     etiquetaRol: 'Cliente',
     badgeClase: 'bg-success text-white',
     icono: 'bi-person',
-    descripcion: 'Catálogo de instrumentos y compras en línea'
+    descripcion: 'Catálogo de instrumentos y compras en línea',
+    backendCorreo: 'cliente@tiendamusica.cl',
+    backendPassword: 'Cliente123!'
   }
+}
+
+function normalizarRol(rol) {
+  if (!rol) return 'cliente'
+  const r = rol.toString().toUpperCase()
+  if (r === 'ADMIN' || r === 'JEFE') return 'jefe'
+  if (r === 'VENDEDOR' || r === 'EMPLEADO' || r === 'TRABAJADOR') return 'trabajador'
+  return 'cliente'
 }
 
 function Login({ onIniciarSesion, onCerrar, usuarios }) {
@@ -32,7 +47,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -46,8 +61,50 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
 
     setCargando(true)
 
-    setTimeout(() => {
-      // Validar contra la lista de usuarios del sistema
+    // 1. Intentar autenticar contra el backend Spring Boot vía API REST
+    try {
+      const sesionBackend = await loginApi({ correo: emailLimpio, password: passLimpio })
+      const rolNormalizado = normalizarRol(sesionBackend.rol)
+
+      const usuarioSesion = {
+        id: `USR-${Date.now()}`,
+        email: sesionBackend.correo || emailLimpio,
+        correo: sesionBackend.correo || emailLimpio,
+        nombre: sesionBackend.nombre || emailLimpio.split('@')[0],
+        rol: rolNormalizado,
+        rolOriginal: sesionBackend.rol,
+        token: sesionBackend.token,
+        activo: true
+      }
+
+      setCargando(false)
+      onIniciarSesion(usuarioSesion)
+      return
+    } catch (err) {
+      // Si el backend rechazó por credenciales (401/403)
+      if (err.message && err.message.includes('Credenciales')) {
+        // Verificar si existe como usuario simulado local antes de rechazar
+        const usuarioLocal = listaUsuarios.find(
+          (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
+        )
+
+        if (usuarioLocal) {
+          if (usuarioLocal.activo === false) {
+            setError('Esta cuenta ha sido desactivada por el Administrador. Contacta a soporte.')
+            setCargando(false)
+            return
+          }
+          setCargando(false)
+          onIniciarSesion(usuarioLocal)
+          return
+        }
+
+        setError(err.message)
+        setCargando(false)
+        return
+      }
+
+      // Si el backend no responde o está caído (modo offline / fallback)
       const usuarioEncontrado = listaUsuarios.find(
         (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
       )
@@ -58,28 +115,36 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
           setCargando(false)
           return
         }
+        setCargando(false)
         onIniciarSesion(usuarioEncontrado)
+      } else if (passLimpio.length >= 4) {
+        setCargando(false)
+        onIniciarSesion({
+          id: `USR-${Date.now()}`,
+          email: emailLimpio,
+          nombre: emailLimpio.split('@')[0],
+          rol: 'cliente',
+          activo: true
+        })
       } else {
-        // Inicio libre como cliente si la clave tiene al menos 4 caracteres
-        if (passLimpio.length >= 4) {
-          onIniciarSesion({
-            id: `USR-${Date.now()}`,
-            email: emailLimpio,
-            nombre: emailLimpio.split('@')[0],
-            rol: 'cliente',
-            activo: true
-          })
-        } else {
-          setError('Contraseña muy corta o credenciales inválidas. Puedes usar los accesos rápidos de abajo.')
-          setCargando(false)
-        }
+        setError('Credenciales inválidas. Verifica tu correo y contraseña.')
+        setCargando(false)
       }
-    }, 300)
+    }
   }
 
-  const seleccionarDemo = (usr) => {
-    setEmail(usr.email)
-    setPassword(usr.password)
+  const seleccionarDemo = (tipo) => {
+    const meta = DEMOS_METADATA[tipo]
+    if (meta && meta.backendCorreo) {
+      setEmail(meta.backendCorreo)
+      setPassword(meta.backendPassword)
+    } else {
+      const usr = listaUsuarios.find((u) => u.rol === tipo)
+      if (usr) {
+        setEmail(usr.email)
+        setPassword(usr.password)
+      }
+    }
     setError('')
   }
 
@@ -144,85 +209,58 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
           <div className="modal-body px-4 py-3">
             {error && (
               <div
-                className="alert alert-danger py-2 px-3 d-flex align-items-center gap-2 border-0 shadow-sm mb-3"
+                className="alert alert-danger py-2 px-3 small d-flex align-items-center gap-2 mb-3"
                 role="alert"
-                style={{ fontSize: '0.875rem', borderRadius: '0.6rem' }}
+                style={{ borderRadius: '0.6rem' }}
               >
-                <i className="bi bi-exclamation-circle-fill flex-shrink-0"></i>
+                <i className="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
                 <div>{error}</div>
               </div>
             )}
 
             <form onSubmit={handleSubmit} noValidate>
               <div className="mb-3">
-                <label className="form-label small fw-bold text-secondary mb-1" htmlFor="login-email">
+                <label className="form-label small fw-bold text-secondary mb-1">
                   Correo Electrónico
                 </label>
                 <div className="input-group">
-                  <span
-                    className="input-group-text bg-light text-muted border-end-0"
-                    style={{ borderColor: '#d8cbbf', borderRadius: '0.6rem 0 0 0.6rem' }}
-                  >
+                  <span className="input-group-text bg-light text-muted border-end-0">
                     <i className="bi bi-envelope"></i>
                   </span>
                   <input
-                    id="login-email"
                     type="email"
-                    className="form-control border-start-0 bg-white"
-                    placeholder="ejemplo@sonidovivo.cl"
+                    className="form-control bg-light border-start-0"
+                    placeholder="usuario@correo.cl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    style={{
-                      borderColor: '#d8cbbf',
-                      borderRadius: '0 0.6rem 0.6rem 0',
-                      color: '#351b16'
-                    }}
+                    style={{ fontSize: '0.95rem' }}
                   />
                 </div>
               </div>
 
               <div className="mb-3">
-                <div className="d-flex justify-content-between align-items-center mb-1">
-                  <label className="form-label small fw-bold text-secondary mb-0" htmlFor="login-password">
-                    Contraseña
-                  </label>
-                  <button
-                    type="button"
-                    className="btn btn-link p-0 text-muted small text-decoration-none"
-                    onClick={() => setMostrarPassword(!mostrarPassword)}
-                    style={{ fontSize: '0.8rem' }}
-                  >
-                    <i className={`bi ${mostrarPassword ? 'bi-eye-slash' : 'bi-eye'} me-1`}></i>
-                    {mostrarPassword ? 'Ocultar' : 'Mostrar'}
-                  </button>
-                </div>
+                <label className="form-label small fw-bold text-secondary mb-1">
+                  Contraseña
+                </label>
                 <div className="input-group">
-                  <span
-                    className="input-group-text bg-light text-muted border-end-0"
-                    style={{ borderColor: '#d8cbbf', borderRadius: '0.6rem 0 0 0.6rem' }}
-                  >
+                  <span className="input-group-text bg-light text-muted border-end-0">
                     <i className="bi bi-key"></i>
                   </span>
                   <input
-                    id="login-password"
                     type={mostrarPassword ? 'text' : 'password'}
-                    className="form-control border-start-0 border-end-0 bg-white"
-                    placeholder="••••••••"
+                    className="form-control bg-light border-start-0 border-end-0"
+                    placeholder="Tu contraseña secreta"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    style={{
-                      borderColor: '#d8cbbf',
-                      color: '#351b16'
-                    }}
+                    style={{ fontSize: '0.95rem' }}
                   />
                   <button
                     type="button"
-                    className="btn btn-light border border-start-0 text-muted"
+                    className="btn btn-outline-secondary bg-light border-start-0"
                     onClick={() => setMostrarPassword(!mostrarPassword)}
-                    style={{ borderColor: '#d8cbbf', borderRadius: '0 0.6rem 0.6rem 0' }}
-                    title={mostrarPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                    aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                   >
                     <i className={`bi ${mostrarPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
                   </button>
@@ -269,25 +307,19 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
               <div className="d-flex flex-column gap-2">
                 {['jefe', 'trabajador', 'cliente'].map((rol) => {
                   const meta = DEMOS_METADATA[rol]
-                  const usr = listaUsuarios.find((u) => u.rol === rol) || {
-                    email: `${rol}@sonidovivo.cl`,
-                    password: `${rol}123`,
-                    nombre: rol,
-                    activo: true
-                  }
-                  const estaSeleccionado = email === usr.email
+                  const correoMostrar = meta.backendCorreo
+                  const estaSeleccionado = email === correoMostrar
                   return (
                     <button
                       key={rol}
                       type="button"
-                      onClick={() => seleccionarDemo(usr)}
+                      onClick={() => seleccionarDemo(rol)}
                       className="btn text-start p-2 border d-flex align-items-center justify-content-between w-100 transition-all"
                       style={{
                         backgroundColor: estaSeleccionado ? '#fbf7f4' : '#ffffff',
                         borderColor: estaSeleccionado ? '#b96622' : '#e5dfd8',
                         borderRadius: '0.6rem',
-                        boxShadow: estaSeleccionado ? '0 0 0 2px rgba(185, 102, 34, 0.2)' : 'none',
-                        opacity: usr.activo === false ? 0.6 : 1
+                        boxShadow: estaSeleccionado ? '0 0 0 2px rgba(185, 102, 34, 0.2)' : 'none'
                       }}
                     >
                       <div className="d-flex align-items-center gap-2">
@@ -304,15 +336,10 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
                         </div>
                         <div>
                           <div className="d-flex align-items-center gap-2">
-                            <span className="fw-semibold text-dark small">{usr.nombre}</span>
+                            <span className="fw-semibold text-dark small">{correoMostrar}</span>
                             <span className={`badge ${meta.badgeClase} py-0 px-2`} style={{ fontSize: '0.65rem' }}>
                               {meta.etiquetaRol}
                             </span>
-                            {usr.activo === false && (
-                              <span className="badge bg-secondary py-0 px-1" style={{ fontSize: '0.6rem' }}>
-                                Desactivado
-                              </span>
-                            )}
                           </div>
                           <span className="text-muted d-block" style={{ fontSize: '0.72rem' }}>
                             {meta.descripcion}
