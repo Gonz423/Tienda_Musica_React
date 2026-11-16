@@ -43,21 +43,21 @@ function Navbar({
 
   const irAInicio = () => {
     handleLinkClick()
-    if (setRolActual) setRolActual('cliente')
+    if (!sesionAbierta && setRolActual) setRolActual('cliente')
     navigate('/')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const irACatalogo = () => {
     handleLinkClick()
-    if (setRolActual) setRolActual('cliente')
+    if (!sesionAbierta && setRolActual) setRolActual('cliente')
     navigate('/catalogo')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const irAContacto = () => {
     handleLinkClick()
-    if (setRolActual) setRolActual('cliente')
+    if (!sesionAbierta && setRolActual) setRolActual('cliente')
     navigate('/contacto')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }

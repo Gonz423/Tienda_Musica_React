@@ -117,12 +117,19 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
         setCargando(false)
         onIniciarSesion(usuarioEncontrado)
       } else if (passLimpio.length >= 4) {
+        let rolDeducido = 'cliente'
+        const lowerEmail = emailLimpio.toLowerCase()
+        if (lowerEmail.includes('admin') || lowerEmail.includes('jefe') || lowerEmail.includes('gonzalo')) {
+          rolDeducido = 'jefe'
+        } else if (lowerEmail.includes('empleado') || lowerEmail.includes('trabajador') || lowerEmail.includes('vendedor')) {
+          rolDeducido = 'trabajador'
+        }
         setCargando(false)
         onIniciarSesion({
           id: `USR-${Date.now()}`,
           email: emailLimpio,
           nombre: emailLimpio.split('@')[0],
-          rol: 'cliente',
+          rol: rolDeducido,
           activo: true
         })
       } else {

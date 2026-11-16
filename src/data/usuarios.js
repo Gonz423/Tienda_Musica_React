@@ -1,5 +1,39 @@
 export const usuariosIniciales = [
   {
+    id: 'USR-000',
+    nombre: 'Jefe Administrador',
+    email: 'admin@tiendamusica.cl',
+    password: 'Admin123!',
+    rol: 'jefe',
+    activo: true,
+    fechaCreacion: '2026-08-01',
+    historial: [
+      {
+        id: 1,
+        fecha: '2026-08-01 09:00',
+        accion: 'Creacion de cuenta',
+        detalle: 'Cuenta creada con rol Jefe / Administrador'
+      }
+    ]
+  },
+  {
+    id: 'USR-000B',
+    nombre: 'Vendedor Bodega',
+    email: 'empleado@tiendamusica.cl',
+    password: 'Vendedor123!',
+    rol: 'trabajador',
+    activo: true,
+    fechaCreacion: '2026-08-01',
+    historial: [
+      {
+        id: 1,
+        fecha: '2026-08-01 10:00',
+        accion: 'Creacion de cuenta',
+        detalle: 'Cuenta creada con rol Trabajador / Vendedor'
+      }
+    ]
+  },
+  {
     id: 'USR-001',
     nombre: 'Gonzalo Yáñez',
     email: 'gonzalo@sonidovivo.cl',
