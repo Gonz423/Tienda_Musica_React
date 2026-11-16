@@ -23,10 +23,15 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
   const [mensajeAlerta, setMensajeAlerta] = useState('')
   const [productoRemoto, setProductoRemoto] = useState(null)
 
-  // Consulta asíncrona hacia el backend si no está disponible o para datos actualizados
+  // Consulta asincrona hacia el backend si no esta en props
   useEffect(() => {
     let activo = true
-    if (id) {
+    const existeEnProps = productos?.some(
+      (p) =>
+        String(p.codigo).toLowerCase() === String(id).toLowerCase() ||
+        String(p.id) === String(id)
+    )
+    if (id && !existeEnProps) {
       obtenerProductoPorId(id)
         .then((data) => {
           if (activo && data) {
@@ -34,13 +39,13 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
           }
         })
         .catch(() => {
-          // Si falla o no hay red, se mantiene el catálogo local
+          // Si falla o no hay red, se mantiene el catalogo local
         })
     }
     return () => {
       activo = false
     }
-  }, [id])
+  }, [id, productos])
 
   const producto =
     productoRemoto ||

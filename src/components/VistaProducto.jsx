@@ -7,6 +7,10 @@ function VistaProducto({ producto, onAgregarAlCarrito, obtenerImagen }) {
 
   const resolverImagen = (codigo) => {
     if (obtenerImagen) return obtenerImagen(codigo)
+    const imgRemota = producto.imagenUrl || producto.imagen
+    if (imgRemota && (imgRemota.startsWith('http://') || imgRemota.startsWith('https://'))) {
+      return imgRemota
+    }
     const clave = `../assets/img/${codigo}.jpg`
     return imagenesLocales[clave] || imagenesLocales['../assets/img/GA001.jpg']
   }
