@@ -82,13 +82,15 @@ function Catalogo({ productos = [], onAgregarAlCarrito, onAbrirCarrito }) {
           totalMostrados={productosFiltrados.length}
           totalProductos={productos.length}
         />
-      </ContenedorCatalogo>
 
-      <ListaProductos
-        productos={productosFiltrados}
-        onAgregarAlCarrito={handleAgregar}
-        onRestablecerFiltros={handleRestablecerFiltros}
-      />
+        <div className="pb-5 mt-4">
+          <ListaProductos
+            productos={productosFiltrados}
+            onAgregarAlCarrito={handleAgregar}
+            onRestablecerFiltros={handleRestablecerFiltros}
+          />
+        </div>
+      </ContenedorCatalogo>
     </LayoutCatalogo>
   )
 }
