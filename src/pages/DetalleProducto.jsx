@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import productosIniciales from '../data/productos'
 import { guardarCarritoStorage, cargarCarritoStorage } from '../utils/persistencia'
+import { obtenerProductoPorId } from '../services/productoService'
 import ProductoNoEncontrado from '../components/ProductoNoEncontrado'
 import BreadcrumbProducto from '../components/BreadcrumbProducto'
 import GaleriaProducto from '../components/GaleriaProducto'
@@ -20,32 +21,63 @@ function DetalleProducto({ productos = productosIniciales, onAgregarAlCarrito, o
   const { id } = useParams()
   const [cantidad, setCantidad] = useState(1)
   const [mensajeAlerta, setMensajeAlerta] = useState('')
+  const [productoRemoto, setProductoRemoto] = useState(null)
 
-  const producto = productos.find(
-    (p) =>
-      String(p.codigo).toLowerCase() === String(id).toLowerCase() ||
-      String(p.id) === String(id)
-  )
+  // Consulta asíncrona hacia el backend si no está disponible o para datos actualizados
+  useEffect(() => {
+    let activo = true
+    if (id) {
+      obtenerProductoPorId(id)
+        .then((data) => {
+          if (activo && data) {
+            setProductoRemoto(data)
+          }
+        })
+        .catch(() => {
+          // Si falla o no hay red, se mantiene el catálogo local
+        })
+    }
+    return () => {
+      activo = false
+    }
+  }, [id])
+
+  const producto =
+    productoRemoto ||
+    productos.find(
+      (p) =>
+        String(p.codigo).toLowerCase() === String(id).toLowerCase() ||
+        String(p.id) === String(id)
+    )
 
   if (!producto) return <ProductoNoEncontrado id={id} />
 
   const resolverImagen = () => {
-    if (!producto.imagen && !producto.codigo) return ''
-    if (producto.imagen?.startsWith('http') || producto.imagen?.startsWith('data:')) return producto.imagen
-    const nombreArchivo = (producto.imagen || producto.codigo).split('/').pop()
+    if (!producto.imagen && !producto.imagenUrl && !producto.codigo) return ''
+    const imgSource = producto.imagenUrl || producto.imagen
+    if (imgSource?.startsWith('http') || imgSource?.startsWith('data:')) return imgSource
+    const nombreArchivo = (imgSource || producto.codigo).split('/').pop()
     const nombreBase = nombreArchivo.split('.')[0]
     for (const ruta in imagenesDisponibles) {
-      if (ruta.includes(nombreBase)) return imagenesDisponibles[ruta]
+      if (ruta.includes(nombreBase)) {
+        return imagenesDisponibles[ruta]
+      }
     }
-    return imagenesDisponibles['../assets/img/GA001.jpg']
+    return imagenesDisponibles['../assets/img/GA001.jpg'] || imgSource
   }
 
   const handleAgregar = () => {
+    if (producto.stock === 0) return
+
     for (let i = 0; i < cantidad; i++) {
-      if (onAgregarAlCarrito) onAgregarAlCarrito(producto)
+      if (onAgregarAlCarrito) {
+        onAgregarAlCarrito(producto)
+      }
     }
     const actual = cargarCarritoStorage()
-    guardarCarritoStorage([...actual, ...Array(cantidad).fill(producto)])
+    const nuevosItems = Array(cantidad).fill(producto)
+    guardarCarritoStorage([...actual, ...nuevosItems])
+
     setMensajeAlerta(`Agregaste ${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'} de "${producto.nombre}" al carrito.`)
     setTimeout(() => setMensajeAlerta(''), 3000)
   }

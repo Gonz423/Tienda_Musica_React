@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import PanelCliente from './pages/PanelCliente'
-import PanelEmpleado from './pages/PanelEmpleado'
-import PanelJefe from './pages/PanelJefe'
+import Catalogo from './pages/Catalogo'
+import PedidosEmpleado from './pages/PedidosEmpleado'
+import StockEmpleado from './pages/StockEmpleado'
+import MetricasJefe from './pages/MetricasJefe'
+import ProductosJefe from './pages/ProductosJefe'
+import UsuariosJefe from './pages/UsuariosJefe'
 import DetalleProducto from './pages/DetalleProducto'
 import Inicio from './pages/Inicio'
 import Contacto from './pages/Contacto'
@@ -25,6 +28,7 @@ import {
   guardarSesionUsuario,
   cerrarSesionUsuario
 } from './services/authService'
+import { listarProductos } from './services/productoService'
 
 function App() {
   const navigate = useNavigate()
@@ -43,10 +47,23 @@ function App() {
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
   const [seccionJefe, setSeccionJefe] = useState('metricas')
 
-  // Datos base
+  // Productos cargados desde backend con fallback a locales
   const [productos, setProductos] = useState(productosIniciales)
   const [pedidos, setPedidos] = useState(pedidosIniciales)
   const [usuarios, setUsuarios] = useState(() => cargarUsuariosStorage(usuariosIniciales))
+
+  // Carga asíncrona de catálogo desde la API REST
+  useEffect(() => {
+    listarProductos()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProductos(data)
+        }
+      })
+      .catch(() => {
+        // En modo offline o pruebas se mantienen los iniciales
+      })
+  }, [])
 
   // Carrito
   const [carrito, setCarrito] = useState(() => cargarCarritoStorage())
@@ -305,28 +322,36 @@ function App() {
           <Route
             path="/"
             element={
-              <PanelEmpleado
-                productos={productos}
-                pedidos={pedidos}
-                seccionActiva={seccionTrabajador}
-                onCambiarSeccion={setSeccionTrabajador}
-                onActualizarStock={handleActualizarStock}
-                onActualizarEstadoPedido={handleActualizarEstadoPedido}
-              />
+              seccionTrabajador === 'pedidos' ? (
+                <PedidosEmpleado
+                  pedidos={pedidos}
+                  productos={productos}
+                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
+                />
+              ) : (
+                <StockEmpleado
+                  productos={productos}
+                  onActualizarStock={handleActualizarStock}
+                />
+              )
             }
           />
           <Route path="/producto/:id" element={<DetalleProducto productos={productos} />} />
           <Route
             path="*"
             element={
-              <PanelEmpleado
-                productos={productos}
-                pedidos={pedidos}
-                seccionActiva={seccionTrabajador}
-                onCambiarSeccion={setSeccionTrabajador}
-                onActualizarStock={handleActualizarStock}
-                onActualizarEstadoPedido={handleActualizarEstadoPedido}
-              />
+              seccionTrabajador === 'pedidos' ? (
+                <PedidosEmpleado
+                  pedidos={pedidos}
+                  productos={productos}
+                  onActualizarEstadoPedido={handleActualizarEstadoPedido}
+                />
+              ) : (
+                <StockEmpleado
+                  productos={productos}
+                  onActualizarStock={handleActualizarStock}
+                />
+              )
             }
           />
         </Routes>
@@ -334,24 +359,29 @@ function App() {
 
       {/* Vista Jefe */}
       {rolActual === 'jefe' && (
-        <PanelJefe
-          productos={productos}
-          pedidos={pedidos}
-          usuarios={usuarios}
-          usuarioActual={usuarioActual}
-          onAgregarProducto={handleAgregarProducto}
-          onActualizarProducto={handleActualizarProducto}
-          onEliminarProducto={handleEliminarProducto}
-          onActualizarStock={handleActualizarStock}
-          onActualizarEstadoPedido={handleActualizarEstadoPedido}
-          onCrearUsuario={handleCrearUsuario}
-          onActualizarUsuario={handleActualizarUsuario}
-          onAlternarEstadoUsuario={handleAlternarEstadoUsuario}
-          onAgregarHistorialUsuario={handleAgregarHistorialUsuario}
-          seccionActiva={seccionJefe}
-          onCambiarSeccion={setSeccionJefe}
-          onCambinarSeccion={setSeccionJefe}
-        />
+        <>
+          {seccionJefe === 'metricas' && (
+            <MetricasJefe productos={productos} pedidos={pedidos} />
+          )}
+          {seccionJefe === 'productos' && (
+            <ProductosJefe
+              productos={productos}
+              onAgregarProducto={handleAgregarProducto}
+              onActualizarProducto={handleActualizarProducto}
+              onEliminarProducto={handleEliminarProducto}
+            />
+          )}
+          {seccionJefe === 'usuarios' && (
+            <UsuariosJefe
+              usuarios={usuarios}
+              usuarioActual={usuarioActual}
+              onCrearUsuario={handleCrearUsuario}
+              onActualizarUsuario={handleActualizarUsuario}
+              onAlternarEstadoUsuario={handleAlternarEstadoUsuario}
+              onAgregarHistorialUsuario={handleAgregarHistorialUsuario}
+            />
+          )}
+        </>
       )}
     </LayoutApp>
   )
