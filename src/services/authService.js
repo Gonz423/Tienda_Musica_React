@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
-// Petición de login a Spring Boot
+// Peticion de login a Spring Boot
 export async function login(credenciales) {
   const correo = credenciales.correo || credenciales.email;
   const password = credenciales.password;
