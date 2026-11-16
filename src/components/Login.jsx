@@ -61,7 +61,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
 
     setCargando(true)
 
-    // 1. Intentar autenticar contra el backend Spring Boot vía API REST
+    // Intento con backend Spring Boot
     try {
       const sesionBackend = await loginApi({ correo: emailLimpio, password: passLimpio })
       const rolNormalizado = normalizarRol(sesionBackend.rol)
@@ -81,9 +81,8 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
       onIniciarSesion(usuarioSesion)
       return
     } catch (err) {
-      // Si el backend rechazó por credenciales (401/403)
+      // Rechazo por credenciales
       if (err.message && err.message.includes('Credenciales')) {
-        // Verificar si existe como usuario simulado local antes de rechazar
         const usuarioLocal = listaUsuarios.find(
           (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
         )
@@ -104,7 +103,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
         return
       }
 
-      // Si el backend no responde o está caído (modo offline / fallback)
+      // Fallback a usuarios locales si el backend no responde
       const usuarioEncontrado = listaUsuarios.find(
         (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
       )
@@ -292,7 +291,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
               </button>
             </form>
 
-            {/* Accesos rapidos */}
+            {/* Accesos rápidos */}
             <div className="mt-4 pt-3 border-top" style={{ borderColor: '#ece6df' }}>
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <span className="small fw-bold text-muted">

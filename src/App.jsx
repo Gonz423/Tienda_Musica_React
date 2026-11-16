@@ -28,13 +28,13 @@ import {
 function App() {
   const navigate = useNavigate()
 
-  // Sesion inicial desde localStorage (persistencia ante F5)
+  // Sesión inicial desde localStorage
   const sesionGuardada = cargarSesionUsuario()
 
   // Rol activo: 'cliente' | 'trabajador' | 'jefe'
   const [rolActual, setRolActual] = useState(() => sesionGuardada?.rol || 'cliente')
 
-  // Sesion
+  // Estado de sesión
   const [sesionAbierta, setSesionAbierta] = useState(() => Boolean(sesionGuardada))
   const [usuarioActual, setUsuarioActual] = useState(() => sesionGuardada || null)
   const [mostrarLogin, setMostrarLogin] = useState(false)
@@ -42,7 +42,7 @@ function App() {
   const [seccionTrabajador, setSeccionTrabajador] = useState('pedidos')
   const [seccionJefe, setSeccionJefe] = useState('metricas')
 
-  // Productos, pedidos y usuarios
+  // Datos base
   const [productos, setProductos] = useState(productosIniciales)
   const [pedidos, setPedidos] = useState(pedidosIniciales)
   const [usuarios, setUsuarios] = useState(() => cargarUsuariosStorage(usuariosIniciales))
@@ -56,7 +56,7 @@ function App() {
     setSesionAbierta(true)
     setMostrarLogin(false)
 
-    // Guardar sesión y token en localStorage para persistencia F5
+    // Persistencia en localStorage
     guardarSesionUsuario(usuario)
 
     if (usuario.rol) {
