@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { crearPedido } from '../services/pedidoService'
 
 const imagenesLocales = import.meta.glob('../assets/img/*.jpg', { eager: true, import: 'default' })
 
@@ -83,8 +84,41 @@ function CarritoModal({
     if (!handleValidarFormulario()) return
 
     setCargandoPago(true)
-    // Simulacion pago
-    setTimeout(() => {
+    try {
+      const respuesta = await crearPedido({
+        clienteId: formulario.email,
+        direccionEnvio: formulario.direccion,
+        items: listaItems.map((item) => ({
+          productoId: Number(item.id) || 1,
+          nombreProducto: item.nombre || 'Instrumento Musical',
+          precioUnitario: Number(item.precio) || 0,
+          cantidad: Number(item.cantidad) || 1
+        }))
+      })
+
+      const nuevaOrden = {
+        id: respuesta.codigoPedido || respuesta.id || Math.floor(1000 + Math.random() * 9000),
+        cliente: formulario.nombre,
+        email: formulario.email,
+        telefono: formulario.telefono,
+        direccion: formulario.direccion,
+        metodoPago: formulario.metodoPago,
+        fecha: respuesta.fecha || new Date().toISOString().split('T')[0],
+        total: respuesta.total ?? total,
+        productos: listaItems.map((item) => ({
+          codigo: item.codigo,
+          nombre: item.nombre,
+          cantidad: item.cantidad,
+          precio: item.precio
+        }))
+      }
+
+      setOrdenGenerada(nuevaOrden)
+      if (onVaciarCarrito) onVaciarCarrito()
+      if (onFinalizarCompra) onFinalizarCompra(nuevaOrden)
+      setPaso('exito')
+    } catch {
+      // Fallback local en modo offline
       const nuevaOrden = {
         id: Math.floor(1000 + Math.random() * 9000),
         cliente: formulario.nombre,
@@ -103,12 +137,12 @@ function CarritoModal({
       }
 
       setOrdenGenerada(nuevaOrden)
-      if (onFinalizarCompra) {
-        onFinalizarCompra(nuevaOrden)
-      }
-      setCargandoPago(false)
+      if (onVaciarCarrito) onVaciarCarrito()
+      if (onFinalizarCompra) onFinalizarCompra(nuevaOrden)
       setPaso('exito')
-    }, 1200)
+    } finally {
+      setCargandoPago(false)
+    }
   }
 
   const handleSeguirComprando = () => {
