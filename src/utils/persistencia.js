@@ -1,5 +1,4 @@
-// src/utils/persistencia.js
-// Funciones de persistencia en localStorage para productos del catalogo
+// Catalogo
 export function guardarProductoStorage(producto) {
   localStorage.setItem('productos_catalogo', JSON.stringify(producto))
 }
@@ -13,7 +12,7 @@ export function cargarProductosStorage() {
   }
 }
 
-// Persistencia del carrito de compras (Perfil Cliente)
+// Carrito
 export function guardarCarritoStorage(carrito) {
   localStorage.setItem('carrito_compras', JSON.stringify(carrito))
 }
@@ -27,8 +26,7 @@ export function cargarCarritoStorage() {
   }
 }
 
-// Persistencia de trabajador
-
+// Pedidos y stock
 export function calcularTotalPedido(articulos = []) {
   if (!Array.isArray(articulos) || articulos.length === 0) return 0;
   return articulos.reduce((total, art) => total + (art.precio * (art.cantidad || 1)), 0);
@@ -54,4 +52,18 @@ export function esStockCritico(stock) {
 export function ajustarStock(stockActual, delta) {
   const resultado = Number(stockActual) + Number(delta);
   return resultado < 0 ? 0 : resultado;
+}
+
+// Usuarios
+export function guardarUsuariosStorage(usuarios) {
+  localStorage.setItem('usuarios_sistema', JSON.stringify(usuarios))
+}
+
+export function cargarUsuariosStorage(fallback = []) {
+  try {
+    const data = localStorage.getItem('usuarios_sistema')
+    return data ? JSON.parse(data) : fallback
+  } catch {
+    return fallback
+  }
 }

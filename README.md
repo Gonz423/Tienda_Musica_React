@@ -1,32 +1,38 @@
-﻿# Tienda Sonido Vivo - Version React
+﻿# Tienda Sonido Vivo - Versión React
 
-Proyecto desarrollado para la Evaluacion Parcial N 2 de la asignatura Desarrollo Fullstack II (DSY1104) - Duoc UC.
+Proyecto desarrollado para la Evaluación Parcial de la asignatura Desarrollo Fullstack II (DSY1104) - Duoc UC.
 
 ## Integrantes del Equipo
-- Gonzalo Yanez (gonzalo)
+- Gonzalo Yáñez (gonzalo)
 - Itsa (itsa)
-- Damian (damian)
+- Damián (damian)
 
-## Tecnologias Utilizadas
+## Tecnologías Utilizadas
 - React 19
 - Vite
 - Bootstrap 5 y Bootstrap Icons
+- Vitest + React Testing Library (72 pruebas unitarias)
 
-## Instalacion y Ejecucion Local
-`ash
-# 1. Clonar el repositorio
-git clone https://github.com/Gonz423/Tienda_Musica_React.git
-cd Tienda_Musica_React
+## Conexión con Microservicios (.env)
+- `VITE_AUTH_API_URL=http://localhost:8081` (auth-service)
+- `VITE_PRODUCTOS_API_URL=http://localhost:8083` (producto-service)
+- `VITE_PEDIDOS_API_URL=http://localhost:8084` (pedido-service)
+- `VITE_METRICAS_API_URL=http://localhost:8085` (metrica-service)
 
-# 2. Instalar dependencias
+## Instalación y Ejecución Local
+```bash
+# 1. Instalar dependencias
 npm install
 
-# 3. Iniciar servidor de desarrollo
+# 2. Iniciar servidor de desarrollo
 npm run dev
-`
+
+# 3. Ejecutar pruebas unitarias (Vitest)
+npm test
+```
 
 ## Estructura de Ramas
-- main: Codigo base consolidado y estable.
+- main: Código base consolidado y estable.
 - gonzalo: Rama de desarrollo para Gonzalo.
 - itsa: Rama de desarrollo para Itsa.
-- damian: Rama de desarrollo para Damian.
+- damian: Rama de desarrollo para Damián.
