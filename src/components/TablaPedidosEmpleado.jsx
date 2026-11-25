@@ -4,7 +4,9 @@ function TablaPedidosEmpleado({
   pedidos = [],
   agruparProductos,
   obtenerColorBadge,
-  avanzarEstado
+  avanzarEstado,
+  cancelarPedido,
+  soloLectura = false
 }) {
   return (
     <div
@@ -31,7 +33,7 @@ function TablaPedidosEmpleado({
               <th scope="col">Artículos</th>
               <th scope="col">Total venta</th>
               <th scope="col">Estado de venta</th>
-              <th scope="col" className="text-center pe-3">Acción Operativa</th>
+              {!soloLectura && <th scope="col" className="text-center pe-3">Acción Operativa</th>}
             </tr>
           </thead>
           <tbody>
@@ -66,7 +68,7 @@ function TablaPedidosEmpleado({
                         <span>
                           <strong>{prod.cantidad}x</strong>{' '}
                           <Link
-                            to={`/producto/${prod.codigo}`}
+                            to={`/producto/${prod.codigo || prod.productoId}`}
                             className="text-decoration-none text-dark fw-medium"
                           >
                             {prod.nombre}
@@ -86,7 +88,7 @@ function TablaPedidosEmpleado({
                 </td>
 
                 <td className="fw-bold" style={{ color: 'var(--color-primario)' }}>
-                  ${pedido.total.toLocaleString('es-CL')}
+                  ${Number(pedido.total || 0).toLocaleString('es-CL')}
                 </td>
 
                 <td>
@@ -94,6 +96,7 @@ function TablaPedidosEmpleado({
                     {pedido.estado}
                   </span>
                 </td>
+                {!soloLectura && (
                 <td className="text-center pe-3">
                   {pedido.estado === 'Pendiente' && (
                     <button
@@ -116,9 +119,30 @@ function TablaPedidosEmpleado({
                   )}
 
                   {pedido.estado === 'Despachado' && (
+                    <button
+                      type="button"
+                      className="btn btn-success btn-sm fw-semibold shadow-sm"
+                      onClick={() => avanzarEstado(pedido.id)}
+                    >
+                      Marcar entregado
+                    </button>
+                  )}
+
+                  {pedido.estado === 'Entregado' && (
                     <span className="badge bg-success px-2 py-1">Completado</span>
                   )}
+
+                  {cancelarPedido && ['Pendiente', 'En preparación', 'En preparacion'].includes(pedido.estado) && (
+                    <button
+                      type="button"
+                      className="btn btn-link btn-sm text-danger d-block mx-auto"
+                      onClick={() => cancelarPedido(pedido.id)}
+                    >
+                      Cancelar
+                    </button>
+                  )}
                 </td>
+                )}
               </tr>
             ))}
           </tbody>

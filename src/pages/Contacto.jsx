@@ -2,7 +2,8 @@ import { useState } from 'react'
 import LayoutContacto from '../components/LayoutContacto'
 import EncabezadoContacto from '../components/EncabezadoContacto'
 import MensajeExitoContacto from '../components/MensajeExitoContacto'
-import FormularioContacto, { TEMAS_CONTACTO } from '../components/FormularioContacto'
+import FormularioContacto from '../components/FormularioContacto'
+import { TEMAS_CONTACTO } from '../utils/temasContacto'
 
 function Contacto() {
   const [formulario, setFormulario] = useState({

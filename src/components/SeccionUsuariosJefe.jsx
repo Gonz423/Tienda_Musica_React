@@ -7,10 +7,15 @@ import ModalHistorialUsuario from './ModalHistorialUsuario'
 
 const formUsuarioInicial = { nombre: '', email: '', password: '', rol: 'cliente', activo: true }
 
+// Generadores de ids/fechas fuera del componente: el render se mantiene puro
+const nuevoIdEvento = () => Date.now()
+const nuevoIdUsuario = () => `USR-${Date.now().toString().slice(-4)}`
+const hoyIso = () => new Date().toISOString().split('T')[0]
+
 const ahoraStr = () =>
   `${new Date().toLocaleDateString('es-CL')} ${new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
 
-function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuario, onActualizarUsuario, onAlternarEstadoUsuario, onAgregarHistorialUsuario }) {
+function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuario, onActualizarUsuario, onAlternarEstadoUsuario, onAgregarHistorialUsuario, onCargarHistorial, onEliminarUsuario }) {
   const [busquedaUsuario, setBusquedaUsuario] = useState('')
   const [filtroRol, setFiltroRol] = useState('todos')
   const [filtroEstado, setFiltroEstado] = useState('todos')
@@ -60,9 +65,9 @@ function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuar
     else if (usuarios.some((u) => u.email.toLowerCase() === formUsuario.email.trim().toLowerCase() && (!usuarioEditando || u.id !== usuarioEditando.id))) err.email = 'Ya existe una cuenta con este correo'
     if (!usuarioEditando) {
       if (!formUsuario.password.trim()) err.password = 'La contraseña es obligatoria'
-      else if (formUsuario.password.trim().length < 4) err.password = 'La contraseña debe tener al menos 4 caracteres'
-    } else if (formUsuario.password.trim() && formUsuario.password.trim().length < 4) {
-      err.password = 'La nueva contraseña debe tener al menos 4 caracteres'
+      else if (formUsuario.password.trim().length < 6) err.password = 'La contraseña debe tener al menos 6 caracteres'
+    } else if (formUsuario.password.trim() && formUsuario.password.trim().length < 6) {
+      err.password = 'La nueva contraseña debe tener al menos 6 caracteres'
     }
     setErroresUsuario(err)
     if (Object.keys(err).length > 0) return
@@ -75,18 +80,40 @@ function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuar
       if (usuarioEditando.rol !== formUsuario.rol) cambios.push(`rol a ${formUsuario.rol}`)
       if (usuarioEditando.activo !== formUsuario.activo) cambios.push(`estado a ${formUsuario.activo ? 'activo' : 'desactivado'}`)
       if (formUsuario.password.trim()) cambios.push('contraseña actualizada')
-      const evento = { id: Date.now(), fecha, accion: 'Modificación de perfil', detalle: cambios.length > 0 ? `Actualización: ${cambios.join(', ')}` : 'Edición de datos realizada' }
-      const actualizado = { ...usuarioEditando, nombre: formUsuario.nombre.trim(), email: formUsuario.email.trim().toLowerCase(), password: formUsuario.password.trim() || usuarioEditando.password, rol: formUsuario.rol, activo: formUsuario.activo, historial: [evento, ...(usuarioEditando.historial || [])] }
-      if (onActualizarUsuario) onActualizarUsuario(actualizado)
-      setMensajeUsuario(`Usuario "${actualizado.nombre}" actualizado con éxito`)
+      const evento = { id: nuevoIdEvento(), fecha, accion: 'Modificación de perfil', detalle: cambios.length > 0 ? `Actualización: ${cambios.join(', ')}` : 'Edición de datos realizada' }
+      // La contraseña nunca se guarda en el frontend: solo se envía al backend si el admin escribió una nueva
+      const actualizado = { ...usuarioEditando, nombre: formUsuario.nombre.trim(), email: formUsuario.email.trim().toLowerCase(), passwordNueva: formUsuario.password.trim() || undefined, rol: formUsuario.rol, activo: formUsuario.activo, historial: [evento, ...(usuarioEditando.historial || [])] }
+      delete actualizado.password
+      cerrarConResultado(onActualizarUsuario?.(actualizado), `Usuario "${actualizado.nombre}" actualizado con éxito`)
+      return
     } else {
-      const nuevo = { id: `USR-${Date.now().toString().slice(-4)}`, nombre: formUsuario.nombre.trim(), email: formUsuario.email.trim().toLowerCase(), password: formUsuario.password.trim(), rol: formUsuario.rol, activo: formUsuario.activo, fechaCreacion: new Date().toISOString().split('T')[0], historial: [{ id: Date.now(), fecha, accion: 'Creación de cuenta', detalle: `Cuenta registrada con rol: ${formUsuario.rol}` }] }
-      if (onCrearUsuario) onCrearUsuario(nuevo)
-      setMensajeUsuario(`Usuario "${nuevo.nombre}" creado con éxito`)
+      const nuevo = { id: nuevoIdUsuario(), nombre: formUsuario.nombre.trim(), email: formUsuario.email.trim().toLowerCase(), password: formUsuario.password.trim(), rol: formUsuario.rol, activo: formUsuario.activo, fechaCreacion: hoyIso(), historial: [{ id: nuevoIdEvento(), fecha, accion: 'Creación de cuenta', detalle: `Cuenta registrada con rol: ${formUsuario.rol}` }] }
+      cerrarConResultado(onCrearUsuario?.(nuevo), `Usuario "${nuevo.nombre}" creado con éxito`)
     }
-    setModalUsuarioAbierto(false)
-    setUsuarioEditando(null)
-    setTimeout(() => setMensajeUsuario(''), 3500)
+  }
+
+  // Espera la respuesta de la API (App.jsx); si falla, el modal queda abierto para corregir
+  const cerrarConResultado = (resultado, texto) => {
+    Promise.resolve(resultado)
+      .then(() => {
+        setModalUsuarioAbierto(false)
+        setUsuarioEditando(null)
+        setMensajeUsuario(texto)
+        setTimeout(() => setMensajeUsuario(''), 3500)
+      })
+      .catch(() => {})
+  }
+
+  // Abre el historial; si hay backend se carga la auditoría real del usuario
+  const handleVerHistorial = (usr) => {
+    setUsuarioHistorialModal(usr)
+    if (onCargarHistorial) {
+      Promise.resolve(onCargarHistorial(usr)).then((historial) => {
+        if (Array.isArray(historial)) {
+          setUsuarioHistorialModal((prev) => (prev && prev.id === usr.id ? { ...prev, historial } : prev))
+        }
+      })
+    }
   }
 
   const handleAlternarEstado = (usr) => {
@@ -94,18 +121,24 @@ function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuar
       alert('Por motivos de seguridad no puedes desactivar tu propia cuenta activa de administrador.')
       return
     }
-    if (onAlternarEstadoUsuario) onAlternarEstadoUsuario(usr.id)
-    setMensajeUsuario(`Estado de "${usr.nombre}" actualizado a ${usr.activo ? 'Desactivado' : 'Activo'}`)
-    setTimeout(() => setMensajeUsuario(''), 3000)
+    Promise.resolve(onAlternarEstadoUsuario?.(usr.id))
+      .then(() => {
+        setMensajeUsuario(`Estado de "${usr.nombre}" actualizado a ${usr.activo ? 'Desactivado' : 'Activo'}`)
+        setTimeout(() => setMensajeUsuario(''), 3000)
+      })
+      .catch(() => {})
   }
 
   const handleAgregarNotaHistorial = (e) => {
     e.preventDefault()
     if (!notaHistorial.trim() || !usuarioHistorialModal) return
-    if (onAgregarHistorialUsuario) onAgregarHistorialUsuario(usuarioHistorialModal.id, { accion: 'Nota Administrativa', detalle: notaHistorial.trim() })
-    const nuevoEv = { id: Date.now(), fecha: ahoraStr(), accion: 'Nota Administrativa', detalle: notaHistorial.trim() }
-    setUsuarioHistorialModal((prev) => ({ ...prev, historial: [nuevoEv, ...(prev.historial || [])] }))
-    setNotaHistorial('')
+    const nuevoEv = { id: nuevoIdEvento(), fecha: ahoraStr(), accion: 'Nota Administrativa', detalle: notaHistorial.trim() }
+    Promise.resolve(onAgregarHistorialUsuario?.(usuarioHistorialModal.id, { accion: 'Nota Administrativa', detalle: notaHistorial.trim() }))
+      .then(() => {
+        setUsuarioHistorialModal((prev) => ({ ...prev, historial: [nuevoEv, ...(prev.historial || [])] }))
+        setNotaHistorial('')
+      })
+      .catch(() => {})
   }
 
   return (
@@ -131,7 +164,7 @@ function SeccionUsuariosJefe({ usuarios = [], usuarioActual = null, onCrearUsuar
 
       <FiltrosUsuarios busquedaUsuario={busquedaUsuario} setBusquedaUsuario={setBusquedaUsuario} filtroRol={filtroRol} setFiltroRol={setFiltroRol} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} onNuevoUsuario={handleAbrirCrearUsuario} />
 
-      <TablaUsuarios usuariosFiltrados={usuariosFiltrados} onVerHistorial={setUsuarioHistorialModal} onEditarUsuario={handleAbrirEditarUsuario} onAlternarEstado={handleAlternarEstado} />
+      <TablaUsuarios usuariosFiltrados={usuariosFiltrados} onVerHistorial={handleVerHistorial} onEditarUsuario={handleAbrirEditarUsuario} onAlternarEstado={handleAlternarEstado} onEliminar={onEliminarUsuario} usuarioActual={usuarioActual} />
 
       <ModalUsuario abierto={modalUsuarioAbierto} onCerrar={() => setModalUsuarioAbierto(false)} usuarioEditando={usuarioEditando} formUsuario={formUsuario} setFormUsuario={setFormUsuario} erroresUsuario={erroresUsuario} mostrarPasswordUsuario={mostrarPasswordUsuario} setMostrarPasswordUsuario={setMostrarPasswordUsuario} onSubmit={handleGuardarUsuario} />
 

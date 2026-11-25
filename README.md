@@ -1,4 +1,4 @@
-﻿# Tienda Sonido Vivo - Versión React
+# Tienda Sonido Vivo - Versión React
 
 Proyecto desarrollado para la Evaluación Parcial de la asignatura Desarrollo Fullstack II (DSY1104) - Duoc UC.
 

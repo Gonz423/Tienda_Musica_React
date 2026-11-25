@@ -1,5 +1,3 @@
-import React from 'react'
-
 function Footer() {
   const handleScrollTop = (e) => {
     e.preventDefault()

@@ -2,12 +2,17 @@ import { useState } from 'react'
 import KpisEmpleado from './KpisEmpleado'
 import TablaPedidosEmpleado from './TablaPedidosEmpleado'
 
-function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarEstadoPedido }) {
+function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarEstadoPedido, soloLectura = false }) {
   const [pedidosLocales, setPedidosLocales] = useState(pedidosProp || [])
   const pedidos = pedidosProp || pedidosLocales
 
-  const obtenerStockReal = (codigo) => {
-    const item = (productos || []).find((p) => String(p.codigo).toLowerCase() === String(codigo).toLowerCase())
+  // Busca el stock actual del producto por código o por ID (los pedidos del backend traen productoId)
+  const obtenerStockReal = (prod) => {
+    const item = (productos || []).find(
+      (p) =>
+        (prod.codigo && String(p.codigo).toLowerCase() === String(prod.codigo).toLowerCase()) ||
+        (prod.productoId != null && p.id === prod.productoId)
+    )
     return item ? item.stock : 0
   }
 
@@ -16,7 +21,7 @@ function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarE
     listaProductos.forEach((prod, index) => {
       const clave = prod.codigo || prod.id || `${prod.nombre}-${index}`
       if (!contador[clave]) {
-        contador[clave] = { ...prod, id: prod.id || prod.codigo || clave, cantidad: Number(prod.cantidad || prod.cant || 1), stock: obtenerStockReal(prod.codigo) }
+        contador[clave] = { ...prod, id: prod.id || prod.codigo || clave, cantidad: Number(prod.cantidad || prod.cant || 1), stock: obtenerStockReal(prod) }
       } else {
         contador[clave].cantidad += Number(prod.cantidad || prod.cant || 1)
       }
@@ -29,7 +34,18 @@ function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarE
     let nuevoEstado = pedidoActual.estado
     if (pedidoActual.estado === 'Pendiente') nuevoEstado = 'En preparación'
     else if (pedidoActual.estado?.toLowerCase().includes('prepara')) nuevoEstado = 'Despachado'
+    else if (pedidoActual.estado === 'Despachado') nuevoEstado = 'Entregado'
+    cambiarEstado(id, nuevoEstado)
+  }
 
+  // Cancelar repone el stock en el backend
+  const cancelarPedido = (id) => {
+    if (window.confirm(`¿Cancelar el pedido #${id}? El stock se devolverá al inventario.`)) {
+      cambiarEstado(id, 'Cancelado')
+    }
+  }
+
+  const cambiarEstado = (id, nuevoEstado) => {
     if (onActualizarEstadoPedido) {
       onActualizarEstadoPedido(id, nuevoEstado)
     } else {
@@ -41,7 +57,9 @@ function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarE
     switch (estado) {
       case 'Pendiente': return 'bg-warning text-dark'
       case 'En preparación': return 'btn-sv-primary'
-      case 'Despachado': return 'bg-success'
+      case 'Despachado': return 'bg-info text-dark'
+      case 'Entregado': return 'bg-success'
+      case 'Cancelado': return 'bg-danger'
       default: return 'bg-secondary'
     }
   }
@@ -53,7 +71,7 @@ function SeccionPedidosEmpleado({ pedidos: pedidosProp, productos, onActualizarE
   return (
     <>
       <KpisEmpleado totalPendientes={totalPendientes} totalPreparacion={totalPreparacion} totalDespachados={totalDespachados} />
-      <TablaPedidosEmpleado pedidos={pedidos} agruparProductos={agruparProductos} obtenerColorBadge={obtenerColorBadge} avanzarEstado={avanzarEstado} />
+      <TablaPedidosEmpleado pedidos={pedidos} agruparProductos={agruparProductos} obtenerColorBadge={obtenerColorBadge} avanzarEstado={avanzarEstado} cancelarPedido={cancelarPedido} soloLectura={soloLectura} />
     </>
   )
 }

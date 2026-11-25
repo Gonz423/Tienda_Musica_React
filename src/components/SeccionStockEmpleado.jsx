@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import TablaStockEmpleado from './TablaStockEmpleado'
 
-function SeccionStockEmpleado({ productos: productosProp = [], onActualizarStock }) {
+function SeccionStockEmpleado({ productos: productosProp = [], onActualizarStock, soloLectura = false }) {
   const [productosLocales, setProductosLocales] = useState(productosProp)
-  const productos = onActualizarStock ? productosProp : productosLocales
+  const productos = onActualizarStock || soloLectura ? productosProp : productosLocales
 
   const handleAjustarStock = (codigo, nuevoStock) => {
     if (onActualizarStock) {
@@ -22,6 +22,7 @@ function SeccionStockEmpleado({ productos: productosProp = [], onActualizarStock
       productos={productos}
       stockBajoCount={stockBajoCount}
       handleAjustarStock={handleAjustarStock}
+      soloLectura={soloLectura}
     />
   )
 }

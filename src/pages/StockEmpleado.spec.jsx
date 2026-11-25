@@ -120,4 +120,16 @@ describe('StockEmpleado - Pruebas Unitarias', () => {
 
     expect(screen.getByText(/Control de Stock e Inventario/i)).toBeInTheDocument()
   })
+
+  it('6. En modo solo lectura (VENDEDOR) muestra el inventario sin botones de ajuste', () => {
+    render(
+      <MemoryRouter>
+        <StockEmpleado productos={productosMock} soloLectura />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText(/solo lectura/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Ajuste Rápido/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /\+1|-1/ })).not.toBeInTheDocument()
+  })
 })

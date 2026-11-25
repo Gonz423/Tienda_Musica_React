@@ -11,7 +11,9 @@ function CarritoModal({
   onRestarUno,
   onEliminarProducto,
   onVaciarCarrito,
-  onFinalizarCompra
+  onFinalizarCompra,
+  usuarioActual = null,
+  onRequiereLogin
 }) {
   const [paso, setPaso] = useState('carrito') // 'carrito' | 'checkout' | 'exito'
   const [cargandoPago, setCargandoPago] = useState(false)
@@ -79,67 +81,60 @@ function CarritoModal({
     return Object.keys(nuevosErrores).length === 0
   }
 
+  // Comprar exige sesión: el pedido se asocia al correo del token JWT
+  const handleContinuarCompra = () => {
+    if (!usuarioActual) {
+      if (onRequiereLogin) onRequiereLogin()
+      return
+    }
+    setFormulario((prev) => ({
+      ...prev,
+      nombre: prev.nombre || usuarioActual.nombre || '',
+      email: usuarioActual.email || prev.email
+    }))
+    setErrores({})
+    setPaso('checkout')
+  }
+
   const handleSubmitCheckout = async (e) => {
     e.preventDefault()
     if (!handleValidarFormulario()) return
+    if (!usuarioActual) {
+      if (onRequiereLogin) onRequiereLogin()
+      return
+    }
+
+    const sinId = listaItems.filter((item) => !Number(item.id))
+    if (sinId.length > 0) {
+      setErrores({ general: 'El catálogo no está conectado al servidor. Recarga la página e intenta nuevamente.' })
+      return
+    }
 
     setCargandoPago(true)
     try {
-      const respuesta = await crearPedido({
-        clienteId: formulario.email,
-        direccionEnvio: formulario.direccion,
+      // Solo se envía producto y cantidad: el backend pone el precio real y descuenta stock
+      const pedido = await crearPedido({
+        direccionEnvio: formulario.direccion.trim(),
         items: listaItems.map((item) => ({
-          productoId: Number(item.id) || 1,
-          nombreProducto: item.nombre || 'Instrumento Musical',
-          precioUnitario: Number(item.precio) || 0,
+          productoId: Number(item.id),
           cantidad: Number(item.cantidad) || 1
         }))
       })
 
       const nuevaOrden = {
-        id: respuesta.codigoPedido || respuesta.id || Math.floor(1000 + Math.random() * 9000),
+        ...pedido,
+        id: pedido.codigoPedido || pedido.id,
         cliente: formulario.nombre,
-        email: formulario.email,
         telefono: formulario.telefono,
-        direccion: formulario.direccion,
-        metodoPago: formulario.metodoPago,
-        fecha: respuesta.fecha || new Date().toISOString().split('T')[0],
-        total: respuesta.total ?? total,
-        productos: listaItems.map((item) => ({
-          codigo: item.codigo,
-          nombre: item.nombre,
-          cantidad: item.cantidad,
-          precio: item.precio
-        }))
+        metodoPago: formulario.metodoPago
       }
 
       setOrdenGenerada(nuevaOrden)
       if (onVaciarCarrito) onVaciarCarrito()
       if (onFinalizarCompra) onFinalizarCompra(nuevaOrden)
       setPaso('exito')
-    } catch {
-      // Fallback local en modo offline
-      const nuevaOrden = {
-        id: Math.floor(1000 + Math.random() * 9000),
-        cliente: formulario.nombre,
-        email: formulario.email,
-        telefono: formulario.telefono,
-        direccion: formulario.direccion,
-        metodoPago: formulario.metodoPago,
-        fecha: new Date().toISOString().split('T')[0],
-        total,
-        productos: listaItems.map((item) => ({
-          codigo: item.codigo,
-          nombre: item.nombre,
-          cantidad: item.cantidad,
-          precio: item.precio
-        }))
-      }
-
-      setOrdenGenerada(nuevaOrden)
-      if (onVaciarCarrito) onVaciarCarrito()
-      if (onFinalizarCompra) onFinalizarCompra(nuevaOrden)
-      setPaso('exito')
+    } catch (err) {
+      setErrores({ general: err.message || 'No pudimos procesar tu pedido.' })
     } finally {
       setCargandoPago(false)
     }
@@ -325,6 +320,13 @@ function CarritoModal({
                 Completa tus datos para confirmar tu pedido en Sonido Vivo Viña del Mar.
               </div>
 
+              {errores.general && (
+                <div className="alert alert-danger py-2 px-3 small border-0 mb-1" role="alert">
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                  {errores.general}
+                </div>
+              )}
+
               <div>
                 <label className="form-label small fw-bold mb-1">Nombre Completo *</label>
                 <input
@@ -343,6 +345,8 @@ function CarritoModal({
                   type="email"
                   className={`form-control form-control-sm ${errores.email ? 'is-invalid' : ''}`}
                   placeholder="ejemplo@correo.cl"
+                  readOnly={Boolean(usuarioActual)}
+                  title={usuarioActual ? 'El pedido se asocia a la cuenta con la que iniciaste sesión' : undefined}
                   value={formulario.email}
                   onChange={(e) => setFormulario({ ...formulario, email: e.target.value })}
                 />
@@ -474,10 +478,10 @@ function CarritoModal({
               <button
                 type="button"
                 className="btn btn-sv-primary py-2 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm"
-                onClick={() => setPaso('checkout')}
+                onClick={handleContinuarCompra}
               >
                 <i className="bi bi-credit-card"></i>
-                Continuar con la Compra
+                {usuarioActual ? 'Continuar con la Compra' : 'Inicia sesión para comprar'}
               </button>
               <button
                 type="button"

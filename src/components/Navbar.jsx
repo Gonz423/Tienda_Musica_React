@@ -1,15 +1,11 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 function Navbar({
   rolActual = 'cliente',
   setRolActual,
   cantidadCarrito = 0,
   onAbrirCarrito,
-  seccionJefe: seccionJefeProp,
-  setSeccionJefe: setSeccionJefeProp,
-  seccionTrabajador: seccionTrabajadorProp,
-  setSeccionTrabajador: setSeccionTrabajadorProp,
   sesionAbierta = false,
   usuarioActual = null,
   onAbrirLogin,
@@ -23,15 +19,13 @@ function Navbar({
   const esCatalogo = location.pathname === '/catalogo'
   const esContacto = location.pathname === '/contacto'
 
-  const [seccionTrabajadorLocal, setSeccionTrabajadorLocal] = useState('pedidos')
-  const [seccionJefeLocal, setSeccionJefeLocal] = useState('metricas')
+  // Las secciones del personal son rutas protegidas (ver App.jsx / RutaProtegida)
+  const esRuta = (ruta) => location.pathname === ruta
 
-  const seccionTrabajador =
-    seccionTrabajadorProp !== undefined ? seccionTrabajadorProp : seccionTrabajadorLocal
-  const setSeccionTrabajador = setSeccionTrabajadorProp || setSeccionTrabajadorLocal
-
-  const seccionJefe = seccionJefeProp !== undefined ? seccionJefeProp : seccionJefeLocal
-  const setSeccionJefe = setSeccionJefeProp || setSeccionJefeLocal
+  const irA = (ruta) => {
+    navigate(ruta)
+    handleLinkClick()
+  }
 
   const handleNavCollapse = () => {
     setIsNavCollapsed(!isNavCollapsed)
@@ -157,46 +151,34 @@ function Navbar({
               </>
             )}
 
-            {/* Trabajador */}
+            {/* Trabajador (VENDEDOR) */}
             {rolActual === 'trabajador' && (
               <li className="nav-item d-flex gap-2 ms-lg-3 my-2 my-lg-0">
                 <button
                   type="button"
-                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'pedidos' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSeccionTrabajador('pedidos')
-                    navigate('/')
-                    handleLinkClick()
-                  }}
+                  className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/vendedor/pedidos') ? 'active' : ''}`}
+                  onClick={() => irA('/vendedor/pedidos')}
                 >
-                  Recepción de Pedidos
+                  Pedidos
                 </button>
                 <button
                   type="button"
-                  className={`nav-link nav-btn-link w-100 border-0 ${seccionTrabajador === 'stock' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSeccionTrabajador('stock')
-                    navigate('/')
-                    handleLinkClick()
-                  }}
+                  className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/vendedor/stock') ? 'active' : ''}`}
+                  onClick={() => irA('/vendedor/stock')}
                 >
-                  Control de Stock
+                  Productos y Stock
                 </button>
               </li>
             )}
 
-            {/* Jefe */}
+            {/* Jefe (ADMIN): acceso total */}
             {rolActual === 'jefe' && (
               <>
                 <li className="nav-item w-100 w-lg-auto">
                   <button
                     type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'metricas' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionJefe('metricas')
-                      navigate('/')
-                      handleLinkClick()
-                    }}
+                    className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/admin/metricas') ? 'active' : ''}`}
+                    onClick={() => irA('/admin/metricas')}
                   >
                     <i className="bi bi-graph-up-arrow me-2"></i> Metricas y Ventas
                   </button>
@@ -204,12 +186,8 @@ function Navbar({
                 <li className="nav-item w-100 w-lg-auto">
                   <button
                     type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'productos' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionJefe('productos')
-                      navigate('/')
-                      handleLinkClick()
-                    }}
+                    className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/admin/productos') ? 'active' : ''}`}
+                    onClick={() => irA('/admin/productos')}
                   >
                     <i className="bi bi-gear me-2"></i> Administracion de Productos
                   </button>
@@ -217,12 +195,17 @@ function Navbar({
                 <li className="nav-item w-100 w-lg-auto">
                   <button
                     type="button"
-                    className={`nav-link nav-btn-link w-100 border-0 ${seccionJefe === 'usuarios' ? 'active' : ''}`}
-                    onClick={() => {
-                      setSeccionJefe('usuarios')
-                      navigate('/')
-                      handleLinkClick()
-                    }}
+                    className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/vendedor/pedidos') ? 'active' : ''}`}
+                    onClick={() => irA('/vendedor/pedidos')}
+                  >
+                    <i className="bi bi-receipt me-2"></i> Pedidos
+                  </button>
+                </li>
+                <li className="nav-item w-100 w-lg-auto">
+                  <button
+                    type="button"
+                    className={`nav-link nav-btn-link w-100 border-0 ${esRuta('/admin/usuarios') ? 'active' : ''}`}
+                    onClick={() => irA('/admin/usuarios')}
                   >
                     <i className="bi bi-people me-2"></i> Gestión de Usuarios
                   </button>

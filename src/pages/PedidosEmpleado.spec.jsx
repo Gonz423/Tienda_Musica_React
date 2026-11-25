@@ -176,5 +176,17 @@ describe('PedidosEmpleado - Pruebas Unitarias', () => {
 
     expect(screen.getByRole('columnheader', { name: /# id/i })).toBeInTheDocument()
   })
-})
 
+  it('7. En modo solo lectura (VENDEDOR) muestra los pedidos pero no las acciones de cambio de estado', () => {
+    render(
+      <MemoryRouter>
+        <PedidosEmpleado pedidos={pedidosMock} productos={productosMock} soloLectura />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Juan Perez')).toBeInTheDocument()
+    expect(screen.getByText(/solo lectura/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Acción Operativa/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^(preparar|despachar|marcar entregado|cancelar)$/i })).not.toBeInTheDocument()
+  })
+})

@@ -55,20 +55,26 @@ function SeccionProductosJefe({ productos, onAgregarProducto, onActualizarProduc
     if (Object.keys(err).length > 0) return
 
     const prodData = { ...form, precio: precioNum, stock: stockNum }
+    const nombre = form.nombre
+    // Los callbacks llaman a la API (App.jsx): solo se confirma si el backend responde OK
+    const confirmar = (texto, limpiar) => {
+      setMensaje(texto)
+      limpiar()
+      setTimeout(() => setMensaje(''), 3000)
+    }
     if (editandoCodigo) {
-      if (onActualizarProducto) onActualizarProducto(prodData)
-      localStorage.setItem('productos_catalogo', JSON.stringify(prodData))
-      setMensaje(`Producto "${form.nombre}" actualizado con éxito`)
-      handleCancelarEdicion()
+      const datos = { ...prodData, codigoOriginal: editandoCodigo }
+      localStorage.setItem('productos_catalogo', JSON.stringify(datos))
+      Promise.resolve(onActualizarProducto?.(datos))
+        .then(() => confirmar(`Producto "${nombre}" actualizado con éxito`, handleCancelarEdicion))
+        .catch(() => {})
     } else {
       const nuevo = { ...prodData, codigo: form.codigo.trim().toUpperCase() }
-      if (onAgregarProducto) onAgregarProducto(nuevo)
       localStorage.setItem('productos_catalogo', JSON.stringify(nuevo))
-      setMensaje(`Producto "${form.nombre}" agregado con éxito`)
-      setForm(formInicial)
-      setErrores({})
+      Promise.resolve(onAgregarProducto?.(nuevo))
+        .then(() => confirmar(`Producto "${nombre}" agregado con éxito`, () => { setForm(formInicial); setErrores({}) }))
+        .catch(() => {})
     }
-    setTimeout(() => setMensaje(''), 3000)
   }
 
   return (

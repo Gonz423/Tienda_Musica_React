@@ -2,7 +2,9 @@ function TablaUsuarios({
   usuariosFiltrados = [],
   onVerHistorial,
   onEditarUsuario,
-  onAlternarEstado
+  onAlternarEstado,
+  onEliminar,
+  usuarioActual = null
 }) {
   return (
     <div className="p-4 bg-white rounded-3 shadow-sm border">
@@ -97,12 +99,14 @@ function TablaUsuarios({
                           title="Ver historial de actividad"
                         >
                           <i className="bi bi-clock-history me-1"></i>
-                          <span
-                            className="badge bg-light text-dark border ms-1"
-                            style={{ fontSize: '0.7rem' }}
-                          >
-                            {usr.historial?.length || 0}
-                          </span>
+                          {usr.historial?.length > 0 && (
+                            <span
+                              className="badge bg-light text-dark border ms-1"
+                              style={{ fontSize: '0.7rem' }}
+                            >
+                              {usr.historial.length}
+                            </span>
+                          )}
                         </button>
                         <button
                           type="button"
@@ -126,6 +130,16 @@ function TablaUsuarios({
                             }`}
                           ></i>
                         </button>
+                        {onEliminar && usuarioActual?.email !== usr.email && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-dark"
+                            onClick={() => onEliminar(usr)}
+                            title="Eliminar usuario"
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

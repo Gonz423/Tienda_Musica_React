@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_PRODUCTOS_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8083/api';
+import { fetchConAuth, errorDeRespuesta } from './apiCliente';
+
+const API_URL = import.meta.env.VITE_PRODUCTOS_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8083/api/v1';
 
 // Consulta el catalogo de productos con filtros opcionales
 export async function listarProductos(filtros = {}) {
@@ -50,59 +52,39 @@ export async function obtenerProductoPorCodigo(codigo) {
   return respuesta.json();
 }
 
-// Crea un nuevo producto (Rol ADMIN)
-export async function crearProducto(producto, token) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const respuesta = await fetch(`${API_URL}/productos`, {
+// Crea un nuevo producto (Rol ADMIN). El token lo agrega fetchConAuth.
+export async function crearProducto(producto) {
+  const respuesta = await fetchConAuth(`${API_URL}/productos`, {
     method: 'POST',
-    headers,
     body: JSON.stringify(producto)
   });
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al crear el producto');
-  }
-
+  if (!respuesta.ok) throw await errorDeRespuesta(respuesta, 'Error al crear el producto');
   return respuesta.json();
 }
 
 // Actualiza un producto existente (Rol ADMIN)
-export async function actualizarProducto(id, producto, token) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const respuesta = await fetch(`${API_URL}/productos/${id}`, {
+export async function actualizarProducto(id, producto) {
+  const respuesta = await fetchConAuth(`${API_URL}/productos/${id}`, {
     method: 'PUT',
-    headers,
     body: JSON.stringify(producto)
   });
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al actualizar el producto');
-  }
-
+  if (!respuesta.ok) throw await errorDeRespuesta(respuesta, 'Error al actualizar el producto');
   return respuesta.json();
 }
 
 // Elimina un producto por ID (Rol ADMIN)
-export async function eliminarProducto(id, token) {
-  const headers = {};
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const respuesta = await fetch(`${API_URL}/productos/${id}`, {
-    method: 'DELETE',
-    headers
-  });
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al eliminar el producto');
-  }
-
+export async function eliminarProducto(id) {
+  const respuesta = await fetchConAuth(`${API_URL}/productos/${id}`, { method: 'DELETE' });
+  if (!respuesta.ok) throw await errorDeRespuesta(respuesta, 'Error al eliminar el producto');
   return true;
 }
 
+// Ajusta el stock en +/- unidades (Rol ADMIN o VENDEDOR)
+export async function ajustarStockProducto(id, delta) {
+  const respuesta = await fetchConAuth(`${API_URL}/productos/${id}/stock`, {
+    method: 'PATCH',
+    body: JSON.stringify({ cantidad: delta })
+  });
+  if (!respuesta.ok) throw await errorDeRespuesta(respuesta, 'Error al ajustar el stock');
+  return respuesta.json();
+}

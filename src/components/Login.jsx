@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { usuariosIniciales } from '../data/usuarios'
-import { cargarUsuariosStorage } from '../utils/persistencia'
-import { login as loginApi } from '../services/authService'
+import { login as loginApi, registrar as registrarApi } from '../services/authService'
 
 const DEMOS_METADATA = {
   jefe: {
@@ -30,23 +28,16 @@ const DEMOS_METADATA = {
   }
 }
 
-function normalizarRol(rol) {
-  if (!rol) return 'cliente'
-  const r = rol.toString().toUpperCase()
-  if (r === 'ADMIN' || r === 'JEFE') return 'jefe'
-  if (r === 'VENDEDOR' || r === 'EMPLEADO' || r === 'TRABAJADOR') return 'trabajador'
-  return 'cliente'
-}
-
-function Login({ onIniciarSesion, onCerrar, usuarios }) {
-  const listaUsuarios = usuarios && usuarios.length > 0 ? usuarios : cargarUsuariosStorage(usuariosIniciales)
-
+function Login({ onIniciarSesion, onCerrar, mensajeInicial = '' }) {
+  const [modoRegistro, setModoRegistro] = useState(false)
+  const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(mensajeInicial)
   const [cargando, setCargando] = useState(false)
 
+  // La autenticación la decide SOLO el backend (auth-service). No hay usuarios locales.
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -54,103 +45,40 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
     const emailLimpio = email.trim()
     const passLimpio = password.trim()
 
-    if (!emailLimpio || !passLimpio) {
-      setError('Por favor, ingresa tu correo electrónico y contraseña.')
+    if (!emailLimpio || !passLimpio || (modoRegistro && !nombre.trim())) {
+      setError(modoRegistro
+        ? 'Completa nombre, correo y contraseña.'
+        : 'Por favor, ingresa tu correo electrónico y contraseña.')
+      return
+    }
+    if (modoRegistro && passLimpio.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.')
       return
     }
 
     setCargando(true)
-
-    // Intento con backend Spring Boot
     try {
-      const sesionBackend = await loginApi({ correo: emailLimpio, password: passLimpio })
-      const rolNormalizado = normalizarRol(sesionBackend.rol)
-
-      const usuarioSesion = {
-        id: `USR-${Date.now()}`,
-        email: sesionBackend.correo || emailLimpio,
-        correo: sesionBackend.correo || emailLimpio,
-        nombre: sesionBackend.nombre || emailLimpio.split('@')[0],
-        rol: rolNormalizado,
-        rolOriginal: sesionBackend.rol,
-        token: sesionBackend.token,
-        activo: true
-      }
-
-      setCargando(false)
-      onIniciarSesion(usuarioSesion)
-      return
+      const sesion = modoRegistro
+        ? await registrarApi({ nombre: nombre.trim(), correo: emailLimpio, password: passLimpio })
+        : await loginApi({ correo: emailLimpio, password: passLimpio })
+      onIniciarSesion(sesion)
     } catch (err) {
-      // Rechazo por credenciales
-      if (err.message && err.message.includes('Credenciales')) {
-        const usuarioLocal = listaUsuarios.find(
-          (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
-        )
-
-        if (usuarioLocal) {
-          if (usuarioLocal.activo === false) {
-            setError('Esta cuenta ha sido desactivada por el Administrador. Contacta a soporte.')
-            setCargando(false)
-            return
-          }
-          setCargando(false)
-          onIniciarSesion(usuarioLocal)
-          return
-        }
-
-        setError(err.message)
-        setCargando(false)
-        return
-      }
-
-      // Fallback a usuarios locales si el backend no responde
-      const usuarioEncontrado = listaUsuarios.find(
-        (u) => u.email.toLowerCase() === emailLimpio.toLowerCase() && u.password === passLimpio
-      )
-
-      if (usuarioEncontrado) {
-        if (usuarioEncontrado.activo === false) {
-          setError('Esta cuenta ha sido desactivada por el Administrador. Contacta a soporte.')
-          setCargando(false)
-          return
-        }
-        setCargando(false)
-        onIniciarSesion(usuarioEncontrado)
-      } else if (passLimpio.length >= 4) {
-        let rolDeducido = 'cliente'
-        const lowerEmail = emailLimpio.toLowerCase()
-        if (lowerEmail.includes('admin') || lowerEmail.includes('jefe') || lowerEmail.includes('gonzalo')) {
-          rolDeducido = 'jefe'
-        } else if (lowerEmail.includes('empleado') || lowerEmail.includes('trabajador') || lowerEmail.includes('vendedor')) {
-          rolDeducido = 'trabajador'
-        }
-        setCargando(false)
-        onIniciarSesion({
-          id: `USR-${Date.now()}`,
-          email: emailLimpio,
-          nombre: emailLimpio.split('@')[0],
-          rol: rolDeducido,
-          activo: true
-        })
-      } else {
-        setError('Credenciales inválidas. Verifica tu correo y contraseña.')
-        setCargando(false)
-      }
+      setError(err.message || 'No se pudo iniciar sesión.')
+    } finally {
+      setCargando(false)
     }
   }
 
   const seleccionarDemo = (tipo) => {
     const meta = DEMOS_METADATA[tipo]
-    if (meta && meta.backendCorreo) {
-      setEmail(meta.backendCorreo)
-      setPassword(meta.backendPassword)
-    } else {
-      const usr = listaUsuarios.find((u) => u.rol === tipo)
-      if (usr) {
-        setEmail(usr.email)
-        setPassword(usr.password)
-      }
-    }
+    setModoRegistro(false)
+    setEmail(meta.backendCorreo)
+    setPassword(meta.backendPassword)
+    setError('')
+  }
+
+  const alternarModo = () => {
+    setModoRegistro((m) => !m)
     setError('')
   }
 
@@ -204,7 +132,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
               </div>
 
               <h4 className="modal-title fw-bold text-dark mb-1" style={{ color: '#351b16' }}>
-                Iniciar Sesión
+                {modoRegistro ? 'Crear cuenta' : 'Iniciar Sesión'}
               </h4>
               <p className="text-muted small mb-0">
                 Bienvenido a <strong style={{ color: '#b96622' }}>Sonido Vivo</strong>
@@ -225,6 +153,22 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
             )}
 
             <form onSubmit={handleSubmit} noValidate>
+              {modoRegistro && (
+                <div className="mb-3">
+                  <label htmlFor="login-nombre" className="form-label small fw-bold text-secondary mb-1">
+                    Nombre completo
+                  </label>
+                  <input
+                    id="login-nombre"
+                    type="text"
+                    className="form-control bg-light"
+                    placeholder="Tu nombre"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    style={{ fontSize: '0.95rem' }}
+                  />
+                </div>
+              )}
               <div className="mb-3">
                 <label className="form-label small fw-bold text-secondary mb-1">
                   Correo Electrónico
@@ -287,18 +231,26 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
                 {cargando ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Iniciando sesión...
+                    {modoRegistro ? 'Creando cuenta...' : 'Iniciando sesión...'}
                   </>
                 ) : (
                   <>
                     <i className="bi bi-box-arrow-in-right me-2"></i>
-                    Ingresar
+                    {modoRegistro ? 'Registrarme' : 'Ingresar'}
                   </>
                 )}
               </button>
             </form>
 
-            {/* Accesos rápidos */}
+            <div className="text-center mt-3 small">
+              {modoRegistro ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}{' '}
+              <button type="button" className="btn btn-link btn-sm p-0 align-baseline" onClick={alternarModo}>
+                {modoRegistro ? 'Inicia sesión' : 'Regístrate como cliente'}
+              </button>
+            </div>
+
+            {/* Accesos rápidos (cuentas sembradas en el backend) */}
+            {!modoRegistro && (
             <div className="mt-4 pt-3 border-top" style={{ borderColor: '#ece6df' }}>
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <span className="small fw-bold text-muted">
@@ -358,6 +310,7 @@ function Login({ onIniciarSesion, onCerrar, usuarios }) {
                 })}
               </div>
             </div>
+            )}
           </div>
         </div>
       </div>

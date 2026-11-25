@@ -3,7 +3,6 @@ import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import DetalleProducto from './DetalleProducto'
-import * as routerDom from 'react-router-dom'
 import { cargarCarritoStorage } from '../utils/persistencia'
 
 const { mockUseParams } = vi.hoisted(() => {

@@ -8,7 +8,9 @@ function UsuariosJefe({
   onCrearUsuario,
   onActualizarUsuario,
   onAlternarEstadoUsuario,
-  onAgregarHistorialUsuario
+  onAgregarHistorialUsuario,
+  onCargarHistorial,
+  onEliminarUsuario
 }) {
   return (
     <LayoutJefe>
@@ -20,6 +22,8 @@ function UsuariosJefe({
         onActualizarUsuario={onActualizarUsuario}
         onAlternarEstadoUsuario={onAlternarEstadoUsuario}
         onAgregarHistorialUsuario={onAgregarHistorialUsuario}
+        onCargarHistorial={onCargarHistorial}
+        onEliminarUsuario={onEliminarUsuario}
       />
     </LayoutJefe>
   )

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 function TablaStockEmpleado({
   productos = [],
   stockBajoCount = 0,
-  handleAjustarStock
+  handleAjustarStock,
+  soloLectura = false
 }) {
   return (
     <div
@@ -29,7 +30,7 @@ function TablaStockEmpleado({
               <th>Categoría</th>
               <th>Estado Stock</th>
               <th>Unidades</th>
-              <th className="text-center pe-3">Ajuste Rápido</th>
+              {!soloLectura && <th className="text-center pe-3">Ajuste Rápido</th>}
             </tr>
           </thead>
           <tbody>
@@ -59,6 +60,7 @@ function TablaStockEmpleado({
                 <td className="fw-bold fs-6" style={{ color: 'var(--color-primario)' }}>
                   {prod.stock}
                 </td>
+                {!soloLectura && (
                 <td className="text-center pe-3">
                   <div className="btn-group btn-group-sm border rounded bg-white shadow-sm">
                     <button
@@ -80,6 +82,7 @@ function TablaStockEmpleado({
                     </button>
                   </div>
                 </td>
+                )}
               </tr>
             ))}
           </tbody>
