@@ -13,7 +13,8 @@ function CarritoModal({
   onVaciarCarrito,
   onFinalizarCompra,
   usuarioActual = null,
-  onRequiereLogin
+  onRequiereLogin,
+  onVerMisPedidos
 }) {
   const [paso, setPaso] = useState('carrito') // 'carrito' | 'checkout' | 'exito'
   const [cargandoPago, setCargandoPago] = useState(false)
@@ -146,6 +147,11 @@ function CarritoModal({
     setOrdenGenerada(null)
     setFormulario({ nombre: '', email: '', telefono: '', direccion: '', metodoPago: 'webpay' })
     if (onCerrar) onCerrar()
+  }
+
+  const handleVerMisPedidos = () => {
+    handleSeguirComprando()
+    onVerMisPedidos()
   }
 
   return (
@@ -450,6 +456,16 @@ function CarritoModal({
                 <i className="bi bi-bag-check me-2"></i>
                 Seguir Comprando
               </button>
+              {onVerMisPedidos && (
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary w-100 py-2 mt-2 fw-semibold"
+                  onClick={handleVerMisPedidos}
+                >
+                  <i className="bi bi-receipt me-2"></i>
+                  Ver mis pedidos
+                </button>
+              )}
             </div>
           )}
         </div>

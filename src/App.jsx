@@ -10,6 +10,7 @@ import UsuariosJefe from './pages/UsuariosJefe'
 import DetalleProducto from './pages/DetalleProducto'
 import Inicio from './pages/Inicio'
 import Contacto from './pages/Contacto'
+import MisPedidos from './pages/MisPedidos'
 import Footer from './components/Footer'
 import CarritoModal from './components/CarritoModal'
 import Login from './components/Login'
@@ -46,6 +47,7 @@ import {
 // Roles del frontend: 'jefe' (ADMIN), 'trabajador' (VENDEDOR), 'cliente' (CLIENTE)
 const ROLES_PERSONAL = ['trabajador', 'jefe']
 const ROLES_ADMIN = ['jefe']
+const ROLES_CLIENTE = ['cliente']
 
 // Renueva el token 5 minutos antes de que expire
 const MARGEN_RENOVACION_MS = 5 * 60 * 1000
@@ -340,8 +342,13 @@ function App() {
     onAbrirCarrito: () => setModalCarritoAbierto(true)
   }
 
-  const protegida = (roles, elemento) => (
-    <RutaProtegida sesion={sesion} rolesPermitidos={roles} onAbrirLogin={abrirLogin}>
+  const protegida = (roles, elemento, mensajeSinSesion) => (
+    <RutaProtegida
+      sesion={sesion}
+      rolesPermitidos={roles}
+      onAbrirLogin={abrirLogin}
+      mensajeSinSesion={mensajeSinSesion}
+    >
       {elemento}
     </RutaProtegida>
   )
@@ -378,6 +385,10 @@ function App() {
             onEliminarProducto={handleEliminarDelCarrito}
             onVaciarCarrito={handleVaciarCarrito}
             onFinalizarCompra={handleFinalizarCompra}
+            onVerMisPedidos={() => {
+              setModalCarritoAbierto(false)
+              navigate('/mis-pedidos')
+            }}
           />
           {mostrarLogin && (
             <Login
@@ -403,6 +414,16 @@ function App() {
         <Route path="/catalogo" element={<Catalogo {...propsTienda} />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/producto/:id" element={<DetalleProducto {...propsTienda} />} />
+
+        {/* CLIENTE: historial de sus propias compras (GET /pedidos/mis-pedidos) */}
+        <Route
+          path="/mis-pedidos"
+          element={protegida(
+            ROLES_CLIENTE,
+            <MisPedidos key={sesion?.email} />,
+            'Inicia sesión con tu cuenta de cliente para ver tus pedidos.'
+          )}
+        />
 
         {/* VENDEDOR (solo lectura) y ADMIN (puede gestionar) */}
         <Route

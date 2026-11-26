@@ -5,13 +5,19 @@
  * El rol viene del token JWT firmado; aunque alguien lo manipule en el navegador,
  * el backend rechaza la petición porque la firma deja de ser válida.
  */
-function RutaProtegida({ sesion, rolesPermitidos = [], onAbrirLogin, children }) {
+function RutaProtegida({
+  sesion,
+  rolesPermitidos = [],
+  onAbrirLogin,
+  mensajeSinSesion = 'Esta sección es solo para personal autorizado de Sonido Vivo.',
+  children
+}) {
   if (!sesion) {
     return (
       <div className="container py-5 text-center" data-testid="ruta-requiere-login">
         <i className="bi bi-lock-fill display-4 text-secondary"></i>
         <h2 className="h4 fw-bold mt-3">Debes iniciar sesión</h2>
-        <p className="text-muted">Esta sección es solo para personal autorizado de Sonido Vivo.</p>
+        <p className="text-muted">{mensajeSinSesion}</p>
         {onAbrirLogin && (
           <button type="button" className="btn btn-sv-primary" onClick={onAbrirLogin}>
             <i className="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión

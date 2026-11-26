@@ -148,6 +148,21 @@ function Navbar({
                     Nosotros
                   </button>
                 </li>
+
+                {/* Solo aparece con la sesión de cliente iniciada */}
+                {sesionAbierta && (
+                  <li className="nav-item w-100 w-lg-auto">
+                    <button
+                      type="button"
+                      className={`nav-link nav-btn-link btn btn-link text-start text-lg-center ${esRuta('/mis-pedidos') ? 'active' : ''}`}
+                      aria-current={esRuta('/mis-pedidos') ? 'page' : undefined}
+                      onClick={() => irA('/mis-pedidos')}
+                    >
+                      <i className="bi bi-bag-check me-2"></i>
+                      Mis Pedidos
+                    </button>
+                  </li>
+                )}
               </>
             )}
 
